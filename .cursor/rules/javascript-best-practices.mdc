@@ -1,0 +1,11 @@
+---
+description: 
+globs: **/*.js,**/*.js.liquid
+alwaysApply: false
+---
+- Use ES6+ features for cleaner and more efficient code
+- Minimize DOM manipulation for better performance
+- Use event delegation for handling events on dynamically added elements
+- Optimize JavaScript loading by deferring or asynchronously loading scripts
+
+- Implement error handling and logging for better debugging
