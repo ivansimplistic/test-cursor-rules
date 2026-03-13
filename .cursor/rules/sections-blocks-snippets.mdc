@@ -5,5 +5,5 @@ alwaysApply: false
 ---
 - Avoid repeating code, use snippets for reusable content or logic
 
-- For the first section on the page (section.index == 1), use eager loading (loading="eager") for its image, and fetchpriority="high" attribute. All other sections should use lazy loading (loading="lazy"). Always maintain proper image sizing based on the container width.
-- When adding an image to the code, check the section.index to use lazy or eager loading properly.
+- When adding an image to the code, check the section.index to use lazy or eager loading properly. As example see the same pattern used in snippets/collage_item.liquid to support lazy loading conditionally by checking the disableLazySizes variable. 
+- For the first section on the page (section.index == 1), use eager loading (loading="eager") for its image, and fetchpriority="high" attribute. All other sections should use lazy loading through lazysizes instead of browser native loading="lazy" attribute.
