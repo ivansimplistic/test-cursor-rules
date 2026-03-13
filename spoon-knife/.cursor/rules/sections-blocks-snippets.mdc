@@ -1,9 +1,0 @@
----
-description: 
-globs: sections/*.liquid,snippets/*.liquid,blocks/*.liquid
-alwaysApply: false
----
-- Avoid repeating code, use snippets for reusable content or logic
-
-- For the first section on the page (section.index == 1), use eager loading (loading="eager") for its image, and fetchpriority="high" attribute. All other sections should use lazy loading (loading="lazy"). Always maintain proper image sizing based on the container width.
-- When adding an image to the code, check the section.index to use lazy or eager loading properly.
