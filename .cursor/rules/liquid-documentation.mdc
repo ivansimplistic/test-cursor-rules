@@ -1,0 +1,215 @@
+---
+description: LiquidDoc Documentation Standards for Shopify Liquid Code
+globs: **/*.liquid
+alwaysApply: false
+---
+
+# LiquidDoc Documentation Standards
+
+## Overview
+LiquidDoc is Shopify's official documentation system for Liquid snippets and blocks that provides structured documentation, real-time validation, and enhanced editor features. All Liquid snippets and blocks must use LiquidDoc notation.
+
+## Required Documentation Structure
+Every snippet and block file must include LiquidDoc documentation at the top using the `{% doc %}` tag:
+
+### Basic Template
+```liquid
+{% doc %}
+  Brief description of what the snippet/block does
+  
+  @param {type} param_name - Description of the parameter
+  @param {type} [optional_param] - Optional parameter description
+  
+  @example
+  {% render 'snippet-name', param_name: value, optional_param: value %}
+{% enddoc %}
+```
+
+## Parameter Documentation Standards
+
+### Required Format
+`@param {type} name - description`
+
+### Parameter Types
+- **`{string}`** - Text values
+- **`{number}`** - Numeric values  
+- **`{boolean}`** - True/false values
+- **`{object}`** - Complex Liquid types or non-primitive values
+
+### Parameter Naming
+- **Required parameters**: Document without brackets
+- **Optional parameters**: Wrap in square brackets `[param_name]`
+- **Unique names**: Each parameter must have a unique name
+- **Descriptive names**: Use clear, meaningful parameter identifiers
+
+### Default Values
+- **Do NOT use** `=value` syntax in parameter documentation (e.g., `[isMain=false]`)
+- **Document default values** in the parameter description instead
+- **Correct format**: `@param {boolean} [isMain] - Whether this is the main product page (default: false)`
+- **Incorrect format**: `@param {boolean} [isMain=false] - Whether this is the main product page`
+
+### Examples
+```liquid
+{% doc %}
+  Product card snippet
+  
+  @param {string} title - Main product title
+  @param {number} price - Product price value
+  @param {boolean} show_vendor - Whether to display vendor name
+  @param {object} product - Product object
+  @param {string} [subtitle] - Optional secondary text
+  @param {boolean} [isMain] - Whether this is the main product page (default: false)
+  @param {number} [quantity] - Product quantity (default: 1)
+{% enddoc %}
+```
+
+## Description Standards
+
+### Primary Description
+- Place the main description before any `@` annotations
+- Explain the purpose and functionality clearly
+- Keep it concise but informative
+
+### @description Tag
+- Use `@description` tag for additional descriptions
+- Only the first description appears in hover tooltips
+- Multi-line descriptions are automatically formatted
+
+## Example Documentation
+
+### Multiple Examples
+```liquid
+{% doc %}
+  Price display snippet
+  
+  @param {number} price - Price value
+  @param {boolean} [show_compare_at] - Whether to show compare-at price
+  
+  @example
+  {% render 'price', price: product.price, show_compare_at: true %}
+  
+  @example
+  {% render 'price',
+    price: variant.price,
+    show_compare_at: false
+  %}
+{% enddoc %}
+```
+
+## Editor Integration Benefits
+LiquidDoc provides real-time development assistance:
+
+### Hover Documentation
+- Comprehensive parameter information on hover
+- Type validation and suggestions
+- Usage examples display
+
+### Code Completion
+- Smart parameter suggestions
+- Automatic parameter name completion
+- Type-aware recommendations
+
+### Parameter Validation
+- Warnings for missing required parameters
+- Type mismatch detection
+- Unrecognized parameter warnings
+
+### Theme Check Integration
+LiquidDoc works with Shopify's Theme Check tool for validation:
+
+#### Documentation Checks
+- **UniqueDocParamNames**: Ensures unique parameter names
+- **UnsupportedDocTag**: Validates `doc` tag usage in snippets only
+- **ValidDocParamTypes**: Validates parameter type definitions
+- **UnusedDocParam**: Ensures documented parameters are used
+
+#### Usage Checks
+- **MissingRenderSnippetArguments**: Validates required parameters
+- **UnrecognizedRenderSnippetArguments**: Catches unknown parameters
+- **ValidRenderSnippetArgumentTypes**: Type validation
+- **DuplicateRenderSnippetArguments**: Prevents duplicate parameters
+
+## Implementation Rules
+
+### File Requirements
+- **Snippets**: Must include LiquidDoc documentation
+- **Blocks**: Must include LiquidDoc documentation
+- **Sections**: Schema documentation is separate from LiquidDoc
+- **Layouts/Templates**: No LiquidDoc required
+
+### Documentation Quality Standards
+1. **Completeness**: Document all parameters with types and descriptions
+2. **Accuracy**: Ensure documentation matches actual implementation
+3. **Examples**: Provide practical usage examples
+4. **Clarity**: Use clear, concise language
+5. **Consistency**: Follow established patterns throughout the codebase
+
+### Validation Requirements
+- All new snippets/blocks must pass Theme Check validation
+- Existing code should be updated to meet LiquidDoc standards
+- Parameter types must match actual usage
+- All documented parameters must be used in the code
+
+## Best Practices
+
+### Parameter Documentation
+- Start with required parameters
+- Group related parameters together
+- Use consistent formatting and spacing
+- Provide meaningful default value examples
+
+### Example Documentation
+- Show common use cases
+- Include edge case examples
+- Demonstrate parameter combinations
+- Use realistic, practical examples
+
+### Maintenance
+- Keep documentation current with code changes
+- Review and update during code reviews
+- Validate documentation with Theme Check
+- Remove documentation for unused parameters
+
+## Common Patterns
+
+### Product-Related Snippets
+```liquid
+{% doc %}
+  Product display component
+  
+  @param {object} product - Product object to display
+  @param {boolean} [show_price] - Whether to display price
+  @param {boolean} [show_vendor] - Whether to display vendor
+  @param {string} [image_size] - Image size variant
+{% enddoc %}
+```
+
+### Navigation Snippets
+```liquid
+{% doc %}
+  Navigation menu component
+  
+  @param {array} menu_items - Array of menu items
+  @param {string} [menu_class] - CSS class for styling
+  @param {boolean} [show_icons] - Whether to display icons
+{% enddoc %}
+```
+
+### Form Snippets
+```liquid
+{% doc %}
+  Form input component
+  
+  @param {string} field_name - Form field name
+  @param {string} [placeholder] - Placeholder text
+  @param {string} [field_type] - Input type (text, email, etc.)
+  @param {boolean} [required] - Whether field is required
+{% enddoc %}
+```
+
+## Enforcement
+- **Mandatory**: All new snippets and blocks must use LiquidDoc
+- **Code Reviews**: Documentation quality must be reviewed
+- **Theme Check**: All documentation must pass validation
+- **Maintenance**: Existing code should be updated to standards
+- **Training**: Team members must understand LiquidDoc syntax

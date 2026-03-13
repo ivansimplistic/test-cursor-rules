@@ -1,0 +1,24 @@
+---
+description: 
+globs: sections/*.liquid,blocks/*.liquid
+alwaysApply: false
+---
+- Define settings of sections and blocks using the conditional settings feature to show only relevant settings depending on current values of the previous settings.
+
+- Conditional settings must be implemented with "visible_if" attribute and the proper syntax is "visible_if": "{{ section.settings.full_width == true or block.settings.another_setting != blank}}". Setting can be in section or block. The setting id in the visible_if value must be prefixed with 'block.settings.' or 'section.settings.' accordingly.
+
+For conditional visibility in sections and blocks:
+1. The visible_if value MUST be a string containing a Liquid expression
+2. The Liquid expression MUST:
+   - Start with '{{' and end with '}}'
+   - Use the correct prefix for settings:
+     * 'block.settings.' for block settings
+     * 'section.settings.' for section settings
+3. Examples of valid conditions:
+   - "{{ block.settings.type != 'brand' }}"
+   - "{{ section.settings.show_title }}"
+   - "{{ block.settings.size > 3 }}"
+4. Common mistakes to avoid:
+   - Don't use setting IDs without prefix (e.g., "{{ type != 'brand' }}" is wrong)
+   - Don't forget the double curly braces
+   - Don't use complex Liquid expressions, keep it simple
