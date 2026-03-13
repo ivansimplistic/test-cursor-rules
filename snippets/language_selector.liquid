@@ -1,0 +1,19 @@
+{%- assign formId = section.id | split: '__' | last | prepend: 'language_selector_' -%}
+{% form 'localization', id: formId, class: "localization-selector" %}
+  <div class="localization-selector-content">
+    <label for="LanguageSelector-{{formId}}" class="flex align-items-center">
+      <span>{{ localization.language.endonym_name | capitalize }}</span>
+      {%- render 'icons', icon: 'chevron-down' -%}
+    </label>
+    <select name="locale_code" id="LanguageSelector-{{formId}}" class="localization-currency" aria-label="{{ 'language_selector.change_language_caption' | t | escape }}">
+      {% for language in localization.available_languages %}
+        <option value="{{ language.iso_code }}"{% if language.iso_code == localization.language.iso_code %} selected="selected"{% endif %}>{{ language.endonym_name | capitalize }}</option>
+      {% endfor %}
+    </select>
+  </div>
+  <script type="module">
+    document.getElementById('LanguageSelector-{{formId}}').addEventListener('change', (e) => {
+      e.target.form.submit()
+    })
+  </script>
+{%- endform -%}

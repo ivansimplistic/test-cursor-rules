@@ -1,0 +1,63 @@
+{%- comment -%}
+    Renders the product badges
+
+    Accepts:
+    - product: {Object} Product Liquid object
+    - badgesLimit: {Integer} Default: 2
+    - badgesType: {String} Default: 'all'. Possible values:
+      'all'
+      'auto'
+      'custom'
+    - defaultVariant: {Object} Variant Liquid object
+    - saleRound: {Boolean} if true, the Sale badge will be displayed as a round bubble
+
+    Usage:
+    {%- render 'product_badges', product: productObject -%}
+{%- endcomment -%}
+
+
+{%- liquid
+  assign badgesLimit = badgesLimit | default: 2
+  assign badgesType = badgesType | default: 'all'
+  assign badgeCount = 0
+  assign sale = ''
+  assign prodOrVar = defaultVariant | default: product
+  assign available = prodOrVar.available
+-%}
+
+{%- if badgesType == 'all' or badgesType == 'auto' -%}
+  {%- if settings.badge_percentoff_text != blank -%}
+    {%- liquid
+      if prodOrVar.price < prodOrVar.compare_at_price
+        assign percent = prodOrVar.compare_at_price | minus: prodOrVar.price | times:100.0 | divided_by: prodOrVar.compare_at_price | floor
+        assign sale = settings.badge_percentoff_text | replace: '[percent]', percent
+      endif 
+    -%}
+    <div class="badge sale {% if saleRound %}round{% endif %}" data-msgtpl="{{settings.badge_percentoff_text | escape}}" {% if available and sale != blank %}{% assign badgeCount = badgeCount | plus: 1 %}{% else %}style="display:none;"{% endif %}>
+      {{sale}}
+    </div>
+  {%- endif -%}
+  {%- if settings.badge_soldout_text != blank -%}
+  <div class="badge sold-out" {% if available %} style="display:none;"{% else %}{% assign badgeCount = badgeCount | plus: 1 %}{% endif %}>
+    {{settings.badge_soldout_text}}
+  </div>
+  {%- endif -%}
+{%- endif -%}
+
+{%- if badgesType == 'all' or badgesType == 'custom' -%}
+  {%- assign badges =  settings.badge_custom_tags | split: ','  -%}
+  {%- for badge in badges -%}
+    {%- liquid
+      if badgeCount >= badgesLimit
+        break
+      endif
+      assign tag = badge | strip
+    -%}
+    {%- if product.tags contains tag -%}
+      {%- assign badgeCount = badgeCount | plus: 1 -%}
+      <div class="badge {{tag | handleize}}">
+        {{tag}}
+      </div>
+    {%- endif -%}
+  {%- endfor -%}
+{%- endif -%}

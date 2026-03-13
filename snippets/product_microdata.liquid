@@ -1,0 +1,55 @@
+{%- assign currentVariant = currentProduct.selected_or_first_available_variant -%}
+<script type="application/ld+json">
+{
+  "@context": "http://schema.org/",
+  "@type": "Product",
+  "name": "{{- currentProduct.title | escape -}}",
+  "url": "{{- shop.url -}}{{- currentProduct.url -}}",
+  {%- case settings.seo_aggregate_rating_source -%}
+    {%- when 'disabled' -%}
+      
+    {%- when 'shopify' -%}
+      {%- if currentProduct.metafields.reviews.rating_count != blank and currentProduct.metafields.reviews.rating.value != blank -%}
+        "aggregateRating": {
+          "@type": "AggregateRating",
+          "ratingValue": "{{ currentProduct.metafields.reviews.rating.value }}",
+          "reviewCount": "{{ currentProduct.metafields.reviews.rating_count }}"
+        },
+      {%- endif -%}
+      
+  {%- endcase -%}
+  {%- if currentProduct.featured_image -%}
+    "image": [
+      "https:{{- currentProduct.featured_image.src | image_url -}}"
+    ],
+  {%- endif -%}
+  "description": "{{- currentProduct.description | strip_html | strip_newlines | escape -}}",
+  "sku": "{{- currentVariant.sku -}}",
+  "brand": {
+    "@type": "Thing",
+    "name": "{{- currentProduct.vendor | escape -}}"
+  },
+  {%- if currentProduct.variants -%}
+    "offers": [
+      {%- for variant in currentProduct.variants -%}
+        {
+          "@type" : "Offer",
+          "availability" : "http://schema.org/{%- if currentProduct.available -%}InStock{%- else -%}OutOfStock{%- endif -%}",
+          "price" : "{{- variant.price | divided_by: 100.00 -}}",
+          "priceCurrency" : "{{- shop.currency -}}",
+          {%- if variant.image -%}
+		        "image": "http:{{- variant.image.src | image_url -}}",
+		      {%- endif -%}
+          {%- if variant.title != blank -%}
+          	"name" : "{{- variant.title | escape -}}",
+          {%- endif -%}
+          {%- if variant.sku != blank -%}
+          	"sku": "{{- variant.sku -}}",
+          {%- endif -%}
+          "url" : "{{- shop.url -}}{{- variant.url -}}"
+        }{%- unless forloop.last -%},{%- endunless -%}
+      {%- endfor -%}
+    ]
+  {%- endif -%}
+}
+</script>

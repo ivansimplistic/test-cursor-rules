@@ -1,0 +1,13 @@
+{%- liquid
+  assign discountCode = ''
+
+  for discount_application in cart.discount_applications 
+    if discount_application.title != blank and discount_application.type == 'discount_code' 
+      unless discountCode contains discount_application.title
+        assign discountCode = discountCode | append: ',' | append: discount_application.title
+      endunless
+    endif
+  endfor 
+
+  echo discountCode | remove_first: ','
+-%}

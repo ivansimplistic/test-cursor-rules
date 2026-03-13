@@ -1,0 +1,39 @@
+# https://github.com/Shopify/theme-check-action/blob/main/README.md
+name: Theme Check
+on: [push]
+jobs:
+ # lhci:
+   # name: Lighthouse
+   # runs-on: ubuntu-latest
+   # steps:
+   # - uses: actions/checkout@v2
+   # - name: Lighthouse
+     # uses: shopify/lighthouse-ci-action@1.0
+     # with:
+       # app_id: ${{ secrets.SHOP_APP_ID }}
+       # app_password: ${{ secrets.SHOP_APP_PASSWORD }}
+       # store: ${{ secrets.SHOP_STORE }}
+       # password: ${{ secrets.SHOP_PASSWORD }}
+       # product_handle: adele-satchel-autumn
+       # collection_handle: color-shirts
+       # lhci_min_score_performance: 0.8
+       # lhci_min_score_accessibility: 0.9
+  theme-check:
+    name: Theme Check
+    runs-on: ubuntu-latest
+    if: ${{ !contains('shopify[bot]', github.event.pusher.name) }}  #comma separated author names: 'shopify[bot],ivansimplistic'
+    steps:
+      - uses: actions/checkout@v4
+      - name: Theme Check
+        uses: shopify/theme-check-action@v2
+        with:
+          theme_root: '.' # optional, could be './dist'
+          # token: ${{ github.token }}
+          base: main
+          flags: --fail-level warning
+      # --- Custom Validation ---
+      - name: Run custom validation (validate-theme.js)
+        if: always() # runs even if Theme Check failed
+        run: |
+          echo "Running custom theme validation..."
+          node validate-theme.js

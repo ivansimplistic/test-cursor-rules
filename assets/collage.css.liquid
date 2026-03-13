@@ -1,0 +1,15 @@
+.collage-section {padding: calc(var(--items-spacing) / 2) 0;}  
+.content-full-width .collage-section {padding-left: var(--items-spacing); padding-right: var(--items-spacing);}
+.collage-grid {grid-gap: var(--items-spacing); height: 100%;}
+.collage-grid .main-block {min-height: calc(var(--min-height) * 2);}
+.collage-grid .main-block .captions > * {margin-bottom: 1.5rem;}
+.collage-grid .main-block .captions > *:last-child {margin-bottom: 0;}
+.collage-grid .main-block .mailing-list button.btn {margin-top: 1.5rem;}
+.collage-grid .secondary-block {flex: 1 1 calc(var(--secondary-blocks-width) - var(--items-spacing)); min-height: var(--min-height);}
+
+@media (min-width: {{settings.breakpoint_tablet | plus: 0.001}}em){
+  .collage-grid .main-block {width: var(--main-block-width);}
+}
+@media (max-width: {{settings.breakpoint_tablet}}){
+  .collage-grid .main-block {width: 100%;}
+}

@@ -1,0 +1,6 @@
+<a href="{{customUtil.settings.url}}" class="item trigger-{{ customUtil.settings.title | handle | default: 'custom-item' }} {% if customUtil.settings.mobile_show == false %}small--hide{% endif %}" aria-label="{{ customUtil.settings.title }}">
+  <div class="{{customUtil.settings.type}} {% if customUtil.settings.type contains 'btn' %}smaller{% endif %} flex align-items-center">
+    {%- render 'icons', icon: customUtil.settings.icon -%}
+    <span {% if customUtil.settings.type == 'normal' %}class="label"{% endif %}>{{ customUtil.settings.title }}</span>
+  </div>
+</a>

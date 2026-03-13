@@ -1,0 +1,25 @@
+util-accordion {display: block; background: var(--bg-color); padding: var(--section-padding);}
+util-accordion .wrapper-accordions {max-width: 44em;}
+util-accordion button[aria-expanded] {display: flex; flex-flow: row; justify-content: space-between; align-items: flex-start; width: 100%; font-family: inherit; font-size: inherit; line-height: inherit; font-weight: inherit; letter-spacing: inherit; color: inherit; background: inherit; text-transform: inherit; text-align: left;}
+util-accordion .accordion-title {font-weight: 700; padding-right: 2em;}
+util-accordion .accordion-icon {position: relative; width: 1.2rem; height: 1.2rem; padding: 1rem; top: 0.3em; margin: -1rem; box-sizing: content-box; flex-shrink: 0;}
+util-accordion .accordion-icon.plus i {display: block; position: relative; width: 100%; height: 100%; }
+util-accordion .accordion-icon.plus i:before,
+util-accordion .accordion-icon.plus i:after {content: ""; position: absolute; width: 100%; height: 1px; top: 50%; left: 0; background: currentColor; transition: all var(--animation-speed-fast) linear; }
+util-accordion .accordion-icon.plus i:before {transform: rotate(90deg); }
+util-accordion .accordion.open > button .accordion-icon.plus i:before {transform: rotate(0deg); }
+
+util-accordion .accordion-icon.chevron {transition: all var(--animation-speed-fast) linear; transform-origin: 50% 58%;}
+util-accordion .accordion-icon.chevron i {display: block; position: relative; width: 70%; height: 70%; margin: 15%; border-bottom: 1px solid; border-right: 1px solid; transform: rotate(45deg);}
+util-accordion .accordion.open > button .accordion-icon.chevron {transform: rotateX(180deg);}
+
+util-accordion .accordion-panel {text-align: left;}
+util-accordion .accordion-panel > :first-child {padding-top: 1rem;}
+
+util-accordion .accordion {padding: 1em 0; }
+util-accordion :not(.grid-item) > .accordion:last-child {border: none;}
+util-accordion .category-title {margin-top: 3rem;}
+
+util-accordion .accordion img {flex-shrink: 0; width: var(--accordion-image-width, 100%); border-radius: var(--accordion-image-border-radius); margin-right: 1em;}
+util-accordion .accordion-trigger.has-image {align-items: center;}
+util-accordion .accordion-trigger.has-image .accordion-icon {top: 0;}

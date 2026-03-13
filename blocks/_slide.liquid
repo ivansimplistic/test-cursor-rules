@@ -1,0 +1,22 @@
+<div class="tb-multi-item keen-slider-slide" id="block-{{ block.id }}" {{ block.shopify_attributes }}>
+  <div class="grid">
+  {%- content_for 'blocks' -%}
+  </div>
+</div>
+{% schema %}
+{
+  "name": "Custom Slide",
+  "tag": null,
+  "blocks": [{"type": "@app"}, {"type": "@theme"}],
+  "presets": [
+    {
+      "name": "Custom Slide",
+      "blocks": [
+      ]
+    }
+  ],
+  "settings": [
+    
+  ]
+}
+{% endschema %}

@@ -1,0 +1,59 @@
+{
+  "name": "Footer group",
+  "type": "custom.footer_sections",
+  "sections": {
+    "footer": {
+      "type": "footer",
+      "blocks": {
+        "mixed_9CDqWb": {
+          "type": "mixed",
+          "settings": {
+            "column_width": 20,
+            "logo_svg1": "[Shop Name]",
+            "logo_width1": 10
+          }
+        },
+        "786c0245-9485-4b5c-8979-594adf664434": {
+          "type": "navigation",
+          "settings": {
+            "accordion_mobile": false,
+            "column_width": 20,
+            "title": "Title custom",
+            "linklist1": "footer"
+          }
+        },
+        "846799f9-1ceb-4908-b79d-e0ef98488189": {
+          "type": "navigation",
+          "settings": {
+            "accordion_mobile": false,
+            "column_width": 20,
+            "title": "Title custom",
+            "linklist1": "footer"
+          }
+        },
+        "ab2312a7-eb62-434c-a495-1331c5f90334": {
+          "type": "mixed",
+          "settings": {
+            "column_width": 30,
+            "logo_width1": 14,
+            "title": "Join our mailing list",
+            "text1": "<p>Lorem ipsum dolor sit amet, consectur adipiscing elit. Nunc eu eros augue tempus finibus mi.</p>",
+            "newsletter": true,
+            "social": true
+          }
+        }
+      },
+      "block_order": [
+        "mixed_9CDqWb",
+        "786c0245-9485-4b5c-8979-594adf664434",
+        "846799f9-1ceb-4908-b79d-e0ef98488189",
+        "ab2312a7-eb62-434c-a495-1331c5f90334"
+      ],
+      "settings": {
+      }
+    }
+  },
+  "order": [
+    "footer"
+  ]
+}

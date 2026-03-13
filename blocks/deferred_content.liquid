@@ -1,0 +1,52 @@
+<script src="{{ 'component_deferred_content.js' | asset_url }}" defer="defer"></script>
+<div class="grid-item">
+  <deferred-content data-mode="{{block.settings.load_mode}}" {% if block.settings.load_mode == 'scroll' %}data-offset="{{block.settings.scroll_offset}}%"{% endif %}>
+    <template id="deferred-content-{{block.id}}">
+      {% content_for 'blocks' %}
+    </template>
+  </deferred-content>
+</div>
+
+{% schema %}
+{
+  "name": "Deferred App or Content",
+  "tag": null,
+  "blocks": [{"type": "@app"}, {"type": "@theme"}],
+  "presets": [
+    {
+      "name": "Deferred App or Content",
+      "category": "Content",
+      "blocks": [
+      ]
+    }
+  ],
+  "settings": [
+    {
+      "type": "paragraph",
+      "content": "The elements inside this container will be wrapped in a template and will start loading when the user scrolls to the section or after the page loaded completely."
+    },
+    {
+      "type": "select",
+      "id": "load_mode",
+      "label": "Load mode",
+      "options": [
+        {"value": "scroll", "label": "On scroll to the section"},
+        {"value": "load", "label": "After Load event"},
+        {"value": "domload", "label": "After document parsed (runs sooner)"}
+      ],
+      "default": "load"
+    },
+    {
+      "type": "range",
+      "id": "scroll_offset",
+      "min": 0,
+      "max": 150,
+      "step": 5,
+      "unit": "%",
+      "label": "Scroll offset",
+      "default": 50,
+      "info": "The distance between the viewport and the section at which the content will start loading, in percentage of the viewport height."
+    }
+  ]
+}
+{% endschema %}

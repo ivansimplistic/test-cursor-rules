@@ -1,0 +1,90 @@
+{%- assign pickUpAvailabilities = product_variant.store_availabilities | where: 'pick_up_enabled', true -%}
+
+{%- if pickUpAvailabilities.size > 0 -%}
+  <style>
+    .pickup-availability-info {padding: 3em;}
+    .pickup-availability-info h3 {margin-top: 1.5em;}
+    .pickup-availability {padding: 1em 0;}
+    .pickup-availability svg {margin-top: 0.25em; margin-right: 0.7em;}
+  </style>
+  <div class="pickup-availability">
+    {%- assign closestLocation = pickUpAvailabilities.first -%}
+
+    {%- if closestLocation.available -%}
+      <div class="flex">
+        {%- render 'icons', icon: 'checkmark' -%}
+        <div>
+          <strong>{{ 'pickup_availability.pickup_available_at_place_label' | t: location_name: closestLocation.location.name }}</strong>
+          <div class="smaller">{{ closestLocation.pick_up_time }}</div>
+          <button type="button" class="link pickup-popup-trigger">
+            {%- if pickUpAvailabilities.size == 1 -%}
+              {{ 'pickup_availability.view_store_info' | t }}
+            {%- else -%}
+              {{ 'pickup_availability.view_availability_other_stores' | t }}
+            {%- endif -%}
+          </button>
+        </div>
+      </div>
+    {%- else -%}
+      <div class="flex">
+        {%- render 'icons', icon: 'close' -%}
+        <div>
+          <strong>{{ 'pickup_availability.pickup_not_available_at_label' | t: location_name: closestLocation.location.name }}</strong>
+          {%- if pickUpAvailabilities.size > 1 -%}
+            <button type="button" class="link">
+              {{ 'pickup_availability.view_availability_other_stores' | t }}
+            </button>
+          {%- endif -%}
+        </div>
+      </div>
+    {%- endif -%}
+  </div>
+
+  <div class="hide">
+    <div class="pickup-availability-info">
+      <h2>{{ product_variant.product.title | escape }}</h2>
+
+      {%- unless product_variant.product.has_only_default_variant -%}
+        <p>
+          {%- for product_option in product_variant.product.options_with_values -%}
+            {{ product_option.name | escape }}:&nbsp;
+            {%- for value in product_option.values -%}
+              {%- if product_option.selected_value == value -%}
+                <span>{{ value | escape }}</span>
+              {%- endif -%}
+            {%- endfor -%}
+            {%- unless forloop.last -%},&nbsp;{%- endunless forloop.last -%}
+          {%- endfor -%}
+        </p>
+      {%- endunless -%}
+
+      {%- for availability in pickUpAvailabilities -%}
+        <div>
+          <h3>{{ availability.location.name | escape }}</h3>
+          <p>
+            {%- if availability.available -%}
+              {%- assign pickupTime = availability.pick_up_time | downcase -%}
+              {{ 'pickup_availability.pickup_available_time_label' | t: pick_up_time: pickupTime }}
+            {%- endif -%}
+          </p>
+
+          {%- assign address = availability.location.address -%}
+          <address>
+            {{ address | format_address }}
+
+            {%- if address.phone.size > 0 -%}
+              <p>{{ address.phone }}</p>
+            {%- endif -%}
+          </address>
+        </div>
+      {%- endfor -%}
+    </div>
+  </div>
+{%- endif -%}
+
+{% schema %}
+  {
+    "name": "Pickup Availability",
+    "class": "type-pickup-availability"
+  }
+{% endschema %}

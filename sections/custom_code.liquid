@@ -1,0 +1,88 @@
+<style>
+  #shopify-section-{{section.id}} .custom-code {
+    padding-top: calc(var(--global-sections-padding) * {{section.settings.section_padding_top | divided_by: 100.00}});
+    padding-bottom: calc(var(--global-sections-padding) * {{section.settings.section_padding_bottom | divided_by: 100.00}});
+  }
+  @media (max-width: {{settings.breakpoint_mobile}}){
+    #shopify-section-{{section.id}} .custom-code {
+      padding-top: calc(var(--global-sections-padding) * {{section.settings.section_padding_top_mobile | divided_by: 100.00}});
+      padding-bottom: calc(var(--global-sections-padding) * {{section.settings.section_padding_bottom_mobile | divided_by: 100.00}});
+    }
+  }
+</style>
+<div class="custom-code scheme color-{{section.settings.section_color_scheme}} {% if section.settings.section_padding_top > 0 %}padding-top{% endif %} {% if section.settings.section_padding_bottom > 0 %}padding-bottom{% endif %}">
+  {{ section.settings.code }}
+</div>
+{% schema %}
+  {
+    "name": "Custom Code Snippet",
+    "class": "type-custom-code-snippet",
+    "tag": "section",
+    "presets": [
+      {
+        "name": "Custom Code Snippet"
+      }
+    ],
+    "settings": [
+      {
+        "type": "paragraph",
+        "content": "The main use of this section is to include app's widgets. For example: Yotpo reviews, Nosto section placeholders, etc."
+      },
+      {
+        "type": "liquid",
+        "id": "code",
+        "label": "Code"
+      },
+      {
+        "type": "header",
+        "content": "Section settings"
+      },
+      {
+        "type": "color_scheme",
+        "id": "section_color_scheme",
+        "label": "Section Color scheme",
+        "default": "scheme-1"
+      },
+      {
+        "type": "range",
+        "id": "section_padding_top",
+        "min": 0,
+        "max": 100,
+        "step": 10,
+        "unit": "%",
+        "label": "Outer padding top (Desktop)",
+        "default": 0
+      },
+      {
+        "type": "range",
+        "id": "section_padding_top_mobile",
+        "min": 0,
+        "max": 100,
+        "step": 10,
+        "unit": "%",
+        "label": "Outer padding top (Mobile)",
+        "default": 0
+      },
+      {
+        "type": "range",
+        "id": "section_padding_bottom",
+        "min": 0,
+        "max": 100,
+        "step": 10,
+        "unit": "%",
+        "label": "Outer padding bottom (Desktop)",
+        "default": 0
+      },
+      {
+        "type": "range",
+        "id": "section_padding_bottom_mobile",
+        "min": 0,
+        "max": 100,
+        "step": 10,
+        "unit": "%",
+        "label": "Outer padding bottom (Mobile)",
+        "default": 0
+      }
+    ]
+  }
+{% endschema %}

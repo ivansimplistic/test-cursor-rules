@@ -1,0 +1,203 @@
+{{ 'list_collections_main.css' | asset_url | stylesheet_tag }}
+<style>
+  .list-collections{
+    --section-padding-top: calc(var(--global-sections-padding) * {{section.settings.section_padding_top | divided_by: 100.00}});
+    --section-padding-bottom: calc(var(--global-sections-padding) * {{section.settings.section_padding_bottom | divided_by: 100.00}});
+  }
+{%- if section.settings.menu != blank -%}
+{%- else -%}
+  @media (min-width: {{settings.breakpoint_tablet | plus: 0.001}}em) {
+    .list-collections {--items-per-row: {{section.settings.items_per_row}};}
+  }
+  @media (max-width: {{settings.breakpoint_tablet}}) {
+    .list-collections {--items-per-row: {{section.settings.items_per_row_tablet}};}
+  }
+  @media (max-width: {{settings.breakpoint_mobile}}) {
+    .list-collections {--items-per-row: {{section.settings.items_per_row_mobile}};}
+  }
+{%- endif -%}
+</style>
+
+<div class="list-collections {% if section.settings.menu != blank %}custom{% else %}default{% endif %} scheme color-{{section.settings.content_color_scheme}} {% if section.settings.section_padding_top > 0 %}padding-top{% endif %} {% if section.settings.section_padding_bottom > 0 %}padding-bottom{% endif %}">
+  <div class="container">
+    {%- if section.settings.menu != blank -%}
+      <div class="grid align-items-start">
+        {%- for link in linklists[section.settings.menu].links -%}
+          {%- if link.url contains '/collections/' -%}
+            {%- render 'collections_card_loop', section: section, link: link -%}
+          {%- endif -%}
+        {%- endfor -%}
+      </div>
+    {%- else -%}
+      <div class="grid justify-content-{{section.settings.grid_align}}">
+        {%- if section.settings.include_shop_all -%}
+          <div class="grid-item">
+            {%- render 'collection_card', collection: collections['all'] -%}
+          </div>
+        {%- endif -%}
+        {%- for collection in collections -%}
+          {%- if collection.metafields.seo.hidden == 1 -%}
+            {%- continue -%}
+          {%- endif -%}
+          {%- unless collection.handle == 'all' and section.settings.include_shop_all == false -%}
+            <div class="grid-item">
+              {%- render 'collection_card', collection: collection -%}
+            </div>
+          {%- endunless -%}
+        {%- endfor -%}
+      </div>
+    {%- endif -%}
+  </div>
+</div>
+
+{%- if settings.collection_match_title_height_grid -%}
+  <script type="module">
+    function layout() {
+      $s.matchHeight(document.querySelectorAll('#shopify-section-{{section.id}} .common-card .title'));
+    }
+    document.querySelector('#shopify-section-{{section.id}} page-manager').addEventListener('pageLoaded', layout);
+    $s.resizeWidthHandle(layout);
+  </script>
+{%- endif -%}
+
+{% schema %}
+  {
+    "name": "Collections Listing",
+    "class": "type-collections-listing",
+    "tag": "section",
+    "settings": [
+      {
+        "type": "header",
+        "content": "Custom collections"
+      },
+      {
+        "type": "paragraph",
+        "content": "Create a menu on the backend (created on Online Store -> Navigation) that contains the list of categories and sub-categories that you want to display here."
+      },
+      {
+        "type": "link_list",
+        "id": "menu",
+        "label": "Menu",
+        "info": "Select the menu created with the Categories tree. If left blank, all the Active collections will be displayed in alphabetical order."
+      },
+      {
+        "type": "checkbox",
+        "id": "include_shop_all",
+        "label": "Include shop all",
+        "default": true
+      },
+      {
+        "type": "header",
+        "content": "Section settings"
+      },
+      {
+        "type": "color_scheme",
+        "id": "content_color_scheme",
+        "label": "Color scheme",
+        "default": "scheme-1"
+      },
+      {
+        "type": "color_scheme",
+        "id": "cards_color_scheme",
+        "label": "Cards color scheme",
+        "default": "scheme-1"
+      },
+      {
+        "type": "range",
+        "id": "section_padding_top",
+        "min": 0,
+        "max": 100,
+        "step": 10,
+        "unit": "%",
+        "label": "Outer padding top (Desktop)",
+        "default": 100
+      },
+      {
+        "type": "range",
+        "id": "section_padding_top_mobile",
+        "min": 0,
+        "max": 100,
+        "step": 10,
+        "unit": "%",
+        "label": "Outer padding top (Mobile)",
+        "default": 100
+      },
+      {
+        "type": "range",
+        "id": "section_padding_bottom",
+        "min": 0,
+        "max": 100,
+        "step": 10,
+        "unit": "%",
+        "label": "Outer padding bottom (Desktop)",
+        "default": 100
+      },
+      {
+        "type": "range",
+        "id": "section_padding_bottom_mobile",
+        "min": 0,
+        "max": 100,
+        "step": 10,
+        "unit": "%",
+        "label": "Outer padding bottom (Mobile)",
+        "default": 100
+      },
+      {
+        "visible_if": "{{ section.settings.menu == blank }}",
+        "type": "paragraph",
+        "content": "Only if the custom collections menu is blank:"
+      },
+      {
+        "visible_if": "{{ section.settings.menu == blank }}",
+        "type": "range",
+        "id": "items_per_row",
+        "min": 2,
+        "max": 6,
+        "step": 1,
+        "label": "Items per row Desktop",
+        "default": 3
+      },
+      {
+        "visible_if": "{{ section.settings.menu == blank }}",
+        "type": "range",
+        "id": "items_per_row_tablet",
+        "min": 1,
+        "max": 5,
+        "step": 1,
+        "label": "Items per row Tablet",
+        "default": 1
+      },
+      {
+        "visible_if": "{{ section.settings.menu == blank }}",
+        "type": "range",
+        "id": "items_per_row_mobile",
+        "min": 1,
+        "max": 10,
+        "step": 1,
+        "label": "Items per row Mobile",
+        "default": 1
+      },
+      {
+        "visible_if": "{{ section.settings.menu == blank }}",
+        "type": "select",
+        "id": "grid_align",
+        "label": "Alignment",
+        "options": [
+          {
+            "value": "start",
+            "label": "Left"
+          },
+          {
+            "value": "center",
+            "label": "Center"
+          },
+          {
+            "value": "end",
+            "label": "Right"
+          }
+        ],
+        "default": "start"
+      }
+    ]
+  }
+{% endschema %}

@@ -1,0 +1,87 @@
+{{ 'customer_portal.css' | asset_url | stylesheet_tag }}
+<script src="{{ 'shopify_common.js' | shopify_asset_url }}" defer></script>
+<script src="{{ 'customer_area.js' | shopify_asset_url }}" defer></script>
+<script src="{{ 'customer_portal.js' | asset_url }}" defer="defer"></script>
+
+<div class="customer-portal-page scheme color-{{settings.customer_portal_color_scheme}}">
+  <div class="container flex flex-wrap align-items-start">
+    {%- render 'customer_portal_menu', template: template -%}
+
+    <div class="flex-1 customer-portal-content address-content">
+      <div class="head">
+        <h1>{{ 'account.addresses.title' | t }}</h1>
+        <button type="button" class="btn" onclick="Shopify.CustomerAddress.toggleNewForm();">{{ 'account.addresses.new_address_button' | t }}</button>
+      </div>
+
+      <div id="add_address" class="customer-address edit-address add-address" style="display: none;">
+        <h2 class="h3">{{ 'account.addresses.new_title' | t }}</h2>
+        {% render 'customer_address_form', customer: customer, address: customer.new_address %}
+      </div>
+
+      {%- paginate customer.addresses by 10 -%}
+        {%- for address in customer.addresses -%}
+          <div class="address-item">
+            <div id="view_address_{{address.id}}">
+              <div class="large--flex medium--flex align-items-start">
+                <div class="info large--flex-1 medium--flex-1">
+                  <div class="address-title flex align-items-center">
+                    {% if address.street != blank %}<span>{{ address.street }}</span>{% endif %}
+                  </div>
+                  <p>{{ address.first_name }} {{address.last_name }}
+                    {% if address.company != blank %}<br />{{ address.company }}{% endif %}
+                    {% if address.city != blank %}<br />{{ address.city }} {% if address.province_code %}, {{ address.province_code }}{% endif %}{% endif %}
+                     {% if address.country != blank %}<br />{{ address.country }} {{ address.zip }}{% endif %}
+                    {% if address.phone != blank %}<br />{{ address.phone }}{% endif %}
+                  </p>
+                </div>
+                <div class="address-actions flex direction-column">
+                  <div>
+                    {% if address == customer.default_address %} 
+                      <div class="default">
+                        <input class="radio-custom" type="radio" id="default_address_{{address.id}}" name="default_address" data-address="{{address.id}}" checked>
+                        <label class="radio-custom-label" for="default_address_{{address.id}}"><strong>{{ 'account.addresses.default_address_label' | t }}</strong></label>
+                      </div>
+                    {% else %}
+                      <div>
+                        <input class="radio-custom" type="radio" id="default_address_{{address.id}}" name="default_address" data-address="{{address.id}}">
+                        <label class="radio-custom-label" for="default_address_{{address.id}}"><strong>{{ 'account.customer_address_form.set_default_address_label' | t }}</strong></label>
+                      </div>
+                    {% endif %}
+                  </div>
+
+                  <div class="buttons flex align-items-center justify-content-end small--justify-content-start">
+                    <button type="button" class="edit action flex align-items-center" onclick="Shopify.CustomerAddress.toggleForm({{address.id}}); $s.scrollToElement(this.closest('.address-item'), 80); return false">{% render 'icons', icon: 'edit' %} {{ 'account.addresses.action_edit' | t }}</button>
+                    <button type="button" class="delete action flex align-items-center" onclick="Shopify.CustomerAddress.destroy({{address.id}}, '{{ 'account.addresses.action_delete_confirm_message' | t | escape}}'); return false">{% render 'icons', icon: 'delete' %} {{ 'account.addresses.action_delete' | t }}</button>
+                  </div>
+                </div>
+              </div>   
+            </div>
+            <div id="edit_address_{{address.id}}" class="edit-address" style="display: none;">
+              <h2 class="h3">{{ 'account.addresses.edit_title' | t }}</h2>
+              {% render 'customer_address_form', customer: customer, address: address %}
+            </div>
+          </div>
+        {%- endfor -%}
+        {%- render 'pagination', paginate: paginate -%}
+      {%- endpaginate -%}
+    </div>
+  </div>
+</div>
+
+<script type="module">
+  document.querySelectorAll('input[name="default_address"]').forEach((input) => {
+    input.addEventListener('change', element => {
+      var form = document.querySelector('#address_form_'+input.dataset.address);
+      var default_address = document.querySelector('#address_default_address_'+input.dataset.address);
+      default_address.checked = true;
+      form.submit()
+    });
+  });
+</script>
+
+{% schema %}
+  {
+    "name": "Addresses",
+    "class": "type-addresses"
+  }
+{% endschema %}

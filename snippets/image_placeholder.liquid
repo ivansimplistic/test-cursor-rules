@@ -1,0 +1,6 @@
+data:image/svg+xml;utf8, 
+{%- if image != blank -%}
+  <svg viewBox='0 0 {{ image.width }} {{ image.height }}' width='{{ image.width }}' height='{{ image.height }}' xmlns='http://www.w3.org/2000/svg'/>
+{%- else -%}
+  <svg viewBox='0 0 1 1' width='1' height='1' xmlns='http://www.w3.org/2000/svg'/>
+{%- endif -%}

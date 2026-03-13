@@ -1,0 +1,78 @@
+{{ 'blog_base.css' | asset_url | stylesheet_tag }}
+{{ 'article_base.css' | asset_url | stylesheet_tag }}
+<style>
+  .comments {--comments-border-radius: {{section.settings.comments_border_radius}}em;}
+</style>
+<article class="article container scheme color-scheme-1">
+  <div class="body">
+    {%- if section.settings.show_excerpt and article.excerpt != blank -%}
+      <div class="excerpt p0 scheme-border-bottom">{{article.excerpt}}</div>
+    {%- endif -%}
+    {{ article.content }}
+  </div>
+  {%- if blog.comments_enabled? -%}
+    {%- render 'blog_comments', section: section -%}
+  {%- endif -%}
+  <div class="foot scheme-border-top small-label flex flex-wrap align-items-center justify-content-between">
+    <a href="{{blog.url}}" class="back flex align-items-center">{%- render 'icons', icon: 'chevron-left' -%}{{ 'article_main.back_to' | t: blog_title: blog.title }}</a>
+    <div class="nav flex align-items-center justify-content-between">
+      {%- if blog.previous_article -%}
+        <a href="{{ blog.previous_article }}" class="flex align-items-center justify-content-center">{%- render 'icons', icon: 'chevron-left' -%} {{ 'article_main.previous_post' | t }}</a>
+      {%- endif -%}
+      {%- if blog.next_article -%}
+        <a href="{{ blog.next_article }}" class="flex align-items-center justify-content-center next">{{ 'article_main.next_post' | t }} {%- render 'icons', icon: 'chevron-right' -%}</a>
+      {%- endif -%}
+    </div>
+  </div>
+</article>
+
+{% schema %}
+  {
+    "name": "Article Main",
+    "class": "blog-article blog-sidebar-sibling type-article-main",
+    "settings": [
+      {
+        "type": "header",
+        "content": "Excerpt"
+      },
+      {
+        "type": "checkbox",
+        "id": "show_excerpt",
+        "label": "Show Excerpt at the top",
+        "default": true
+      },
+      {
+        "type": "header",
+        "content": "Comments"
+      },
+      {
+        "type": "paragraph",
+        "content": "To enable/disable the comments for this blog, please go to /admin/blogs and enter to the blog's settings."
+      },
+      {
+        "type": "color_scheme",
+        "id": "comments_color_scheme",
+        "label": "Color scheme",
+        "default": "scheme-2"
+      },
+      {
+        "type": "range",
+        "id": "comments_border_radius",
+        "min": 0,
+        "max": 10,
+        "step": 0.2,
+        "unit": "em",
+        "label": "Border radius",
+        "default": 0
+      },
+      {
+        "type": "checkbox",
+        "id": "comments_border",
+        "label": "Border"
+      }
+    ],
+    "blocks": [
+      
+    ]
+  }
+{% endschema %}

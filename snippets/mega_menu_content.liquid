@@ -1,0 +1,160 @@
+{%- comment -%}Include mega_menu.css only once{%- endcomment -%}
+{%- for i in (1..5) -%}
+  {%- assign menuId = 'mega_menu_' | append: i -%}
+  {%- assign settingKey = 'mega_menu_' | append: i | append: '_parent_link' -%}
+  {%- if settings[settingKey] != blank -%}
+    {%- if menuId == section.id -%}
+      {{ 'mega_menu.css' | asset_url | stylesheet_tag }}
+    {%- endif -%}
+    {%- break -%}
+  {%- endif -%}
+{%- endfor -%}
+<div class="mega-menu-{{section.id}} submenu scheme color-{{settings.mega_menu_color_scheme}} expandable mega-menu width-{{settings.mega_menu_width}}">
+  <style>
+    .mega-menu-{{section.id}} {
+      --columns-quantity: {{section.blocks.size}};
+      --columns-padding: {{section.settings.columns_padding}}em;
+      --titles-size: {{section.settings.title_size}}%;
+    }
+  </style>
+  <div class="mega-menu-content body-font">
+    {%- for block in section.blocks -%}
+      {%- if block.type == 'space' -%}
+        <div class="column space border-{{block.settings.border}} block-{{block.id}} {% if block.settings.stretch %}stretch{% endif %} ">
+          <style>
+            .mega-menu-{{section.id}} .block-{{block.id}} {
+              --column-width: {{block.settings.width}}%;
+            }
+          </style>
+        </div>
+      {%- elsif block.type == 'column' -%}
+        <div class="column block-{{block.id}} text-{{block.settings.text_align}}">
+          <style>
+            .mega-menu-{{section.id}} .block-{{block.id}} {
+              --column-width: {{block.settings.width}}%;
+              --column-min-width: {{block.settings.min_width}}em;
+              --img-simple-border-radius: {{block.settings.images_border_radius}}em;
+            }
+          </style>
+          <div class="custom">
+            {%- for i in (1..2) -%}
+              {%- liquid 
+                assign title = 'title' | append: i
+                assign text = 'text' | append: i
+                assign button = 'button' | append: i
+                assign buttonLink = 'button_link' | append: i
+                assign ctaStyle = 'cta_style' | append: i
+                assign image = 'image' | append: i
+                assign imageText = 'image_text' | append: i
+                assign imageCta = 'image_cta' | append: i
+                assign imageCtaStyle = 'image_cta_style' | append: i
+                assign imageTextShadow = 'image_text_shadow' | append: i
+                assign imageTextColor = 'image_text_color' | append: i
+                assign imageTextPosition = 'image_text_position' | append: i
+                assign imageTextAlign = 'image_text_align' | append: i
+                assign imageLink = 'image_link' | append: i
+                assign linklist = 'linklist' | append: i
+                assign linklistFilter = 'linklist_filter' | append: i
+                assign linklistFilterHandle = block.settings[linklistFilter] | handle
+                assign linklistFilterShowParent = 'linklist_filter_show_parent' | append: i
+                assign featuredProduct = 'featured_product' | append: i
+                assign featuredProductInline = 'featured_product_inline' | append: i
+              -%}
+              {%- if block.settings[title] != blank and block.settings[title] != "" -%}
+                <div class="mm-title {{section.settings.title_style}}">{{block.settings[title]}}</div>
+              {%- endif -%}
+              {%- if block.settings[image] != blank -%}
+                <div class="module">
+                  {% render 'img_simple_overlay', imageLink: block.settings[imageLink], image: block.settings[image], text: block.settings[imageText], textShadow: block.settings[imageTextShadow], colorScheme: block.settings[imageTextColor], textPosition: block.settings[imageTextPosition], textAlign: block.settings[imageTextAlign], cta: block.settings[imageCta], ctaStyle: block.settings[imageCtaStyle] %}
+                </div>
+              {%- endif -%}
+              {%- if block.settings[text] != blank and block.settings[text] != '<p></p>' -%}
+                <div class="text module {{section.settings.text_size | prepend: 'p'}}">{{block.settings[text]}}</div>
+              {%- endif -%}
+              {%- if block.settings[button] != blank -%}
+                {%- assign linkIcon = blank -%}
+                {%- if block.settings[ctaStyle] contains 'link' and settings.links_arrow != 'none' -%}
+                  {%- capture linkIcon -%}{%- render 'icons', icon: settings.links_arrow -%}{%- endcapture -%}
+                {%- endif -%}
+                <div class="button module">
+                  <a class="{{block.settings[ctaStyle]}}" href="{{block.settings[buttonLink]}}">{{block.settings[button]}}{{linkIcon}}</a>
+                </div>
+              {%- endif -%}
+              {%- if block.settings[linklist] != blank -%}
+                {%- capture linksModule -%}
+                  <div class="links module">
+                    {%- liquid
+                      for link in linklists[block.settings[linklist]].links
+                        if block.settings[linklistFilter] != blank
+                          if link.handle == linklistFilterHandle
+                            assign parentLink = link
+                            render 'simple_link', link: link
+                            break
+                          elsif link.links != blank
+                            for link in link.links
+                              if link.handle == linklistFilterHandle
+                                assign parentLink = link
+                                render 'simple_link', link: link
+                                break
+                              endif
+                            endfor
+                          endif
+                        else
+                          render 'simple_link', link: link, printFirstLink: true 
+                        endif
+                      endfor 
+                    -%}
+                  </div>
+                {%- endcapture -%}
+
+                {%- if block.settings[linklistFilter] != blank and block.settings[linklistFilterShowParent] -%}
+                  {%- assign linkUrlLastChar = parentLink.url | slice: -1 -%}
+                  {{ '<' }}{%- if linkUrlLastChar != '#' -%}a href="{{parentLink.url}}" {% if parentLink.url contains 'http' %}target="_blank"{% endif %}{%- else -%}div{%- endif %} class="mm-title {{section.settings.title_style}}"{{ '>' }}
+                    {{parentLink.title}}
+                  {{ '</' }}{%- if linkUrlLastChar != '#' -%}a{%- else -%}div{%- endif -%}{{ '>' }}
+                {%- endif -%}
+
+                {{ linksModule }}
+              {%- endif -%}
+              {%- if block.settings[featuredProduct] != blank -%}
+                <div class="featured-product module inline-{{block.settings[featuredProductInline]}}">
+                  {%- render 'product_card_atc', productCard: block.settings[featuredProduct], quickView: false -%}
+                </div>
+              {%- endif -%}
+            {%- endfor -%}
+          </div>
+        </div>
+      {%- endif -%}
+    {%- endfor -%}
+  </div>
+</div>
+<script type="module">
+  var content = document.querySelector("#shopify-section-{{ section.id }} .mega-menu");
+  {%- assign settingKey = section.id | append: '_parent_link' -%}
+  var parent = '{{settings[settingKey] | handleize}}';
+  var selector = '.header-main-menu [data-parent="'+ parent +'"]';
+  var parentElement = document.querySelector(selector);
+  if (parentElement) {
+    parentElement.classList.add('has-dropdown', 'mega-menu-trigger');
+    var trigger = parentElement.querySelector('a,button');
+    if (trigger) {
+      trigger.setAttribute('aria-expanded','false');
+    }
+    parentElement.append(content);
+    $s.setHeaderSubmenus();
+  } else {
+    console.warn('Can\'t create MEGAMENU, parent element not fount, selector: ' + selector);
+  }
+</script>
+{% if request.design_mode %}
+<script type="module">
+  var section = document.getElementById('shopify-section-{{section.id}}');
+  var menuid = {{section.id | json}};
+  section.addEventListener('shopify:section:select', (e)=>{
+    $s.expand([document.querySelector('.submenu.mega-menu-'+menuid)]);
+  });
+  section.addEventListener('shopify:section:deselect', (e)=>{
+    $s.collapse([document.querySelector('.submenu.mega-menu-'+menuid)]);
+  });
+</script>
+{% endif %}

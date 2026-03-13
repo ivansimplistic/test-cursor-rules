@@ -1,0 +1,184 @@
+{%- liquid 
+  assign disableLazySizes = false
+  if section.index == 1 
+    assign disableLazySizes = true
+  endif
+-%}
+
+<style>
+  .decorative-image-inner {position: relative; z-index: 1;}
+  .decorative-image .img-wrapper {position: absolute;}
+  .decorative-image .img-wrapper > * {border-radius: inherit;}
+</style>
+{%- for block in section.blocks -%}
+<style>
+  {%- assign blockSelector = '#block-' | append: block.id -%}
+  {{blockSelector}} .img-wrapper {border-radius: {{block.settings.border_radius | replace: '10', '1000'}}em; {% if block.settings.shadow %}box-shadow: var(--floating-box-shadow);{% endif %}}
+  @media (min-width: {{settings.breakpoint_tablet | plus: 0.001}}em) {
+    {{blockSelector}} .img-wrapper {width: {{block.settings.image_width_desktop}}%; {{block.settings.image_css_desktop}}; }
+  }
+  @media (max-width: {{settings.breakpoint_tablet}}) and (min-width: {{settings.breakpoint_mobile | plus: 0.001}}em) {
+    {{blockSelector}} .img-wrapper {width: {{block.settings.image_width_tablet}}%; {{block.settings.image_css_tablet}}; }
+  }
+  @media (max-width: {{settings.breakpoint_mobile}}){
+    {{blockSelector}} .img-wrapper {width: {{block.settings.image_width_mobile}}%; {{block.settings.image_css_mobile}}; }
+  }
+  {{block.settings.custom_css | replace: '[BLOCKID]', blockSelector}}
+</style>
+
+<div id="block-{{block.id}}" class="decorative-image {% if block.settings.use_container %}container{% endif %} {% unless block.settings.show_on_desktop %}large--hide{% endunless %} {% unless block.settings.show_on_tablet %}medium--hide{% endunless %} {% unless block.settings.show_on_mobile %}small--hide{% endunless %}" {{ block.shopify_attributes }}>
+  <div class="decorative-image-inner">
+    <div class="img-wrapper">
+        <img alt="{{block.settings.image.alt}}" class="img {% unless disableLazySizes %}lazyload{% endunless %}" data-sizes="auto" {% if disableLazySizes %}fetchpriority="high" {% else %}data-{% endif %}srcset="{% render 'lazy_src', image: block.settings.image %}" width="{{ block.settings.image.width }}" height="{{ block.settings.image.height }}" {% if block.settings.image.presentation.focal_point != blank %}style="object-position: {{block.settings.image.presentation.focal_point}};"{% endif %} />
+    </div>
+  </div>
+</div>
+{%- endfor -%}
+
+{% schema %}
+  {
+    "name": "Decorative Images",
+    "class": "type-decorative-images",
+    "presets": [
+      {
+        "name": "Decorative Images"
+      }
+    ],
+    "blocks": [
+      {
+        "type": "image_item",
+        "name": "Image",
+        "settings": [
+          {
+            "type": "header",
+            "content": "Content"
+          },
+          {
+            "type": "image_picker",
+            "id": "image",
+            "label": "Image"
+          },
+          {
+            "type": "checkbox",
+            "id": "use_container",
+            "label": "Align to container",
+            "default": true
+          },
+          {
+            "type": "range",
+            "id": "border_radius",
+            "min": 0,
+            "max": 10,
+            "step": 0.2,
+            "unit": "em",
+            "label": "Border radius",
+            "default": 0
+          },
+          {
+            "type": "checkbox",
+            "id": "shadow",
+            "label": "Shadow",
+            "default": true
+          },
+          {
+            "type": "header",
+            "content": "Desktop Settings"
+          },
+          {
+            "type": "checkbox",
+            "id": "show_on_desktop",
+            "label": "Show",
+            "default": true
+          },
+          {
+            "visible_if": "{{ block.settings.show_on_desktop == true }}",
+            "type": "range",
+            "id": "image_width_desktop",
+            "min": 0,
+            "max": 100,
+            "step": 1,
+            "unit": "%",
+            "label": "Width",
+            "default": 8
+          },
+          {
+            "visible_if": "{{ block.settings.show_on_desktop == true }}",
+            "type": "liquid",
+            "id": "image_css_desktop",
+            "label": "CSS settings",
+            "default": "top: 0em; left: 0%; transform: rotate(0deg);",
+            "info": "Use to enter position coordinates, rotation and any other necessary style."
+          },
+          {
+            "type": "header",
+            "content": "Tablet Settings"
+          },
+          {
+            "type": "checkbox",
+            "id": "show_on_tablet",
+            "label": "Show",
+            "default": true
+          },
+          {
+            "visible_if": "{{ block.settings.show_on_tablet == true }}",
+            "type": "range",
+            "id": "image_width_tablet",
+            "min": 0,
+            "max": 100,
+            "step": 1,
+            "unit": "%",
+            "label": "Width",
+            "default": 8
+          },
+          {
+            "visible_if": "{{ block.settings.show_on_tablet == true }}",
+            "type": "liquid",
+            "id": "image_css_tablet",
+            "label": "CSS settings",
+            "default": "top: 0em; left: 0%; transform: rotate(0deg);",
+            "info": "Use to enter position coordinates, rotation and any other necessary style."
+          },
+          {
+            "type": "header",
+            "content": "Mobile Settings"
+          },
+          {
+            "type": "checkbox",
+            "id": "show_on_mobile",
+            "label": "Show",
+            "default": true
+          },
+          {
+            "visible_if": "{{ block.settings.show_on_mobile == true }}",
+            "type": "range",
+            "id": "image_width_mobile",
+            "min": 0,
+            "max": 100,
+            "step": 1,
+            "unit": "%",
+            "label": "Width",
+            "default": 8
+          },
+          {
+            "visible_if": "{{ block.settings.show_on_mobile == true }}",
+            "type": "liquid",
+            "id": "image_css_mobile",
+            "label": "CSS settings",
+            "default": "top: 0em; left: 0%; transform: rotate(0deg);",
+            "info": "Use to enter position coordinates, rotation and any other necessary style."
+          },
+          {
+            "type": "header",
+            "content": "Advanced Settings"
+          },
+          {
+            "type": "liquid",
+            "id": "custom_css",
+            "label": "Custom CSS",
+            "info": "Use the label \"[BLOCKID]\" to reference the current block. It will be automatically replaced on render."
+          }
+        ]
+      }
+    ]
+  }
+{% endschema %}

@@ -1,0 +1,102 @@
+{%- capture currentElement -%}
+  {%- if template contains 'page' -%}
+    <span class="bar">/</span>
+    <span>{{ page.title }}</span>
+  {%- elsif template contains 'product' -%}
+    {%- if collection.url -%}
+      <span class="bar">/</span>
+      {{ collection.title | link_to: collection.url }}
+    {%- endif -%}
+    <span class="bar">/</span>
+    <span>{{ product.title | truncatewords: 7, '...' }}</span>
+  {%- elsif template contains 'collection' and collection.handle -%}
+    <span class="bar">/</span>
+    {%- if current_tags -%}
+      {%- capture url -%}{{ routes.collections_url }}/{{ collection.handle }}{%- endcapture -%}
+      {{ collection.title | link_to: url }}
+      <span class="bar">/</span>
+      <span>{{ current_tags | join: " + " }}</span>
+    {%- else -%}
+      <span>{{ collection.title }}</span>
+    {%- endif -%}
+  {%- elsif template contains 'search' -%}
+    <span class="bar">/</span>
+    <span>{{ page_title | remove: '*' }}</span>
+  {%- elsif template contains 'blog' -%}
+    <span class="bar">/</span>
+    {%- if current_tags -%}
+      {{ blog.title | link_to: blog.url }}
+      <span class="bar">/</span>
+      <span>{{ current_tags | join: " + " }}</span>
+    {%- else -%}
+    <span>{{ blog.title }}</span>
+    {%- endif -%}
+  {%- elsif template contains 'article' -%}
+    <span class="bar">/</span>
+    {{ blog.title | link_to: blog.url }}
+    <span class="bar">/</span>
+    <span>{{ article.title | truncatewords: 7, '...' }}</span>
+  {%- else -%}
+  <span class="bar">/</span>
+  <span>{{ page_title }}</span>
+  {%- endif -%}
+{%- endcapture -%}
+
+{%- if currentLink -%}
+  {%- assign titlePart = currentLink.title | split: '**' -%}
+  {%- if currentLink.current -%}
+    <span class="bar">/</span>
+    <span>{{ titlePart[0] | strip }}</span>
+  {%- elsif currentLink.active -%}
+    <span class="bar">/</span>
+    {{ titlePart[0] | strip | link_to: currentLink.url }}
+    {{currentElement | split: '<span ' | last | prepend: '<span ' }}
+
+  {%- elsif currentLink.child_active -%}
+    <span class="bar">/</span>
+    {%- assign linkUrlLastChar = currentLink.url | slice: -1 -%}
+    {%- if linkUrlLastChar != '#' -%}
+      {{ titlePart[0] | strip | link_to: currentLink.url }}
+    {%- else -%}
+      <span>{{ titlePart[0] | strip }}</span>
+    {%- endif -%}
+    {%- liquid 
+      for link in currentLink.links
+        if link.active or link.child_active
+          render 'breadcrumb', currentLink: link
+          break
+        endif
+      endfor
+    -%}
+  {%- endif -%}
+{%- else -%}
+<nav class="breadcrumb-wrapper scheme large--color-{{section.settings.color_scheme}} medium-down--color-{{section.settings.color_scheme_mobile}} {% if section.settings.border_top %}large--scheme-border-top{% endif %} {% if section.settings.border_bottom %}large--scheme-border-bottom{% endif %} {% if section.settings.border_top_mobile %}medium-down--scheme-border-top{% endif %} {% if section.settings.border_bottom_mobile %}medium-down--scheme-border-bottom{% endif %} {% unless section.settings.placement == 'inside' %}{% if section.settings.over_first_section %}desktop-over{% endif %} {% if section.settings.over_first_section_mobile %}mobile-over{% endif %}{% endunless %} {% if section.settings.hide_mobile %}medium-down--hide{% endif %}" {% if section.settings.placement == 'inside' %}style="background-color: transparent"{% endif %}>
+  <style>
+    @media (min-width: {{settings.breakpoint_tablet | plus: 0.001}}em){ 
+      .breadcrumb-wrapper {--padding-top: {{section.settings.padding_top}}rem; --padding-bottom: {{section.settings.padding_bottom}}rem;}
+    }
+    @media (max-width: {{settings.breakpoint_tablet}}){ 
+      .breadcrumb-wrapper {--padding-top: {{section.settings.padding_top_mobile}}rem; --padding-bottom: {{section.settings.padding_bottom_mobile}}rem;} 
+    }
+  </style>
+  <div class="flex flex-wrap flex-align-center large--justify-content-{{section.settings.text_align}} medium-down--justify-content-{{section.settings.text_align_mobile}} {% unless section.settings.placement == 'inside' %}container{% endunless %}">
+    <div class="breadcrumb flex flex-wrap align-items-center small-label" role="navigation" aria-label="breadcrumbs">
+      <a href="{{ routes.root_url }}" title="Home">{{ 'general.home_link' | t }}</a>
+      {%- liquid 
+        if linklists[settings.breadcrumbs_navigation_menu].links
+          for link in linklists[settings.breadcrumbs_navigation_menu].links
+            if link.active or link.child_active
+              render 'breadcrumb', currentLink: link
+              assign nestedBreadcrumbShown = true
+              break
+            endif
+          endfor
+        endif
+      -%}
+      {%- if nestedBreadcrumbShown != true -%}
+        {{currentElement}}
+      {%- endif -%}
+    </div>
+  </div>
+</nav>
+{%- endif -%}

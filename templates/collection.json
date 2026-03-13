@@ -1,0 +1,58 @@
+{
+  "sections": {
+    "collection_hero": {
+      "type": "collection_hero",
+      "blocks": {
+        "breadcrumb": {
+          "type": "breadcrumb",
+          "settings": {
+          }
+        },
+        "title": {
+          "type": "title",
+          "settings": {
+          }
+        },
+        "quantity": {
+          "type": "quantity",
+          "settings": {
+          }
+        },
+        "description": {
+          "type": "richtext",
+          "settings": {
+          }
+        },
+        "subcategories": {
+          "type": "subcategories",
+          "settings": {
+          }
+        }
+      },
+      "block_order": [
+        "breadcrumb",
+        "title",
+        "quantity",
+        "subcategories"
+      ],
+      "settings": {
+      }
+    },
+    "collection_subcategories": {
+      "type": "collection_subcategories",
+      "disabled": true,
+      "settings": {
+      }
+    },
+    "collection_main": {
+      "type": "collection_main",
+      "settings": {
+      }
+    }
+  },
+  "order": [
+    "collection_hero",
+    "collection_subcategories",
+    "collection_main"
+  ]
+}

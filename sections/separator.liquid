@@ -1,0 +1,93 @@
+<style>
+#shopify-section-{{section.id}} .container.half .border {width: 60%; margin: auto;}
+@media (min-width: {{settings.breakpoint_tablet | plus: 0.001}}em) {
+  #shopify-section-{{section.id}} .separator {padding: {{section.settings.padding}}rem 0;}
+}
+@media (max-width: {{settings.breakpoint_tablet}}) {
+  #shopify-section-{{section.id}} .separator {padding: {{section.settings.padding_mobile}}rem 0;}
+}
+</style>
+<section class="separator scheme color-{{section.settings.color_scheme}}">
+  <div class="large--{{section.settings.border_width}} medium-down--{{section.settings.border_width_mobile}}">
+    {%- if section.settings.border -%}
+      <div class="border scheme-border-bottom medium-down--hide"></div>
+    {%- endif -%}
+    {%- if section.settings.border_mobile -%}
+      <div class="border scheme-border-bottom large--hide medium-down--show"></div>
+    {%- endif -%}
+  </div>
+</section>
+{% schema %}
+  {
+    "name": "Separator",
+    "class": "type-separator",
+    "tag": "section",
+    "presets": [
+      {
+        "name": "Separator"
+      }
+    ],
+    "settings": [
+      {
+        "type": "color_scheme",
+        "id": "color_scheme",
+        "label": "Color scheme",
+        "default": "scheme-1"
+      },
+      {
+        "type": "range",
+        "id": "padding",
+        "min": 0,
+        "max": 20,
+        "step": 0.5,
+        "unit": "rem",
+        "label": "Padding (Desktop)",
+        "default": 3.5
+      },
+      {
+        "type": "checkbox",
+        "id": "border",
+        "label": "Border (Desktop)",
+        "default": true
+      },
+      {
+        "type": "select",
+        "id": "border_width",
+        "label": "Border width (Desktop)",
+        "options": [
+          {"value": "full", "label": "Full"},
+          {"value": "container", "label": "Container"},
+          {"value": "container half", "label": "Half container"}
+        ],
+        "default": "container"
+      },
+      {
+        "type": "range",
+        "id": "padding_mobile",
+        "min": 0,
+        "max": 20,
+        "step": 0.5,
+        "unit": "rem",
+        "label": "Padding (Mobile)",
+        "default": 2.5
+      },
+      {
+        "type": "checkbox",
+        "id": "border_mobile",
+        "label": "Border (Mobile)",
+        "default": true
+      },
+      {
+        "type": "select",
+        "id": "border_width_mobile",
+        "label": "Border width (Mobile)",
+        "options": [
+          {"value": "full", "label": "Full"},
+          {"value": "container", "label": "Container"},
+          {"value": "container half", "label": "Half container"}
+        ],
+        "default": "container"
+      }
+    ]
+  }
+{% endschema %}

@@ -1,0 +1,62 @@
+{%- liquid
+  assign cardsColorScheme = block.settings.cards_color_scheme
+  if block.settings.ignore_color_scheme
+    assign cardsColorScheme = ''
+  endif
+-%}
+{%- for prod in block.settings.products -%}
+<div class="tb-multi-item keen-slider-slide" id="block-{{ block.id }}-1-{{ forloop.index }}" {{ block.shopify_attributes }}>
+  {%- render 'product_card_atc', productCard: prod, cardsColorScheme: cardsColorScheme -%}
+</div>
+{%- endfor -%}
+{%- for prod in block.settings.collection.products limit: block.settings.collection_limit -%}
+  <div class="tb-multi-item keen-slider-slide" id="block-{{ block.id }}-2-{{ forloop.index }}" {{ block.shopify_attributes }}>
+    {%- render 'product_card_atc', productCard: prod, cardsColorScheme: cardsColorScheme -%}
+  </div>
+{%- endfor -%}
+{% schema %}
+{
+  "name": "Product Cards",
+  "tag": null,
+  "presets": [
+    {
+      "name": "Product Cards",
+      "blocks": [
+      ]
+    }
+  ],
+  "settings": [
+    {
+      "type": "product_list",
+      "id": "products",
+      "label": "Products"
+    },
+    {
+      "type": "collection",
+      "id": "collection",
+      "label": "Collection"
+    },
+    {
+      "visible_if": "{{ block.settings.collection != blank }}",
+      "type": "number",
+      "id": "collection_limit",
+      "label": "Collection products limit",
+      "default": 10,
+      "info": "Limit the number of collection products to show. Maximum: 50"
+    },
+    {
+      "type": "checkbox",
+      "id": "ignore_color_scheme",
+      "label": "Cards inherit color scheme",
+      "default": true
+    },
+    {
+      "visible_if": "{{ block.settings.ignore_color_scheme == false }}",
+      "type": "color_scheme",
+      "id": "cards_color_scheme",
+      "label": "Cards color scheme",
+      "default": "scheme-1"
+    }
+  ]
+}
+{% endschema %}

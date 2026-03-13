@@ -1,0 +1,51 @@
+{{ 'customer_portal.css' | asset_url | stylesheet_tag }}
+<script src="{{ 'customer_portal.js' | asset_url }}" defer="defer"></script>
+<div class="customer-portal-page scheme color-{{settings.customer_portal_color_scheme}}">
+  <div class="container flex flex-wrap align-items-start">
+
+    {%- render 'customer_portal_menu', template: template -%}
+
+    <div class="flex-1 customer-portal-content">
+      {%- render 'customer_portal_announcement' -%}
+
+      <h1>Hello, {{ customer.first_name }}</h1>
+      
+      <div class="grid info">
+        <div class="grid-item one-half small--one-whole">
+          <h2 class="h3">{{ 'account.account_details.details_column_title' | t }}</h2>
+          <p>{{ customer.name }}<br/>
+          {{ customer.email }}</p>
+          <a class="link" href="{{ routes.account_login_url }}#recover?email={{customer.email}}">{{ 'account.account_details.reset_password_label' | t }}</a>
+        </div>
+        <div class="grid-item one-half small--one-whole">
+          <h2 class="h3">{{ 'account.account_details.address_column_title' | t }}</h2>
+          {%- if customer.default_address != nil and customer.default_address.address1 != blank -%}
+            <p>
+              {{ customer.default_address.address1 }}<br/>
+              {%- if customer.default_address.address2 != "" -%}
+                {{ customer.default_address.address2 }}<br/>
+              {%- endif -%}
+              {{ customer.default_address.city}}, {% if customer.default_address.province_code %}{{customer.default_address.province_code}}, {% endif %}{{customer.default_address.country}}<br/>
+              {{ customer.default_address.zip}}<br/>
+              {{ customer.default_address.phone }}
+            </p>
+          {%- endif -%}
+          <a class="link" href="{{ routes.account_addresses_url }}">{{ 'account.account_details.manage_addresses_label' | t }} ({{ customer.addresses_count }})</a>
+        </div>
+      </div>
+      
+      <h2 class="h3">{{ 'account.account_details.latest_orders_title' | t }}</h2>
+      {%- render 'order_history_content', orderLimit: 3 -%}
+      {%- if customer.orders.size > 3 -%}
+        {%- assign pastOrders = customer.orders.size | minus: 3 -%}
+        <a class="link see-all-orders" href="{{ routes.account_url }}?view=order_history">{{ 'account.account_details.see_past_orders_label' | t: orders_size: customer.orders.size, past_orders_size: pastOrders }}</a>
+      {%- endif -%}
+    </div>
+  </div>
+</div>
+{% schema %}
+  {
+    "name": "Account",
+    "class": "type-account"
+  }
+{% endschema %}

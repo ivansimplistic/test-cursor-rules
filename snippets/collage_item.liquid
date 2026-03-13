@@ -1,0 +1,167 @@
+{%- liquid assign link = block.settings.link
+  capture linkObject 
+    echo link.object
+  endcapture
+  if link contains 'product'
+    assign object = link.object
+    assign objectImage = object.featured_image
+  elsif link contains 'collection'
+    assign object = link.object
+    if object.image != blank
+      assign objectImage = object.image
+    elsif object.products.first.featured_image != blank
+      assign objectImage = object.products.first.featured_image
+    endif
+  elsif linkObject contains 'rticle'
+    assign object = link.object
+    assign objectImage = object.image
+  elsif link contains 'blog' 
+    assign object = link.object
+endif -%}
+
+{%- liquid 
+  assign disableLazySizes = false
+  if section.index == 1 
+    assign disableLazySizes = true
+  endif
+-%}
+
+<div id="{{blockId}}" class="collage-item trigger-floating-buttons block-{{block.id}} {{blockClass}} {% if block.settings.text_under_image %}text-below{% endif %} tint-{{block.settings.tint_type}} {% if block.settings.image != blank %}has-image{% endif %} {{block.settings.width}}" {{block.shopify_attributes}} {% if current_page %}data-page="{{ current_page }}"{% endif %}>
+  <style>
+    .block-{{block.id}} {
+      {% assign tintOpacity = block.settings.tint_opacity | divided_by: 100.00 %}
+      --tint: {{block.settings.tint_color | color_modify: 'alpha', tintOpacity}};
+      --tint-blur: {{block.settings.tint_blur}}px;
+      --cta-spacing: {{block.settings.cta_spacing}}rem;
+      --border-radius: {{block.settings.border_radius | default: section.settings.items_border_radius}}em;
+      --text-padding: calc(var(--global-sections-padding) * {{block.settings.text_padding | divided_by: 100.00}});
+      {%- if block.settings.image != blank -%}
+        --image-padding-top: {{100.0 | divided_by: block.settings.image.aspect_ratio}}%;
+      {%- endif -%}
+    }
+    {% if block.settings.custom_background != blank and block.settings.custom_background != 'rgba(0,0,0,0)' %}.block-{{block.id}} .wrap {--scheme-background-gradient: {{block.settings.custom_background}};}{% endif %}
+    @media (max-width: {{settings.breakpoint_tablet}}) {
+      .block-{{block.id}} {
+        --text-padding: calc(var(--global-sections-padding) * {{block.settings.text_padding_mobile | divided_by: 100.00}});
+      }
+    }
+    {%- if block.settings.show_on_page_number != blank -%}
+      @media (min-width: {{settings.breakpoint_tablet | plus: 0.001}}em) {
+        .block-{{block.id}} {order: {{block.settings.flex_order_desktop | plus: orderIndex}} !important;}
+      }
+      @media (max-width: {{settings.breakpoint_tablet}}) and (min-width: {{settings.breakpoint_mobile | plus: 0.001}}em) {
+        .block-{{block.id}} {order: {{block.settings.flex_order_tablet | plus: orderIndex}} !important;}
+      }
+      @media (max-width: {{settings.breakpoint_mobile}}) {
+        .block-{{block.id}} {order: {{block.settings.flex_order_mobile | plus: orderIndex}} !important;}
+      }
+    {%- endif -%}
+  </style>
+  {{ '<' }}{% if block.settings.link != blank and block.settings.button == blank %}a href="{{block.settings.link}}" {% else %}div{% endif %} class="wrap scheme color-{{block.settings.content_color_scheme}} no-highlight-hover flex {{block.settings.text_position}} text-{{block.settings.text_align}} {% if block.settings.border %}scheme-border-box{% endif %}"{{ '>' }}
+    {%- if block.settings.media_type == 'video' -%}
+      {%- if block.settings.video_mp4 != blank or block.settings.video_iframe != blank -%}
+        <div class="media-wrap ease-animation-slow {% if block.settings.video_iframe != blank %}iframe-wrap{% endif %}">
+          {%- render 'media_video_html', section: block, autoplay: true -%}
+        </div>
+      {%- endif -%}
+    {%- elsif block.settings.media_type == 'image' and block.settings.image != blank -%}
+      <div class="media-wrap ease-animation-slow">
+        <img class="media ease-animation-slow {% unless disableLazySizes %}lazyload{% endunless %}" data-sizes="auto" alt="{{block.settings.image.alt}}" src="{% render 'image_placeholder', image: block.settings.image %}" {% if disableLazySizes %}fetchpriority="high" {% else %}data-{% endif %}srcset="{% render 'lazy_src', image: block.settings.image %}" width="{{ block.settings.image.width }}" height="{{ block.settings.image.height }}" {% if block.settings.image.presentation.focal_point != blank %}style="object-position: {{block.settings.image.presentation.focal_point}};"{% endif %} />
+      </div>
+    {%- elsif objectImage != blank -%}
+      <div class="media-wrap ease-animation-slow">
+        <img class="media ease-animation-slow {% unless disableLazySizes %}lazyload{% endunless %}" data-sizes="auto" alt="{{object.title}}" src="{% render 'image_placeholder', image: objectImage %}" {% if disableLazySizes %}fetchpriority="high" {% else %}data-{% endif %}srcset="{% render 'lazy_src', image: objectImage %}" width="{{ block.settings.image.width }}" height="{{ block.settings.image.height }}" {% if block.settings.image.presentation.focal_point != blank %}style="object-position: {{block.settings.image.presentation.focal_point}};"{% endif %} />
+      </div>
+    {%- endif -%}
+    {%- liquid
+      if object.title != blank and block.settings.show_object_title
+        assign showObjectTitle = true
+      endif
+      if block.settings.button != blank and block.settings.cta_style != 'floating_button'
+        assign showCta = true
+      endif
+      if block.settings.text != blank and block.settings.text != '<p></p>'
+        assign hasTextField = true
+      endif 
+    -%}
+    {%- if block.settings.title != blank or showObjectTitle or hasTextField or showCta -%}
+      <div class="captions {% if block.settings.text_under_image %}flex direction-column {{block.settings.text_position | remove: 'justify-content' | replace: 'align-items', 'justify-content' | prepend: 'align-items'}}{% endif %}">
+        {%- liquid 
+          if block.settings.show_object_title and object.title != blank
+            assign title = object.title
+          elsif block.settings.title != blank
+            assign title = block.settings.title
+          endif 
+        -%}
+        {%- if title != blank -%}
+          <div class="title {{block.settings.title_size | replace: 0, '1-xl' | replace: -1, '1-xxl' | prepend: 'h' }}">
+            {{title | replace: '[br]', '<br aria-hidden="true" />' | replace: '[hi]', '<span class="highlight">' | replace: '[/hi]', '</span>' |  replace: '[hi2]', '<span class="highlight2">' | replace: '[/hi2]', '</span>'}}
+          </div>
+        {%- endif -%}
+        {%- if block.settings.show_object_info -%}
+          {%- if object.price != blank -%}
+            <div class="price {{block.settings.text_size | prepend: 'p'}}">
+              {%- if object.compare_at_price > object.price -%}
+                <s>{{object.compare_at_price | money_without_trailing_zeros}}</s>&nbsp;&nbsp;
+              {%- endif -%}
+              {{object.price | money_without_trailing_zeros}}
+            </div>
+          {%- elsif object.products.size > 0 -%}
+            <div class="small-label">
+              {{ 'collage_item.products_title' | t: products_quantity: object.products.size }}
+            </div>
+          {%- elsif object.articles.size > 0 -%}
+            <div class="small-label">
+              {{ 'collage_item.posts_title' | t: posts_quantity: object.articles.size }}
+            </div>
+          {%- elsif object.published_at != blank -%}
+            <div class="small-label">
+              {{ object.published_at | date: "%d %B %Y" }}
+            </div>
+          {%- endif -%}
+        {%- endif -%}
+        {%- if hasTextField -%}
+          <div class="text {{block.settings.text_size | prepend: 'p'}}">{{block.settings.text}}</div>
+        {%- endif -%}
+        {%- if block.settings.cta_style != 'floating_button' and block.settings.button != blank -%}
+          {%- assign linkIcon = blank -%}
+          {%- if block.settings.cta_style contains 'link' and settings.links_arrow != 'none' -%}
+            {%- capture linkIcon -%}{%- render 'icons', icon: settings.links_arrow -%}{%- endcapture -%}
+          {%- endif -%}
+          <a class="cta {{block.settings.cta_style}} {{block.settings.cta_size}}" href="{{block.settings.link}}" {% if block.settings.link contains 'https://' %}target="_blank"{% endif %}>{{block.settings.button}}{{linkIcon}}</a>
+        {%- endif -%}
+        {%- if block.settings.newsletter -%}
+          {%- render 'newsletter_form', block: block -%}
+        {%- endif -%}
+      </div>
+    {%- endif -%}
+    {%- if block.settings.cta_style == 'floating_button' and block.settings.button != blank -%}
+      <a href="{{block.settings.link}}" {% if block.settings.link contains 'https://' %}target="_blank"{% endif %} class="floating-buttons flex direction-column">
+        <div class="cta">
+          <div class="circle ease-animation flex align-items-center justify-content-center">
+            {%- liquid
+              if block.settings.link contains 'instagram'
+                render 'icons', icon: 'instagram'
+              elsif block.settings.link contains 'facebook'
+                render 'icons', icon: 'facebook'
+              elsif block.settings.link contains 'tiktok'
+                render 'icons', icon: 'tiktok'
+              elsif block.settings.link contains 'youtube'
+                render 'icons', icon: 'youtube'
+              elsif block.settings.link contains 'vimeo'
+                render 'icons', icon: 'vimeo'
+              elsif block.settings.link contains 'product' or block.settings.link contains 'collection'
+                render 'icons', icon: 'cart'
+              else
+                render 'icons', icon: 'arrow-right'
+              endif
+            -%}
+          </div>
+          {%- if block.settings.button != blank -%}
+            <div class="tooltip medium-down--visually-hidden ease-animation badge">{{block.settings.button}}</div>
+          {%- endif -%}
+        </div>
+      </a>
+    {%- endif -%}
+  {{ '</' }}{% if block.settings.link != blank and block.settings.button == blank %}a{% else %}div{% endif %}{{ '>' }}
+</div>

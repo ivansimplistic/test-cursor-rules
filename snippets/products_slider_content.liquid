@@ -1,0 +1,18 @@
+<component-carousel class="carousel-element text-left" {% if initOndemand %}data-init-ondemand="true"{% endif %} data-carousel-mode="free-snap" data-carousel-loop-desktop="false" data-carousel-loop-mobile="false" data-carousel-autoplay="0" data-carousel-automove="0" data-slides-scroll-mode="{{settings.carousel_slides_scroll_mode}}" data-carousel-centered-desktop="" data-carousel-spacing-desktop="15" data-slides-per-view-desktop="{{itemsDesktop | default: 2}}" data-carousel-centered-tablet="" data-carousel-spacing-tablet="15" data-slides-per-view-tablet="{{itemsTablet | default: 2}}" data-carousel-centered-mobile="" data-carousel-spacing-mobile="10" data-slides-per-view-mobile="{{itemsMobile | default: 2}}" data-match-height-selectors=".title">
+  <div class="featured-head flex align-items-end justify-content-between">
+    <div class="info">
+      {{headContentHtml}}
+    </div>
+    <div class="keen-arrows flex">
+      {% render 'carousel_arrow', type: 'prev' %}
+      {% render 'carousel_arrow', type: 'next' %}
+    </div>
+  </div>
+
+  <div class="keen">
+    <div class="keen-slider keen-slider-slide-margin">
+    {{itemsHtml}}
+    </div>
+    <div class="keen-nav-bar"></div>
+  </div>
+</component-carousel>

@@ -1,0 +1,37 @@
+{%- comment -%}
+    Renders the search form on the top utils
+
+    Accepts:
+    - form_style: {String} (embedded / popup / dropdown)
+    
+    Usage:
+    {%- render 'top_utils_search', form_style: section.settings.search_form_style -%}
+{%- endcomment -%}
+
+{%- capture searchDropdown -%}
+  <button type="button" aria-controls="search-bar" aria-expanded="false" class="trigger-search item {% unless section.settings.search_show_mobile %}small--hide{% endunless %}" aria-label="{{ 'top_utils_search.search_caption' | t | escape }}">
+    {%- render 'icons', icon: 'search' -%}
+    <span class="label">{{ 'top_utils_search.search_caption' | t }}</span>
+  </button>
+  <div id="search-bar" class="scheme color-{{section.settings.submenu_color_scheme}} {{form_style}} {% unless section.settings.search_show_mobile %}small--hide{% endunless %}">
+    <div class="container flex align-items-start">
+      {%- render 'search_form', autocomplete: true -%}
+      <button class="close-search-bar" aria-label="{{ 'top_utils_search.close_caption' | t | escape }}">
+        {% render 'icons', icon: 'close' %}
+      </button>          
+    </div>
+  </div>
+{%- endcapture -%}
+
+{%- if form_style == 'embedded' -%}
+<div class="medium-down--hide">
+  <div class="embedded-search item">
+    {%- render 'search_form', autocomplete: true, color_scheme: section.settings.submenu_color_scheme -%}
+  </div>
+</div>
+<div class="hide medium-down--show">
+  {{searchDropdown}}
+</div>
+{%- else -%}
+  {{searchDropdown}}
+{%- endif -%}

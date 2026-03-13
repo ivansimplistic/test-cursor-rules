@@ -1,0 +1,120 @@
+.filters-inner {position: relative; border-radius: var(--filters-border-radius);}
+.filters-inner.same-scheme:not(.scheme-border-box) {background: transparent; padding: 0 !important;}
+.filters-inner > * {position: relative;}
+.filters-inner > *:not(:last-child):not(.visually-hidden) {margin-bottom: 1.5em;}
+.collection-filters .summary button {font-size: 0.8em; border: 1px solid; line-height: 1; padding: 0.4em 0.8em; border-radius: 3em; margin: 0 0.3em 0.3em 0;}
+.collection-filters .summary button svg {font-size: 0.8em; margin-left: 0.5em;}
+.collection-filters .group-title {position: relative; padding: 0.7em 0;} 
+.collection-filters .item {padding: 0.3em 0;}
+.collection-filters .item.disabled {opacity: 0.4;}
+.collection-filters .item .count {opacity: 0.6;}
+.collection-filters .item.disabled .count {opacity: 1;}
+.collection-filters .color-swatch {width: 20px; height: 20px; margin-right: 0.7em; margin-left: 3px; border: 1px solid rgba(0,0,0,0.1); border-radius: 50%; background-size: cover; background-position: center; flex-shrink: 0;}
+.collection-filters input:checked + label .color-swatch {box-shadow: 0 0 0 2px; border-color: #fff;}
+.collection-filters .checkbox {width: 18px; height: 18px; margin-right: 0.7em; border: 1px solid; background: url({{"checked.png" | asset_url}}) no-repeat center; background-size: 0%;}
+.collection-filters input:checked + label .checkbox {background-size: 70%;}
+.user-is-tabbing .collection-filters input:focus + label {outline-width: 2px; outline-style: solid; outline-color: Highlight;}
+.collection-filters util-accordion .accordion {padding: 0;}
+.collection-filters util-accordion .accordion-panel > :first-child {padding: 1rem 0;}
+
+.collection-filters .item-price {column-gap: 0.5em; padding-top: 0.25em; margin-bottom: 1.2em;}
+.collection-filters .item-price label, 
+.collection-filters .item-price .currency {margin-right: 0.3em; opacity: 0.7; line-height: 1;}
+.collection-filters .item-price .field {display: flex; align-items: center; border: none; background-color: transparent;}
+.collection-filters .item-price .field input {padding: 0; background: transparent !important;}
+.collection-filters [aria-expanded="false"] + .accordion-panel { position: relative; } /* workaround for sliding panel filters bug showing empty space below accordions */
+.collection-filters .results-count {margin-bottom: 0.75em;}
+
+@media (min-width: {{settings.breakpoint_tablet | plus: 0.001}}em) and (max-width: {{settings.container_width | divided_by: 10 | divided_by: 1.5}}rem){
+  .collection-filters .item-price .group {display: block !important;}
+}
+@media (min-width: {{settings.breakpoint_tablet | plus: 0.001}}em){
+  .collection-filters:not(.layout-button) {width: max(20%, 13.5em); margin-right: 2em; box-shadow: none;}
+  .collection-filters:not(.layout-button) .filters-inner {padding: 1.5em;}
+
+  .collection-filters.layout-button .filters-inner {padding: var(--container-padding); border-radius: 0; overflow-y: auto; border: none;}
+
+  .collection-filters.layout-horizontal {width: 100%; margin-right: 0; margin-bottom: 2em;}
+  .collection-filters.layout-horizontal .filters-inner {position: relative; top: 0; overflow: unset; max-height: none;}
+  .collection-filters.layout-horizontal .filters-inner util-accordion {display: flex; flex-wrap: wrap; gap: 1em 2em; margin-bottom: 0;}
+  .collection-filters.layout-horizontal .filters-inner .accordion-panel {position: absolute; z-index: 3; box-shadow: var(--floating-box-shadow);}
+  .collection-filters.layout-horizontal .filters-inner .panel-inner {padding: 0.75em; max-height: 50vh; overflow-y: auto; background: #fff;}
+  .collection-filters.layout-horizontal .filters-inner #panel-filter\.v\.price .panel-inner {padding-bottom: 1.75em; max-width: 17em;}
+  .collection-filters.layout-horizontal .accordion {padding: 0;}
+  /* optional: move summary to bottom on desktop only */
+  .collection-filters.layout-horizontal .filters-inner {display: flex; flex-flow: column;}
+  .collection-filters.layout-horizontal .filters-inner .summary {order: 1; margin-bottom: 0; margin-top: 1em;}
+  .collection-filters.layout-horizontal .group-title {padding: 0 0 0.2em;}
+  .collection-filters:not(.layout-horizontal) util-accordion .accordion:first-child .group-title {padding-top: 0;} 
+  .collection-filters:not(.layout-horizontal) util-accordion .accordion:last-child .group-title:not(.scheme-border-bottom) {padding-bottom: 0;}
+  .collection-filters:not(.layout-horizontal) util-accordion .accordion:last-child {border-bottom: 0;}
+  .collection-filters:not(.layout-horizontal) util-accordion .accordion .group-title.scheme-border-bottom + .accordion-panel > :first-child {padding-bottom: 2rem;}
+  
+  /* optional: sticky (not finished) */
+  /*
+  .collection-filters.layout-horizontal {z-index: 2; position: sticky; top: var(--header-height) !important; transition-delay: 20ms !important;}
+  */
+}
+@media (max-width: {{settings.breakpoint_tablet}}){
+  .open-filters svg {margin-left: 0.5em;}
+  .filters-inner {padding:  1.3em; border-radius: 0; overflow-y: auto; border: none;}
+}
+
+
+/*
+******************** Price Range ********************
+*/
+.price-range-filter {
+  display: block;
+  padding: 0 0 0.6em !important;
+}
+.price-range-filter .price-progress{
+  height: 5px;
+  position: relative;
+  border-radius: 5px;
+}
+.price-range-filter .price-progress .line{
+  height: 100%;
+  left: 0%;
+  right: 100%;
+  position: absolute;
+  border-radius: 5px;
+  background: var(--scheme-text-color);
+}
+.price-range-filter .range-input{
+  position: relative;
+}
+.price-range-filter .range-input input{
+  position: absolute;
+  width: 100%;
+  height: 5px;
+  top: -5px;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  background: none;
+  pointer-events: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+}
+.price-range-filter .range-input input::-webkit-slider-thumb{
+  height: 17px;
+  width: 17px;
+  border-radius: 50%;
+  pointer-events: auto;
+  -webkit-appearance: none;
+  background: var(--scheme-text-color);
+  box-shadow: 0 0 6px rgba(0,0,0,0.05);
+  cursor: pointer;
+}
+.price-range-filter .range-input input::-moz-range-thumb{
+  height: 17px;
+  width: 17px;
+  border: none;
+  border-radius: 50%;
+  pointer-events: auto;
+  -moz-appearance: none;
+  background: var(--scheme-text-color);
+  box-shadow: 0 0 6px rgba(0,0,0,0.05);
+  cursor: pointer;
+}

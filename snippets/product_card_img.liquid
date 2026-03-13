@@ -1,0 +1,19 @@
+{%- assign productImage = productImage | default: productCard.featured_media -%}
+<div class="img-wrap mode-{{imgMode}}">
+  {%- if productImage.media_type == 'video' or productImage.media_type == 'external_video' -%}
+    {%- assign placeholderSize = productCard.featured_media.preview_image.width | append: 'x' | append: productCard.featured_media.preview_image.height -%}
+    <img class="img main under-video lazyload" data-sizes="auto" alt="{{ productImage.alt }}" data-srcset="{{ 'placeholder.png' | asset_img_url: placeholderSize }}" width="{{ productCard.featured_media.preview_image.width }}" height="{{ productCard.featured_media.preview_image.height }}" />
+    <div class="img media-wrap video-wrap">
+      {%- if productImage.media_type == 'video' -%}
+        {%- render 'media_video_html', videoMp4: productImage, autoplay: true -%}
+      {%- else -%}
+        {%- render 'media_video_html', videoIframe: productImage, videoIframeType: productImage.host -%}
+      {%- endif -%}
+    </div>
+  {%- else -%}
+    <img class="img main lazyload" alt="{{ productImage.alt }}" data-sizes="auto" data-srcset="{% render 'lazy_src', image: productImage %}" width="{{ productImage.width }}" height="{{ productImage.height }}" />
+    {%- if productCard.images.size > 1 and imgMode == 'hover' -%}
+      <img class="img hover-img ease-animation-slow lazyload" alt="" data-sizes="auto" data-srcset="{% render 'lazy_src', image: productCard.images.last %}" width="{{ productImage.width }}" height="{{ productImage.height }}" />
+    {%- endif -%}
+  {%- endif -%}
+</div>

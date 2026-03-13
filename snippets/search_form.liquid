@@ -1,0 +1,41 @@
+{%- comment -%}
+    Renders the search form
+
+    Accepts:  
+    - searchTypes: {String} Comma separated list of types like page, article or product. Default: product
+    - autocomplete: {Boolean} When true, query and show results while typing.
+    - color_scheme (optional): {String} color scheme (scheme-1 / scheme-1 v2 / scheme-2 / scheme-3 / scheme-4)
+
+    Usage:
+    {%- render 'search_form', autocomplete: true -%}
+{%- endcomment -%}
+
+{%- if autocomplete -%}
+  {%- capture linksJson -%}[
+  {%- for link in linklists[settings.search_popular_links].links -%}
+    {% if forloop.index > 1 %},{% endif %}{"url": {{link.url | json}}, "title": {{link.title | json}} }
+  {%- endfor -%}]
+  {%- endcapture -%}
+{%- endif -%}
+
+<search-form {% if autocomplete and settings.enable_autocomplete_results == true %}data-autocomplete="true" data-predictive-search="{{settings.enable_predictive_search}}" data-popular-searches="{{ linksJson | escape}}"{% endif %} {% if settings.search_show_price %} data-show-price="true"{% endif %}>
+  <form action="{{ routes.search_url }}" method="get" class="search-form" role="search">
+    <div class="field no-label">
+      <input placeholder="{{ 'search_form.search_placeholder' | t | escape }}" aria-label="{{ 'search_form.enter_search_terms_caption' | t | escape }}" type="text" class="input-search animation" name="q" value="{{ search.terms | remove: '*' | escape }}" autocomplete="off" autocapitalize="off" spellcheck="false" />
+      <button aria-label="{{ 'search_form.submit_search_caption' | t | escape }}" tabindex="-1">
+        {%- render 'icons', icon: 'search' -%}
+      </button>
+    </div>
+    {%- liquid
+      assign defaultTypes = 'product'
+      if settings.search_include_pages
+        assign defaultTypes = defaultTypes | append: ',page'
+      endif
+      if settings.search_include_articles
+        assign defaultTypes = defaultTypes | append: ',article'
+      endif
+    -%}
+    <input type="hidden" name="type" value="{{searchTypes | default: defaultTypes}}" />
+  </form>
+  <div class="search-results {% if color_scheme != blank %}scheme color-{{ color_scheme }}{% endif %}"></div>
+</search-form>

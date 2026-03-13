@@ -1,0 +1,974 @@
+<style>
+  {%- for block in section.blocks -%}
+    .block-{{block.id}} {
+      --footer-column-width: {{block.settings.column_width}}%;
+      {%- if block.settings.social_media_size != blank -%}
+        --social-media-size: {{block.settings.social_media_size}}%;
+      {%- endif -%}
+      {%- if block.type == 'mixed' -%}
+      --img-simple-border-radius: {{block.settings.images_border_radius}}em;
+      {%- endif -%}
+    }
+  {%- endfor -%}
+  @media (min-width: {{settings.breakpoint_tablet | plus: 0.001}}em){
+    #footer {
+      --footer-top-padding: calc(var(--global-sections-padding) * {{section.settings.top_padding_desktop | divided_by: 100.00}});
+      --footer-bottom-padding: calc(var(--global-sections-padding) * {{section.settings.bottom_padding_desktop | divided_by: 100.00}});
+      --footer-titles-size: {{section.settings.top_title_size}}%;
+      --footer-links-margin-vertical: {{section.settings.top_menu_margin_vertical}}rem;
+      --footer-links-transform: {{section.settings.top_menu_transform}};
+      --footer-links-letter-spacing: {{section.settings.top_menu_letter_spacing | divided_by: 10.00}}em;
+      
+    }
+  }
+  @media (max-width: {{settings.breakpoint_tablet}}){
+    #footer {
+      --footer-top-padding: calc(var(--global-sections-padding) * {{section.settings.top_padding_mobile | divided_by: 100.00}});
+      --footer-bottom-padding: calc(var(--global-sections-padding) * {{section.settings.bottom_padding_mobile | divided_by: 100.00}});
+      --footer-titles-size: {{section.settings.top_title_size_mobile}}%;
+      --footer-links-margin-vertical: {{section.settings.top_menu_margin_vertical}}rem;
+    }
+  }
+</style>
+<div id="footer">
+  {%- if section.blocks.size > 0 -%}
+  <div class="top scheme color-{{section.settings.top_color_scheme}} border-{{section.settings.top_border}} {% if section.settings.top_border == 'full' %}scheme-border-top{% endif %}">
+    <div class="container">
+      <div class="wrap {% if section.settings.top_border == 'container' %}scheme-border-top{% endif %}">
+        <div class="grid justify-content-between">
+          {%- for block in section.blocks -%}
+            <div class="grid-item block-{{block.id}} {{block.type}} {% if block.settings.accordion_mobile %}accordion-mobile{% endif %}" {{block.shopify_attributes}}>
+              {%- if block.type == 'navigation' -%}
+                {{ '<' }}{%- if block.settings.accordion_mobile -%}util-accordion data-expand-multiple="true"{%- else -%}div{%- endif %} class="custom"{{ '>' }}
+                  {%- for i in (1..2) -%}
+                    {%- if forloop.first -%}
+                      {%- assign title = 'title' -%}
+                    {%- else -%}
+                      {%- assign title = 'title' | append: i -%}
+                    {%- endif -%}
+                    {%- assign linklist = 'linklist' | append: i -%}
+                    {%- assign linklistFilter = 'linklist_filter' | append: i -%}
+                    {%- assign linklistFilterHandle = block.settings[linklistFilter] | handle -%}
+                    {%- if block.settings[linklist] != blank -%}
+                      {%- capture aTitle -%}
+                        <h2 class="footer-title {{section.settings.top_title_style}}">{{block.settings[title]}}</h2>
+                      {%- endcapture -%}
+                      {%- capture aContent -%}
+                        <div class="links-wrap {{section.settings.top_menu_size | prepend: 'p'}}">
+                          {%- liquid
+                            for link in linklists[block.settings[linklist]].links
+                              if block.settings[linklistFilter] != blank
+                                if link.handle == linklistFilterHandle
+                                  render 'simple_link', link: link
+                                  break
+                                elsif link.links != blank
+                                  for link in link.links
+                                    render 'simple_link', link: link
+                                    break
+                                  endfor
+                                endif
+                              else
+                                render 'simple_link', link: link, printFirstLink: true 
+                              endif
+                            endfor 
+                          -%}
+                        </div>
+                      {%- endcapture -%}
+                      {%- if block.settings.accordion_mobile and block.settings[title] != blank -%}
+                        {%- assign hasAccordion = true -%}
+                        <div class="accordion">
+                          <button type="button" aria-expanded="false" class="accordion-trigger" aria-controls="panel-{{block.id}}-{{i}}" id="button-{{block.id}}-{{i}}">
+                            {{aTitle}}
+                            <div class="accordion-icon hide small--show {{settings.accordions_icon}}"><i></i></div>
+                          </button>
+                          <div class="links module accordion-panel small--expandable" id="panel-{{block.id}}-{{i}}" role="region" aria-labelledby="button-{{block.id}}-{{i}}">
+                            {{aContent}}
+                          </div>
+                        </div>
+                      {%- else -%}
+                        {%- if block.settings[title] != blank -%}
+                          {{aTitle}}
+                        {%- endif -%}
+                        <div class="links module">
+                          {{aContent}}
+                        </div>
+                      {%- endif -%}
+                    {%- endif -%}
+                  {%- endfor -%}
+                {{ '</' }}{%- if block.settings.accordion_mobile -%}util-accordion{%- else -%}div{%- endif -%}{{ '>' }}
+                {%- if hasAccordion -%}
+                  {{ 'util_accordion.css' | asset_url | stylesheet_tag }}
+                  <script src="{{ 'util_accordion.js' | asset_url }}" defer="defer"></script>
+                {%- endif -%}
+              {%- elsif block.type == 'mixed' -%}
+                <div class="custom">
+                  {%- for i in (1..2) -%}
+                    {%- liquid 
+                      assign showLogo = 'show_logo' | append: i
+                      assign logo = 'logo' | append: i
+                      assign logoSvg = 'logo_svg' | append: i
+                      assign logoWidth = 'logo_width' | append: i
+                      if forloop.first
+                        assign title = 'title'
+                      else
+                        assign title = 'title' | append: i
+                      endif
+                      assign text = 'text' | append: i
+                      assign button = 'button' | append: i
+                      assign buttonLink = 'button_link' | append: i
+                      assign ctaStyle = 'cta_style' | append: i
+                      assign image = 'image' | append: i
+                      assign imageText = 'image_text' | append: i
+                      assign imageCta = 'image_cta' | append: i
+                      assign imageCtaStyle = 'image_cta_style' | append: i
+                      assign imageTextShadow = 'image_text_shadow' | append: i
+                      assign imageTextColor = 'image_text_color' | append: i
+                      assign imageTextPosition = 'image_text_position' | append: i
+                      assign imageTextAlign = 'image_text_align' | append: i
+                      assign imageLink = 'image_link' | append: i
+                      assign linklist = 'linklist' | append: i
+                      assign linklistFilter = 'linklist_filter' | append: i
+                      assign linklistFilterHandle = block.settings[linklistFilter] | handle 
+                    -%}
+                    {%- if block.settings[showLogo] -%}
+                      {%- if block.settings[logo] != blank -%}
+                        <div class="logo-wrap">
+                          <a href="{{ routes.root_url }}">
+                            <img class="lazyload" data-sizes="auto" src="{% render 'image_placeholder', image: block.settings[logo] %}" data-srcset="{% render 'lazy_src', image: block.settings[logo] %}" alt="{{shop.name}}" width="{{ block.settings[logo].width }}" height="{{ block.settings[logo].height }}" />
+                          </a>
+                          <style>.block-{{block.id}} {--footer-logo-width: {{block.settings[logoWidth]}}rem;}</style>
+                        </div>
+                      {%- elsif block.settings[logoSvg] != blank -%}
+                        <div class="logo-wrap">
+                          <a href="{{ routes.root_url }}" aria-label="{{shop.name}}">
+                            {%- if block.settings[logoSvg] contains '[Shop Name]' -%}
+                              <span class="h2">{{shop.name}}</span>
+                            {%- else -%}
+                              {{ block.settings[logoSvg] }}
+                            {%- endif -%}
+                          </a>
+                          <style>.block-{{block.id}} {--footer-logo-width: {{block.settings[logoWidth]}}rem;}</style>
+                        </div>
+                      {%- endif -%}
+                    {%- endif -%}
+                    {%- if block.settings[title] != blank and block.settings[title] != "" -%}
+                      <h2 class="footer-title {{section.settings.top_title_style}}">{{block.settings[title]}}</h2>
+                    {%- endif -%}
+                    {%- if block.settings[text] != blank and block.settings[text] != '<p></p>' -%}
+                      <div class="text module {{section.settings.top_text_size | prepend: 'p'}}">{{block.settings[text]}}</div>
+                    {%- endif -%}
+                    {%- if block.settings[button] != blank -%}
+                      {%- liquid assign linkIcon = blank -%}
+                      {%- if block.settings[ctaStyle] contains 'link' and settings.links_arrow != 'none' -%}
+                        {%- capture linkIcon -%}{%- render 'icons', icon: settings.links_arrow -%}{%- endcapture -%}
+                      {%- endif -%}
+                      <div class="button module">
+                        <a class="{{block.settings[ctaStyle]}}" href="{{block.settings[buttonLink]}}">{{block.settings[button]}}{{linkIcon}}</a>
+                      </div>
+                    {%- endif -%}
+                    {%- if block.settings[image] != blank -%}
+                      <div class="module">
+                        {% render 'img_simple_overlay', imageLink: block.settings[imageLink], image: block.settings[image], text: block.settings[imageText], textShadow: block.settings[imageTextShadow], colorScheme: block.settings[imageTextColor], textPosition: block.settings[imageTextPosition], textAlign: block.settings[imageTextAlign], cta: block.settings[imageCta], ctaStyle: block.settings[imageCtaStyle] %}
+                      </div>
+                    {%- endif -%}
+                    {%- if block.settings[linklist] != blank -%}
+                      <div class="links module">
+                        <div class="links-wrap {{section.settings.top_menu_size | prepend: 'p'}}">
+                          {%- liquid
+                            for link in linklists[block.settings[linklist]].links
+                              if block.settings[linklistFilter] != blank
+                                if link.handle == linklistFilterHandle
+                                  render 'simple_link', link: link
+                                  break
+                                elsif link.links != blank
+                                  for link in link.links
+                                    render 'simple_link', link: link
+                                    break
+                                  endfor
+                                endif
+                              else
+                                render 'simple_link', link: link, printFirstLink: true 
+                              endif
+                            endfor
+                          -%}
+                        </div>
+                      </div>
+                    {%- endif -%}
+                    {%- if block.settings.newsletter and forloop.last -%}
+                      <div class="module">
+                        {%- render 'newsletter_form', block: block -%}
+                      </div>
+                    {%- endif -%}
+                    {%- if block.settings.social and forloop.last -%}
+                      <div class="module social">
+                        {%- render 'social_links' -%}
+                      </div>
+                    {%- endif -%}
+                  {%- endfor -%}
+                </div>
+              {%- endif -%}
+            </div>
+          {%- endfor -%}
+        </div>
+      </div>
+    </div>
+  </div>
+  {%- endif -%}
+  <div class="bottom scheme color-{{section.settings.bottom_color_scheme}} border-{{section.settings.bottom_border}} {% if section.settings.bottom_border == 'full' %}scheme-border-top{% endif %}">
+    <div class="container">
+      <div class="wrap {{section.settings.bottom_text_size | prepend: 'p'}} flex flex-wrap align-items-center medium-down--column-reverse medium-down--align-items-start {% if section.settings.bottom_border == 'container' %}scheme-border-top{% endif %}">
+        <div class="flex-1 left-column flex flex-wrap align-items-center medium-down--one-whole medium-down--justify-content-between">
+          {%- assign currentYear = 'now' | date: "%Y" -%}
+          <div class="copy">{{ 'general.copyright' | t: year: currentYear, name: shop.name }}</div>
+          {%- if section.settings.payment_types -%}
+            <div class="payment-types flex">
+              {%- for type in shop.enabled_payment_types -%}
+                {{ type | payment_type_svg_tag: class:'payment-icon' }}
+              {%- endfor %}
+            </div>
+          {%- endif -%}
+        </div>
+        <div class="flex flex-wrap align-items-center medium-down--one-whole medium-down--justify-content-between">
+          <div class="links flex flex-wrap large--justify-content-center">
+            {%- for link in linklists[section.settings.bottom_linklist].links -%}
+              <a href="{{link.url}}">{{link.title}}</a>
+              {%- if link.links != blank -%}
+                {%- for link_level2 in link.links -%}
+                  <a href="{{link_level2.url}}">{{link_level2.title}}</a>
+                  {%- if link_level2.links != blank -%}
+                    {%- for link_level3 in link.links -%}
+                      <a href="{{link_level3.url}}">{{link_level3.title}}</a>
+                    {%- endfor -%}
+                  {%- endif -%}
+                {%- endfor -%}
+              {%- endif -%}
+            {%- endfor -%}
+          </div>
+          {%- if settings.show_currency_selector_footer or settings.show_language_selector_footer -%}
+            <div class="toolbar flex">
+              {%- if settings.show_currency_selector_footer -%}
+                {%- render 'currency_selector' -%}
+              {%- endif -%}
+              {%- if settings.show_language_selector_footer -%}
+                {%- render 'language_selector' -%} 
+              {%- endif -%}
+            </div>
+          {%- endif -%}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% schema %}
+  {
+    "name": "Footer",
+    "class": "type-footer",
+    "settings": [
+      {
+        "type": "header",
+        "content": "Top Part Settings"
+      },
+      {
+        "type": "color_scheme",
+        "id": "top_color_scheme",
+        "label": "Color scheme",
+        "default": "scheme-2"
+      }, 
+      {
+        "type": "select",
+        "id": "top_border",
+        "label": "Border top",
+        "options": [
+          {"value": "none", "label": "None"},
+          {"value": "full", "label": "Full width"},
+          {"value": "container", "label": "Container width"}
+        ],
+        "default": "none"
+      },
+      {
+        "type": "range",
+        "id": "top_padding_desktop",
+        "min": 0,
+        "max": 100,
+        "step": 10,
+        "unit": "%",
+        "label": "Padding (Desktop)",
+        "default": 80
+      },
+      {
+        "type": "range",
+        "id": "top_padding_mobile",
+        "min": 0,
+        "max": 100,
+        "step": 10,
+        "unit": "%",
+        "label": "Padding (Mobile)",
+        "default": 80
+      },
+      {
+        "type": "select",
+        "id": "top_title_style",
+        "label": "Titles style",
+        "options": [
+          {"value": "body-font","label": "Body"},
+          {"value": "heading-font","label": "Heading"},
+          {"value": "subheading","label": "Subheading"},
+          {"value": "small-label","label": "Small label"}
+        ],
+        "default": "heading-font"
+      },
+      {
+        "type": "range",
+        "id": "top_title_size",
+        "min": 80,
+        "max": 180,
+        "step": 1,
+        "unit": "%",
+        "label": "Titles size (Desktop)",
+        "default": 100
+      },
+      {
+        "type": "range",
+        "id": "top_title_size_mobile",
+        "min": 80,
+        "max": 180,
+        "step": 1,
+        "unit": "%",
+        "label": "Titles size (Mobile)",
+        "default": 100
+      },
+      {
+        "type": "range",
+        "id": "top_text_size",
+        "min": 1,
+        "max": 5,
+        "step": 1,
+        "unit": "p",
+        "label": "Text size",
+        "default": 3
+      },
+      {
+        "type": "select",
+        "id": "top_menu_transform",
+        "label": "Links capitalization",
+        "options": [
+          {
+            "value": "none",
+            "label": "Natural"
+          },
+          {
+            "value": "uppercase",
+            "label": "Uppercase"
+          }
+        ],
+        "default": "none"
+      },
+      {
+        "type": "range",
+        "id": "top_menu_size",
+        "min": 1,
+        "max": 5,
+        "step": 1,
+        "unit": "p",
+        "label": "Links size",
+        "default": 3
+      },
+      {
+        "type": "range",
+        "id": "top_menu_letter_spacing",
+        "min": -0.5,
+        "max": 2,
+        "step": 0.1,
+        "unit": "em",
+        "label": "Links letter spacing",
+        "default": 0,
+        "info": "This value will be divided by 10, so 0.5 is 0.05em."
+      },
+      {
+        "type": "range",
+        "id": "top_menu_margin_vertical",
+        "min": 0,
+        "max": 2,
+        "step": 0.1,
+        "unit": "rem",
+        "label": "Links Top/bottom margin",
+        "default": 0.4
+      },
+      {
+        "type": "header",
+        "content": "Bottom Part Settings"
+      },
+      {
+        "type": "link_list",
+        "id": "bottom_linklist",
+        "label": "Menu"
+      },
+      {
+        "type": "range",
+        "id": "bottom_text_size",
+        "min": 1,
+        "max": 5,
+        "step": 1,
+        "unit": "p",
+        "label": "Text size",
+        "default": 3
+      },
+      {
+        "type": "checkbox",
+        "id": "payment_types",
+        "label": "Show payment methods"
+      },
+      {
+        "type": "color_scheme",
+        "id": "bottom_color_scheme",
+        "label": "Color scheme",
+        "default": "scheme-3"
+      },
+      {
+        "type": "select",
+        "id": "bottom_border",
+        "label": "Border top",
+        "options": [
+          {"value": "none", "label": "None"},
+          {"value": "full", "label": "Full width"},
+          {"value": "container", "label": "Container width"}
+        ],
+        "default": "none"
+      },
+      {
+        "type": "range",
+        "id": "bottom_padding_desktop",
+        "min": 0,
+        "max": 100,
+        "step": 10,
+        "unit": "%",
+        "label": "Padding (Desktop)",
+        "default": 30
+      },
+      {
+        "type": "range",
+        "id": "bottom_padding_mobile",
+        "min": 0,
+        "max": 100,
+        "step": 10,
+        "unit": "%",
+        "label": "Padding (Mobile)",
+        "default": 30
+      }
+    ],
+    "blocks": [
+      {
+        "type": "navigation",
+        "name": "Navigation",
+        "settings": [
+
+          {
+            "type": "checkbox",
+            "id": "accordion_mobile",
+            "label": "Accordion Mobile",
+            "default": false
+          },
+
+          {
+            "type": "range",
+            "id": "column_width",
+            "min": 0,
+            "max": 100,
+            "step": 1,
+            "unit": "%",
+            "label": "Column width",
+            "default": 20
+          },
+          {
+            "type": "text",
+            "id": "title",
+            "label": "Title #1",
+            "default": "Custom title"
+          },
+          {
+            "type": "link_list",
+            "id": "linklist1",
+            "label": "Menu #1",
+            "default": "footer"
+          },
+          {
+            "type": "text",
+            "id": "linklist_filter1",
+            "label": "Menu filter",
+            "info": "Filter the above menu by writing the title of a specific link (first level). Only the sub-links (second level) of this link will be displayed here, instead of the whole menu."
+          },
+          {
+            "type": "text",
+            "id": "title2",
+            "label": "Title #2"
+          },
+          {
+            "type": "link_list",
+            "id": "linklist2",
+            "label": "Menu #2"
+          },
+          {
+            "type": "text",
+            "id": "linklist_filter2",
+            "label": "Menu filter",
+            "info": "Filter the above menu by writing the title of a specific link (first level). Only the sub-links (second level) of this link will be displayed here, instead of the whole menu."
+          }
+        ]
+      },
+      {
+        "type": "mixed",
+        "name": "Mixed content",
+        "settings": [
+          {
+            "type": "range",
+            "id": "column_width",
+            "min": 0,
+            "max": 100,
+            "step": 1,
+            "unit": "%",
+            "label": "Column width",
+            "default": 20
+          },
+          {
+            "type": "range",
+            "id": "images_border_radius",
+            "min": 0,
+            "max": 10,
+            "step": 0.2,
+            "unit": "em",
+            "label": "Images border radius",
+            "default": 0
+          },
+          {
+            "type": "header",
+            "content": "Top content"
+          },
+          {
+            "type": "checkbox",
+            "id": "show_logo1",
+            "label": "Logo"
+          },
+          {
+            "visible_if": "{{ block.settings.show_logo1 != blank }}",
+            "type": "paragraph",
+            "content": "******************************************* Logo Settings *******************************************"
+          },
+          {
+            "visible_if": "{{ block.settings.show_logo1 != blank }}",
+            "type": "image_picker",
+            "id": "logo1",
+            "label": "Logo"
+          },
+          {
+            "visible_if": "{{ block.settings.show_logo1 != blank }}",
+            "type": "liquid",
+            "id": "logo_svg1",
+            "label": "Logo (SVG)"
+          },
+          {
+            "visible_if": "{{ block.settings.show_logo1 != blank }}",
+            "type": "range",
+            "id": "logo_width1",
+            "min": 0,
+            "max": 30,
+            "step": 0.5,
+            "unit": "rem",
+            "label": "Logo width",
+            "default": 14
+          },
+          {
+            "visible_if": "{{ block.settings.show_logo1 != blank }}",
+            "type": "paragraph",
+            "content": "******************************************* End of Logo Settings *******************************************"
+          },
+          {
+            "type": "text",
+            "id": "title",
+            "label": "Title"
+          },
+          {
+            "type": "richtext",
+            "id": "text1",
+            "label": "Text"
+          },
+          {
+            "type": "text",
+            "id": "button1",
+            "label": "Button"
+          },
+          {
+            "visible_if": "{{ block.settings.button1 != blank }}",
+            "type": "url",
+            "id": "button_link1",
+            "label": "Button url"
+          },
+          {
+            "visible_if": "{{ block.settings.button1 != blank }}",
+            "type": "select",
+            "id": "cta_style1",
+            "label": "Button style",
+            "options": [
+              {"value": "link", "label": "Link"},
+              {"value": "btn", "label": "Button"},
+              {"value": "btn v2", "label": "Button V2"}
+            ],
+            "default": "btn"
+          },
+          {
+            "type": "image_picker",
+            "id": "image1",
+            "label": "Image"
+          },
+          {
+            "visible_if": "{{ block.settings.image1 != blank }}",
+            "type": "paragraph",
+            "content": "******************************************* Image Settings *******************************************"
+          },
+          {
+            "visible_if": "{{ block.settings.image1 != blank }}",
+            "type": "url",
+            "id": "image_link1",
+            "label": "Image link"
+          },
+          {
+            "visible_if": "{{ block.settings.image1 != blank }}",
+            "type": "richtext",
+            "id": "image_text1",
+            "label": "Image caption",
+            "default": "<p><em>Eyebrow</em></p><p><strong>Title here</strong></p><p>This is a text lorem ipsum.</p>",
+            "info": "Use italic for the eyebrow and bold for the title."
+          },
+          {
+            "visible_if": "{{ block.settings.image1 != blank }}",
+            "type": "color_scheme",
+            "id": "image_text_color1",
+            "label": "Image caption color",
+            "default": "scheme-1"
+          },
+          {
+            "visible_if": "{{ block.settings.image1 != blank }}",
+            "type": "text",
+            "id": "image_cta1",
+            "label": "Image caption CTA"
+          },
+          {
+            "visible_if": "{{ block.settings.image1 != blank }}",
+            "type": "select",
+            "id": "image_cta_style1",
+            "label": "Imagee caption CTA style",
+            "options": [
+                {"value": "link", "label": "Link"},
+                {"value": "btn", "label": "Button"},
+                {"value": "btn v2", "label": "Button V2"}
+            ],
+            "default": "btn"
+          },
+          {
+            "visible_if": "{{ block.settings.image1 != blank }}",
+            "type": "select",
+            "id": "image_text_position1",
+            "label": "Caption position",
+            "options": [
+                {"value": "inside", "label": "Inside"},
+                {"value": "outside", "label": "Outside"}
+            ],
+            "default": "inside"
+          },
+          {
+            "visible_if": "{{ block.settings.image1 != blank }}",
+            "type": "select",
+            "id": "image_text_align1",
+            "label": "Caption align",
+            "options": [
+                {"value": "left", "label": "Left"},
+                {"value": "center", "label": "Center"},
+                {"value": "right", "label": "Right"}
+            ],
+            "default": "center"
+          },
+          {
+            "visible_if": "{{ block.settings.image1 != blank }}",
+            "type": "checkbox",
+            "id": "image_text_shadow1",
+            "label": "Shadow behind caption"
+          },
+          {
+            "visible_if": "{{ block.settings.image1 != blank }}",
+            "type": "paragraph",
+            "content": "******************************************* End of Image Settings *******************************************"
+          },
+          {
+            "type": "link_list",
+            "id": "linklist1",
+            "label": "Menu"
+          },
+          {
+            "visible_if": "{{ block.settings.linklist1 != blank }}",
+            "type": "text",
+            "id": "linklist_filter1",
+            "label": "Menu filter",
+            "info": "Filter the above menu by writing the title of a specific link (first level). Only the sub-links (second level) of this link will be displayed here, instead of the whole menu."
+          },
+          {
+            "type": "header",
+            "content": "Bottom content"
+          },
+          {
+            "type": "checkbox",
+            "id": "show_logo2",
+            "label": "Logo"
+          },
+          {
+            "visible_if": "{{ block.settings.show_logo2 != blank }}",
+            "type": "paragraph",
+            "content": "******************************************* Logo Settings *******************************************"
+          },
+          {
+            "visible_if": "{{ block.settings.show_logo2 != blank }}",
+            "type": "image_picker",
+            "id": "logo2",
+            "label": "Logo"
+          },
+          {
+            "visible_if": "{{ block.settings.show_logo2 != blank }}",
+            "type": "liquid",
+            "id": "logo_svg2",
+            "label": "Logo (SVG)"
+          },
+          {
+            "visible_if": "{{ block.settings.show_logo2 != blank }}",
+            "type": "range",
+            "id": "logo_width2",
+            "min": 0,
+            "max": 30,
+            "step": 0.5,
+            "unit": "rem",
+            "label": "Logo width",
+            "default": 14
+          },
+          {
+            "visible_if": "{{ block.settings.show_logo2 != blank }}",
+            "type": "paragraph",
+            "content": "******************************************* End of Logo Settings *******************************************"
+          },
+          {
+            "type": "text",
+            "id": "title2",
+            "label": "Title"
+          },
+          {
+            "type": "richtext",
+            "id": "text2",
+            "label": "Text"
+          },
+          {
+            "type": "text",
+            "id": "button2",
+            "label": "Button"
+          },
+          {
+            "visible_if": "{{ block.settings.button2 != blank }}",
+            "type": "url",
+            "id": "button_link2",
+            "label": "Button url"
+          },
+          {
+            "visible_if": "{{ block.settings.button2 != blank }}",
+            "type": "select",
+            "id": "cta_style2",
+            "label": "Button style",
+            "options": [ 
+            {"value": "link", "label": "Link"},
+              {"value": "btn", "label": "Button"},
+              {"value": "btn v2", "label": "Button V2"}
+            ],
+            "default": "btn"
+          },
+          {
+            "type": "image_picker",
+            "id": "image2",
+            "label": "Image"
+          },
+          {
+            "visible_if": "{{ block.settings.image2 != blank }}",
+            "type": "paragraph",
+            "content": "******************************************* Image Settings *******************************************"
+          }, 
+          {
+            "visible_if": "{{ block.settings.image2 != blank }}",
+            "type": "url",
+            "id": "image_link2",
+            "label": "Image link"
+          },
+          {
+            "visible_if": "{{ block.settings.image2 != blank }}",
+            "type": "richtext",
+            "id": "image_text2",
+            "label": "Image caption",
+            "default": "<p><em>Eyebrow</em></p><p><strong>Title here</strong></p><p>This is a text lorem ipsum.</p>",
+            "info": "Use italic for the eyebrow and bold for the title."
+          },
+          {
+            "visible_if": "{{ block.settings.image2 != blank }}",
+            "type": "color_scheme",
+            "id": "image_text_color2",
+            "label": "Image caption color",
+            "default": "scheme-1"
+          },
+          {
+            "visible_if": "{{ block.settings.image2 != blank }}",
+            "type": "text",
+            "id": "image_cta2",
+            "label": "Image caption CTA"
+          },
+          {
+            "visible_if": "{{ block.settings.image2 != blank }}",
+            "type": "select",
+            "id": "image_cta_style2",
+            "label": "Imagee caption CTA style",
+            "options": [
+                {"value": "link", "label": "Link"},
+                {"value": "btn", "label": "Button"},
+                {"value": "btn v2", "label": "Button V2"}
+            ],
+            "default": "btn"
+          },
+          {
+            "visible_if": "{{ block.settings.image2 != blank }}",
+            "type": "select",
+            "id": "image_text_position2",
+            "label": "Caption position",
+            "options": [
+                {"value": "inside", "label": "Inside"},
+                {"value": "outside", "label": "Outside"}
+            ],
+            "default": "inside"
+          },
+          {
+            "visible_if": "{{ block.settings.image2 != blank }}",
+            "type": "select",
+            "id": "image_text_align2",
+            "label": "Caption align",
+            "options": [
+                {"value": "left", "label": "Left"},
+                {"value": "center", "label": "Center"},
+                {"value": "right", "label": "Right"}
+            ],
+            "default": "center"
+          },
+          {
+            "visible_if": "{{ block.settings.image2 != blank }}",
+            "type": "checkbox",
+            "id": "image_text_shadow2",
+            "label": "Shadow behind caption"
+          },
+          {
+            "visible_if": "{{ block.settings.image2 != blank }}",
+            "type": "paragraph",
+            "content": "******************************************* End of Image Settings *******************************************"
+          },
+          {
+            "type": "link_list",
+            "id": "linklist2",
+            "label": "Menu"
+          },
+          {
+            "visible_if": "{{ block.settings.linklist2 != blank }}",
+            "type": "text",
+            "id": "linklist_filter2",
+            "label": "Menu filter",
+            "info": "Filter the above menu by writing the title of a specific link (first level). Only the sub-links (second level) of this link will be displayed here, instead of the whole menu."
+          },
+          {
+            "type": "header",
+            "content": "Newsletter"
+          },
+          {
+            "type": "checkbox",
+            "id": "newsletter",
+            "label": "Show newsletter"
+          },
+          {
+            "visible_if": "{{ block.settings.newsletter == true }}",
+            "type": "richtext",
+            "id": "success_message",
+            "label": "Success",
+            "default": "<p>Thanks for subscribing!</p>"
+          },
+          {
+            "visible_if": "{{ block.settings.newsletter == true }}",
+            "type": "select",
+            "id": "submit_style",
+            "label": "Submit style",
+            "options": [
+              {"value": "btn","label": "Button"},
+              {"value": "arrow","label": "Arrow"}
+            ],
+            "default": "arrow"
+          },
+          {
+            "visible_if": "{{ block.settings.newsletter == true }}",
+            "type": "text",
+            "id": "submit_label",
+            "label": "Submit label",
+            "default": "Subscribe"
+          },
+          {
+            "visible_if": "{{ block.settings.newsletter == true }}",
+            "type": "richtext",
+            "id": "legal",
+            "label": "Legal footnote"
+          },
+          {
+            "type": "header",
+            "content": "Social media links"
+          },
+          {
+            "type": "paragraph",
+            "content": "To show the social media buttons, go to Theme Settings and look for the tab called 'Social Media', enter the urls and the buttons will show up here."
+          },
+          {
+            "type": "checkbox",
+            "id": "social",
+            "label": "Show social media links"
+          },
+          {
+            "visible_if": "{{ block.settings.social == true }}",
+            "type": "range",
+            "id": "social_media_size",
+            "min": 100,
+            "max": 200,
+            "step": 1,
+            "unit": "%",
+            "label": "Font size",
+            "default": 100
+          }
+        ]
+      }
+    ],
+    "default": {
+      "blocks": [
+        {
+          "type": "mixed",
+          "settings": {
+            "logo_svg1": "[Shop Name]"
+          }
+        },
+        {
+          "type": "navigation"
+        },
+        {
+          "type": "navigation"
+        },
+        {
+          "type": "mixed",
+          "settings": {
+            "title": "Join our mailing list",
+            "newsletter": true
+          }
+        }
+      ]
+    }
+  }
+{% endschema %}

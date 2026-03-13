@@ -1,0 +1,38 @@
+{%- comment -%}
+    Renders a product quantity input
+
+    Accepts:
+    - productCard: {Object} Product Liquid object
+    - cartItem: (Optional) {Object} Cart Item Liquid object
+    - minValue: (Optional) {Integer}
+    - disabled: (Optional) {Boolean}
+
+    Usage:
+    {%- render 'product_card_quantity', productCard: product -%}
+{%- endcomment -%}
+
+{%- assign enablePlus = true -%}
+{%- if cartItem.variant.inventory_management == 'shopify' and cartItem.quantity >= cartItem.variant.inventory_quantity and cartItem.variant.inventory_policy == 'deny' -%}
+  {%- assign enablePlus = false -%}
+{%- endif -%}
+
+<quantity-input class="quantity-box field no-label {% if disabled %}quantity-disabled{% endif %}">
+  <button class="quantity-button minus" type="button" aria-hidden="true" tabindex="-1">
+    {% render 'icons', icon:'minus' %}
+  </button>
+  <input class="quantity-input"
+    type="number"
+    name="{% if cartItem %}updates[]{% else %}quantity{% endif %}"
+    value="{% if cartItem %}{{cartItem.quantity}}{% else %}1{% endif %}"
+    min="{{minValue | default: '0'}}"
+    {%- if enablePlus == false -%}
+      max="{{ cartItem.variant.inventory_quantity }}"
+    {%- endif -%}
+    
+    aria-label="{{ 'general.product_quantity.quantity_of_product_caption' | t: product_title: productCard.title | escape }}"
+    {% if disabled %}readonly="readonly"{% endif %}
+  >
+  <button class="quantity-button plus" type="button" aria-hidden="true" tabindex="-1" {% unless enablePlus %}disabled{% endunless %}>
+    {% render 'icons', icon:'plus' %}
+  </button>
+</quantity-input>

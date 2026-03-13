@@ -1,0 +1,29 @@
+{%- content_for 'blocks' -%}
+
+{% schema %}
+{
+  "name": "Object: Metaobj. Example",
+  "tag": null,
+  "blocks": [{"type": "@theme"}],
+  "presets": [
+    {
+      "name": "Object: Metaobject Example",
+      "category": "Dynamic source context",
+      "blocks": [
+      ]
+    }
+  ],
+  "settings": [
+    {
+      "type": "paragraph",
+      "content": "This is an example file of a metaobject block. You can duplicate the file and change the 'metaobject_type' to the type you want."
+    },
+    {
+      "type": "metaobject",
+      "id": "metaobject",
+      "label": "Metaobject", 
+      "metaobject_type": "product_review"
+    }
+  ]
+}
+{% endschema %}

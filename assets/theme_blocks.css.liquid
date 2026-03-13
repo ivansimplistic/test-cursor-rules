@@ -1,0 +1,85 @@
+.theme-blocks .tb-item,
+.theme-blocks .grid-item.tb-item {width: var(--width-desktop, 100%);}
+.theme-blocks .tb-item.grow {flex-grow: 1;}
+@media (max-width: {{settings.breakpoint_tablet}}) {
+  .theme-blocks .tb-item,
+  .theme-blocks .grid-item.tb-item {width: var(--width-tablet, 100%);}
+}
+@media (max-width: {{settings.breakpoint_mobile}}) {
+  .theme-blocks .tb-item,
+  .theme-blocks .grid-item.tb-item {width: var(--width-mobile, 100%);}
+}
+
+.tb-container {
+  --grid-gap: var(--spacing-desktop); 
+  padding-top: calc(var(--global-sections-padding) * var(--padding-top)); 
+  padding-bottom: calc(var(--global-sections-padding) * var(--padding-bottom));
+  height: 100%;
+  position: relative;
+}
+.tb-container > div {height: 100%;}
+@media (max-width: {{settings.breakpoint_tablet}}){
+  .tb-container {--grid-gap: var(--spacing-mobile);}
+}
+
+/*
+TODO: Investigate why
+border-box was being used for some reason (seems used for container padding top/bottom otherwise elements get out of expected area.)
+content-box needed for outer containers like a grid of images or the slider dots
+*/
+.theme-blocks .container {box-sizing: var(--box-sizing, content-box);}
+.theme-blocks .grid {row-gap: var(--grid-gap);}
+.theme-blocks .grid-item:not(.tb-item) {width: 100%;}
+.theme-blocks .section-grid .grid {margin-bottom: 0;}
+.theme-blocks .section-grid .grid-item {margin-bottom: 0;}
+.theme-blocks .grid-item.tb-multi-item {width: calc(100% / var(--items-per-row));}
+/*.theme-blocks .grid-item.tb-multi-item > .grid,
+.theme-blocks .grid-item.tb-multi-item > .grid > .tb-item {height: 100%;}*/
+{% comment %}
+REMOVED THIS IN FAVOR OF BOX-SIZING SETTING OF CONTAINER
+{% for scheme in settings.color_schemes %}
+  .color-scheme-{{ forloop.index }} > .grid > .grid-item:not(.absolute) > .color-scheme-{{ forloop.index }}.container {box-sizing: content-box;}
+{% endfor %}
+{% endcomment %}
+
+.theme-blocks .grid {position: relative;}
+.tb-item.absolute {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  top: 0;
+}
+
+.theme-blocks .accordion-item + .accordion-item {margin-top: calc(-1* var(--grid-gap));}
+.theme-blocks util-accordion button[aria-expanded] {align-items: center;}
+.theme-blocks util-accordion .accordion-icon {position: static;}
+.theme-blocks .btn-wrap {margin: 0; row-gap: 1em; column-gap: 1em; display: inline-flex; align-items: center; justify-content: center; flex-wrap: wrap;} 
+.theme-blocks .btn-wrap .btn {margin: 0;}
+.theme-blocks .text-left > .grid-item > .btn-wrap {justify-content: flex-start; }
+.theme-blocks .text-center > .grid-item > .btn-wrap {justify-content: center; }
+.theme-blocks .text-right > .grid-item > .btn-wrap {justify-content: flex-end; }
+.theme-blocks .media-block {vertical-align: middle; 
+  width: var(--media-block-width); /* affected by the image block setting width */
+  display: inline-block; /* affected by "Content align" setting of the container */
+}
+.theme-blocks .media-block img {height: var(--media-block-height); object-fit: cover; border-radius: var(--media-block-border-radius);}
+.theme-blocks .media-block .block-mp4 {padding-top: var(--media-block-height); height: 0;}
+.theme-blocks .media-block .block-mp4 video {position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover;}
+.theme-blocks .media-wrap {position: relative;}
+.theme-blocks .controls {position: absolute; top: 0; right: 0; z-index: 3; padding: 1em;}
+
+
+/**** ADVANCED STRUCTURE RULES ****/
+/* image background in absolute position */
+.tb-item.absolute > div > div > div:has( > .media-block), 
+.tb-item.absolute > div > div > div > .media-block, 
+.tb-item.absolute > div > div > div > .media-block div, 
+.tb-item.absolute > div > div > div > .media-block img,
+.tb-item.absolute > div > div > div > .media-block iframe {height: 100%;}
+.tb-item.absolute > div > div > div > .media-block .media-wrap {padding-top: 0;}
+
+/* nowrap on flex-direction: column so it overflows vertically, otherwise content would overflow horizontally causing horizontal page scroll */
+.theme-blocks .direction-column {flex-wrap: nowrap;}
+
+.theme-blocks .grid-item.sticky {position: sticky; top: var(--header-offset, 0); z-index: 1;}

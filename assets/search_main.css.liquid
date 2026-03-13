@@ -1,0 +1,26 @@
+.search-main .empty {margin: 0 0 4em;}
+.search-main .empty .head {font-size: 2em; margin-bottom: 0.3em;}
+.search-main .empty .icon {display: inline;}
+.search-main .empty .title {font-size: 1.5em; margin-bottom: 2em;}
+
+.search-top {padding-top: var(--global-sections-padding); position: relative;}
+.search-top .wrap {max-width: 38em;}
+.search-top.text-center .wrap {margin: auto;}
+.search-top.text-right .wrap {margin-left: auto;}
+.search-top.padding-bottom-true {padding-bottom: var(--global-sections-padding);}
+.search-top form {position: relative;}
+.search-top input {width: 100%; padding-right: 2.5em;}
+.search-top button {position: absolute; font-size: 1em; right: 1em; top: 50%; -webkit-transform: translateY(-50%); transform: translateY(-50%); padding: 0.1em;}
+.search-top search-form {position: relative; display: block;} 
+.search-top .search-results:not(:empty) {position: absolute; z-index: 11; width: 100%; box-shadow: var(--floating-box-shadow); padding: 1em; }
+.search-top .search-results:empty {display: none;}
+.search-top .search-results-items {padding-top: 0.5em;}
+.search-main .page-card {position: relative; display: block; height: 100%;}
+.search-main .page-card .title {font-size: 1.2em;}
+.search-main .page-card .image-container {width: 100%; position: relative; margin-bottom: 1em; overflow: hidden; border-radius: 0; }
+.search-main .page-card .image-container .img {width: 100%; padding-top: {{settings.article_card_img_height}}%; background-size: cover; background-position: center; background-repeat: no-repeat; -webkit-transform: scale(1.001); transform: scale(1.001);}
+.search-main .page-card .item-content {position: absolute; top: 0; left: 0; right: 0; bottom: 0; font-size: 0.7em;}
+.search-main .page-card .link {margin-top: 0.25em;}
+.search-main .page-card .item-content:after {content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: linear-gradient(0deg,var(--scheme-background-color) 0%, rgba(0,0,0,0) 20%, rgba(0,0,0,0) 80%, var(--scheme-background-color) 100%) }
+.search-main [data-grid-layout="1"] .page-card .image-container .img,
+.search-main [data-grid-layout="list"] .page-card .image-container .img {padding-top: 8em;}

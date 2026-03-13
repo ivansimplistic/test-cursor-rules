@@ -1,0 +1,154 @@
+{%- liquid
+  assign firstBlock = section.blocks.first
+  if firstBlock.type == 'breadcrumb' and firstBlock.settings.placement == 'outside'
+    render 'breadcrumb', section: firstBlock
+  endif
+-%}
+
+{{ 'page_hero.css' | asset_url | stylesheet_tag }}
+
+{%- if section.settings.image != blank -%}
+  {%- assign image = section.settings.image -%}
+{%- elsif collection.image != blank -%}
+  {%- assign image = collection.image -%}
+{%- elsif article.image != blank -%}
+  {%- assign image = article.image -%}
+{%- endif -%}
+
+<style>
+  #shopify-section-{{ section.id }} {
+    --text-padding: calc(var(--global-sections-padding) * {{section.settings.text_padding | divided_by: 100.00}});
+    --video-height: {{section.settings.video_orientation | replace: 'landscape', '56.25%' | replace: 'square', '100%' | replace: 'portrait', '150%' | default: '100%' }};
+    --text-border-radius: {{section.settings.text_border_radius}}em;
+    --image-border-radius: {{section.settings.image_border_radius | replace: '10', '1000'}}em;
+
+    {% assign tintOpacity = section.settings.tint_opacity | divided_by: 100.00 %}
+    --tint: {{section.settings.tint_color | color_modify: 'alpha', tintOpacity}};
+    --tint-blur: {{section.settings.tint_blur}}px;
+    --title-color: {{section.settings.title_color}};
+    --tint-border-radius: {{section.settings.tint_border_radius}}em;
+    --text-color: {{section.settings.text_color}};
+  }
+  @media (min-width: {{settings.breakpoint_tablet | plus: 0.001}}em){
+    #shopify-section-{{ section.id }} {
+      --section-padding-top: calc(var(--global-sections-padding) * {{section.settings.section_padding_top | divided_by: 100.00}});
+      --section-padding-bottom: calc(var(--global-sections-padding) * {{section.settings.section_padding_bottom | divided_by: 100.00}});
+      --text-width: {{section.settings.text_width | append: 'em' | replace: '100em', '100%'}};
+      --image-width: {{section.settings.image_width | default: 0 | append: '%'}};
+      {%- liquid
+        if section.settings.image_height == 'auto'
+          assign imageHeight = 'auto'
+          assign imageMinHeight = 'unset'
+          if image != blank
+            assign imagePadding = 100.0 | divided_by: image.aspect_ratio | append: '%'
+          else
+            assign imagePadding = '0%'
+          endif
+        else
+          assign imageHeight = '100%'
+          assign imageMinHeight = section.settings.image_height | replace: 'small', '40rem' | replace: 'medium', '55rem' | replace: 'large', '70rem'
+          assign imagePadding = '0%'
+        endif
+      -%}
+      --image-height: {{imageHeight}};
+      --image-min-height: {{imageMinHeight}};
+      --image-padding: {{imagePadding}};
+    }
+  }
+  @media (max-width: {{settings.breakpoint_tablet}}){
+    #shopify-section-{{ section.id }} {
+      --section-padding-top: calc(var(--global-sections-padding) * {{section.settings.section_padding_top_mobile | divided_by: 100.00}});
+      --section-padding-bottom: calc(var(--global-sections-padding) * {{section.settings.section_padding_bottom_mobile | divided_by: 100.00}});
+      --text-width: {{section.settings.text_width_mobile | append: 'em' | replace: '100em', '100%'}};
+      --text-padding: calc(var(--global-sections-padding) * {{section.settings.text_padding_mobile | divided_by: 100.00}});
+      {%- liquid
+        if section.settings.image_height_mobile == 'auto'
+          assign imageHeight = 'auto'
+          assign imageMinHeight = 'unset'
+          if section.settings.image_mobile != blank
+            assign imagePadding = 100.0 | divided_by: section.settings.image_mobile.aspect_ratio | append: 'vw'
+          elsif image != blank
+            assign imagePadding = 100.0 | divided_by: image.aspect_ratio | append: 'vw'
+          else
+            assign imagePadding = '0%'
+          endif
+        else
+          assign imageHeight = '100%'
+          assign imageMinHeight = section.settings.image_height_mobile | replace: 'small', '30rem' | replace: 'medium', '45rem' | replace: 'large', '60rem'
+          assign imagePadding = '0%'
+        endif
+      -%}
+      --image-height: {{imageHeight}};
+      --image-min-height: {{imageMinHeight}};
+      --image-padding: {{imagePadding}};
+    }
+  }
+</style>
+{{ 'image_text.css' | asset_url | stylesheet_tag }}
+
+{%- liquid 
+  assign imageHeight = section.settings.image_height | default: 'auto'
+  assign imageHeightMobile = section.settings.image_height_mobile | default: 'auto'
+
+  if section.settings.full_width
+    assign correctTextPadding = true
+  elsif section.settings.full_width != true and section.settings.section_color_scheme == section.settings.content_color_scheme
+    assign correctTextPadding = true
+  endif
+
+  assign disableLazySizes = false
+  if section.index == 1
+    assign disableLazySizes = true
+  endif 
+-%}
+
+<div class="page-hero scheme color-{{section.settings.section_color_scheme}} desktop-media-{{imageHeight}} mobile-media-{{imageHeightMobile}} {% if section.settings.full_width %}full-width{% endif %} tint-{{section.settings.tint_type}} {% if section.settings.background_image_desktop %}background-image-desktop{% endif %} {% if section.settings.background_image_mobile %}background-image-mobile{% endif %} {% if correctTextPadding %}text-padding-correction{% endif %} {% if section.settings.section_padding_top > 0 %}padding-top{% endif %} {% if section.settings.section_padding_bottom > 0 %}padding-bottom{% endif %} {% if section.settings.image_padding %}media-padding{% endif %} {% if section.settings.text_overlaps_media %}text-overlaps-media{% endif %} {% if section.settings.section_color_scheme == section.settings.content_color_scheme %}same-scheme{% endif %}">
+  <div class="content-wrapper {% unless section.settings.full_width %}container{% endunless %}">
+    <div class="content flex medium-down--flex-wrap scheme color-{{section.settings.content_color_scheme}} {% if section.settings.show_image and image != blank %}{{section.settings.image_position}} {% if section.settings.full_width %}{% if section.settings.image_position == 'row-reverse' %}large--container-left{% else %}large--container-right{% endif %}{% endif %} {% else %}no-media{% endif %} medium-down--{{section.settings.image_position_mobile}} {% if imageHeight != 'cover' %}align-items-{{section.settings.content_vertical_alignment}}{% endif %}">
+      {%- if image != blank and section.settings.show_image -%}
+        <div class="media-column medium-down--one-whole flex align-items-{{section.settings.content_vertical_alignment}}">
+          <div class="media-wrap {% if section.settings.image_mobile != blank %}medium-down--hide{% endif %}">
+            <img alt="{{image.alt}}" class="img media {% unless disableLazySizes %}lazyload{% endunless %}" data-sizes="auto" src="{% render 'image_placeholder', image: image %}" {% if disableLazySizes %}fetchpriority="high" {% else %}data-{% endif %}srcset="{% render 'lazy_src', image: image %}" width="{{ image.width }}" height="{{ image.height }}" {% if image.presentation.focal_point != blank %}style="object-position: {{image.presentation.focal_point}};"{% endif %} />
+          </div>
+          {%- if section.settings.image_mobile != blank -%}
+            <div class="media-wrap hide medium-down--show">
+              <img alt="{{section.settings.image_mobile.alt}}" class="img media {% unless disableLazySizes %}lazyload{% endunless %}" data-sizes="auto" src="{% render 'image_placeholder', image: section.settings.image_mobile %}" {% if disableLazySizes %}fetchpriority="high" {% else %}data-{% endif %}srcset="{% render 'lazy_src', image: section.settings.image_mobile %}" width="{{ section.settings.image_mobile.width }}" height="{{ section.settings.image_mobile.height }}" {% if section.settings.image_mobile.presentation.focal_point != blank %}style="object-position: {{section.settings.image_mobile.presentation.focal_point}};"{% endif %} />
+            </div>
+          {%- endif -%}
+        </div>
+      {%- endif -%}
+      <div class="text-column flex-1 medium-down--one-whole flex large--justify-content-{{section.settings.text_position}} medium-down--justify-content-{{section.settings.text_position_mobile}} {% unless section.settings.show_image and image != blank %}{% if section.settings.full_width %}large--container-left large--container-right{% endif %}{% endunless %}">
+        <div class="wrap large--text-{{section.settings.text_align}} medium-down--text-{{section.settings.text_align_mobile}}">
+          <div class="captions-wrap">
+            <div class="large--flex {{section.settings.text_align | replace: 'left', 'align-items-end justify-content-between' | replace: 'right', 'row-reverse align-items-end justify-content-between' | replace: 'center', 'direction-column align-items-center'}}">
+              <div class="flex-1 richtext-wrap">
+                {%- for block in section.blocks -%}
+                  {%- if block.type == 'breadcrumb' and block.settings.placement == 'inside' -%}
+                    {%- render 'breadcrumb', section: block -%}
+                  {%- else -%}
+                    {%- render 'page_hero_blocks', section: section, block: block -%}
+                  {%- endif -%}
+                {%- endfor -%}
+              </div>
+              {%- if subcategoryCount > 0 -%}
+                <div class="keen-arrows large--flex justify-content-center medium-down--hide">
+                  {% render 'carousel_arrow', type: 'prev' %}
+                  {% render 'carousel_arrow', type: 'next' %}
+                </div>
+              {%- endif -%}
+            </div>
+            {%- if subcategoryCount > 0 -%}
+              <div class="sub-collections desktop-{{section.settings.text_align}} mobile-{{section.settings.text_align_mobile}}">
+                <div class="keen">
+                  <div class="keen-slider">
+                    {{subcategoryItems}}
+                  </div>
+                </div>
+              </div>
+            {%- endif -%}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

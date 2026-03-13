@@ -1,0 +1,765 @@
+{{ 'util_accordion.css' | asset_url | stylesheet_tag }}
+<style>
+  #shopify-section-{{section.id}} {
+    --accordion-image-width: {{section.settings.accordion_image_width}}em;
+    --accordion-image-border-radius: {{section.settings.accordion_image_border_radius}}em;
+  }
+</style>
+
+{%- capture contentHtml -%}
+  {%- liquid
+    assign expandFirst = section.settings.expand_first
+    assign disableLazySizes = false
+    if section.index == 1 and expandFirst == true
+      assign disableLazySizes = true
+    endif
+  -%}
+  <util-accordion data-expand-multiple="{% if section.settings.expand_multiple %}true{% else %}{% endif %}">
+    {%- liquid
+      assign categoryId = ''
+      assign hideCategory = false
+      assign categoryOptions = ''
+    -%}
+    {%- capture blocksHtml -%}
+      {%- for block in section.blocks -%}
+        {%- if block.type == 'heading' -%}
+          {%- if block.settings.title != blank -%}
+            {%- assign title2Tag = section.settings.is_h1 | replace: true, 'h2' | replace: false, 'h3' -%}
+            {%- assign title2Size = section.settings.title_size | plus: 1 | replace: 0, 1 | prepend: 'h' -%}
+
+            {%- if section.settings.category_dropdown -%}
+
+              {%- liquid
+                if categoryId != blank
+                  assign hideCategory = true
+                endif
+                assign expandFirst = section.settings.expand_first
+                assign categoryId = block.id | handleize
+              -%}
+              {%- capture categoryOptions -%}
+                {{categoryOptions}}
+                <option value="{{categoryId}}">{{block.settings.title}}</option>
+              {%- endcapture -%}
+              <{{title2Tag}} class="category-title hide">{{block.settings.title}}</{{title2Tag}}>
+
+            {%- else -%}
+              {%- assign categoryId = block.id | handleize -%}
+              <{{title2Tag}} class="category-title {{title2Size}}" {{ block.shopify_attributes }}>{{block.settings.title}}</{{title2Tag}}>
+            {%- endif -%}
+
+          {%- endif -%}
+        {%- else -%}
+          {%- liquid 
+            if block.settings.custom_items
+              assign items = block.settings.custom_items
+            else
+              assign items = block.settings.title | append: '|_|' | append: block.settings.content
+            endif 
+            assign items = items | split : '|__|'
+          -%}
+          {% for item in items %}
+            {%- liquid
+              assign itemParts = item | split: '|_|'
+              assign title = itemParts[0] | strip
+              assign content = itemParts[1] | strip
+              if title == blank or content == blank
+                continue
+              endif
+            -%}
+            <div class="accordion {% if section.settings.accordion_border %}scheme-border-bottom{% endif %} {% if expandFirst %}open{% endif %}" data-category="{{categoryId}}" {% if hideCategory %}style="display: none"{% endif %} {{ block.shopify_attributes }}>
+              <button type="button" aria-expanded="{% if expandFirst %}true{% else %}false{% endif %}" class="accordion-trigger {% if block.settings.image != blank %}has-image{% endif %}" aria-controls="panel-{{section.id}}-{{block.id}}-{{forloop.index}}" id="button-{{section.id}}-{{block.id}}-{{forloop.index}}">
+                <div class="accordion-title flex align-items-center">
+                  {%- if block.settings.image != blank -%}
+                    <img alt="{{block.settings.image.alt}}" class="{% unless disableLazySizes %}lazyload{% endunless %} {% if section.settings.accordion_image_border %}scheme-border-box{% endif %}" data-sizes="auto" src="{% render 'image_placeholder', image: block.settings.image %}" {% if disableLazySizes %}fetchpriority="high" {% else %}data-{% endif %}srcset="{% render 'lazy_src', image: block.settings.image %}" width="{{ block.settings.image.width }}" height="{{ block.settings.image.height }}" {% if block.settings.image.presentation.focal_point != blank %}style="object-position: {{block.settings.image.presentation.focal_point}};"{% endif %} />
+                  {%- endif -%}
+                  <div class="{{section.settings.accordion_title_style}} {{section.settings.accordion_title_size | prepend: 'p'}}">{{title}}</div>
+                </div>
+                <div class="accordion-icon {{settings.accordions_icon}}"><i></i></div>
+              </button>
+              <div id="panel-{{section.id}}-{{block.id}}-{{forloop.index}}" role="region" aria-labelledby="button-{{section.id}}-{{block.id}}-{{forloop.index}}" class="accordion-panel {{section.settings.accordion_text_size | prepend: 'p'}} expandable {% if expandFirst %}expandable-default-open{% endif %}">
+                {{content}}
+              </div>
+            </div>
+            {%- if expandFirst -%}
+              {%- assign expandFirst = false -%}
+            {%- endif -%}
+          {% endfor %}
+        {%- endif -%}
+      {%- endfor -%}
+    {%- endcapture -%}
+    
+    {%- if section.settings.category_dropdown -%}
+      <div class="field category-filter-wrap">{% comment %}.category-filter-wrap element must be at the same DOM level of the .accordion nodes{% endcomment %}
+        <select class="category-filter" aria-label="{{ 'accordion.filter_content_label' | t | escape }}">
+          {{categoryOptions}}
+        </select>
+        {%- render 'icons', icon: 'chevron-down' -%}
+      </div>
+    {%- endif -%}
+
+    {{blocksHtml}}
+    
+  </util-accordion>
+{%- endcapture -%}
+
+{%- render 'section_image_text_structure', section: section, textColumnHtml: contentHtml -%}
+
+<script src="{{ 'util_accordion.js' | asset_url }}" defer="defer"></script>
+
+{% schema %}
+  {
+    "name": "Accordion",
+    "class": "type-accordion",
+    "tag": "section",
+  	"presets": [
+      {
+        "name":"Accordion",
+        "blocks": [
+          {
+            "type": "heading",
+            "settings": {
+              "title": "Category A"
+            }
+          },
+          {
+            "type": "item",
+            "settings": {
+              "title": "Item 1",
+              "content": "<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus ut tellus nec mi tincidunt imperdiet eget vitae sapien. Integer massa velit, commodo at magna eget, semper vehicula quam. Morbi laoreet tellus at neque blandit, eu congue sem congue. Mauris dapibus est ut ipsum malesuada tincidunt. Curabitur tempus commodo suscipit. Sed eu blandit urna, at porttitor ligula. In maximus lobortis tellus.</p>"
+            }
+          },
+          {
+            "type": "item",
+            "settings": {
+              "title": "Item 2",
+              "content": "<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus ut tellus nec mi tincidunt imperdiet eget vitae sapien. Integer massa velit, commodo at magna eget, semper vehicula quam. Morbi laoreet tellus at neque blandit, eu congue sem congue. Mauris dapibus est ut ipsum malesuada tincidunt. Curabitur tempus commodo suscipit. Sed eu blandit urna, at porttitor ligula. In maximus lobortis tellus.</p>"
+            }
+          },
+          {
+            "type": "heading",
+            "settings": {
+              "title": "Category B"
+            }
+          },
+          {
+            "type": "item",
+            "settings": {
+              "title": "Item 3",
+              "content": "<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus ut tellus nec mi tincidunt imperdiet eget vitae sapien. Integer massa velit, commodo at magna eget, semper vehicula quam. Morbi laoreet tellus at neque blandit, eu congue sem congue. Mauris dapibus est ut ipsum malesuada tincidunt. Curabitur tempus commodo suscipit. Sed eu blandit urna, at porttitor ligula. In maximus lobortis tellus.</p>"
+            }
+          }
+        ]
+      }
+	  ],
+	  "settings": [
+      {
+        "type": "header",
+        "content": "Accordion settings"
+      },
+      {
+        "type": "checkbox",
+        "id": "category_dropdown",
+        "label": "Filter categories with dropdown"
+      },
+      {
+        "type": "checkbox",
+        "id": "expand_multiple",
+        "label": "Allow multiple panels expanded at once",
+        "default": false
+      },
+      {
+        "type": "checkbox",
+        "id": "expand_first",
+        "label": "Expand first item by default",
+        "default": true
+      },
+      {
+        "type": "select",
+        "id": "accordion_title_style",
+        "label": "Title style",
+        "options": [
+          {"value": "normal","label": "Body"},
+          {"value": "heading-font","label": "Heading"},
+          {"value": "subheading","label": "Subheading"},
+          {"value": "small-label","label": "Small label"}
+        ],
+        "default": "normal"
+      },
+      {
+        "type": "range",
+        "id": "accordion_title_size",
+        "min": 1,
+        "max": 3,
+        "step": 1,
+        "unit": "p",
+        "label": "Title size",
+        "default": 2,
+        "info": "1 = larger. 2 = normal. 3 = smaller."
+      },
+      {
+        "type": "range",
+        "id": "accordion_text_size",
+        "min": 1,
+        "max": 5,
+        "step": 1,
+        "unit": "p",
+        "label": "Text size",
+        "default": 3
+      },
+      {
+        "type": "checkbox",
+        "id": "accordion_border",
+        "label": "Border between items",
+        "default": false
+      },
+      {
+        "type": "range",
+        "id": "accordion_image_width",
+        "min": 0,
+        "max": 5,
+        "step": 0.5,
+        "unit": "em",
+        "label": "Images width",
+        "default": 2
+      },
+      {
+        "type": "range",
+        "id": "accordion_image_border_radius",
+        "min": 0,
+        "max": 10,
+        "step": 0.2,
+        "unit": "em",
+        "label": "Images border radius",
+        "default": 0
+      },
+      {
+        "type": "checkbox",
+        "id": "accordion_image_border",
+        "label": "Images border"
+      },
+      {
+        "type": "header",
+        "content": "Head"
+      },
+      {
+        "type": "text",
+        "id": "eyebrow",
+        "label": "Eyebrow"
+      },
+      {
+        "visible_if": "{{ section.settings.eyebrow != blank }}",
+        "type": "range",
+        "id": "eyebrow_size",
+        "min": 1,
+        "max": 5,
+        "step": 1,
+        "unit": "p",
+        "label": "Eyebrow size",
+        "default": 3
+      },
+      {
+        "type": "text",
+        "id": "title",
+        "label": "Title",
+      	"default": "Lorem ipsum dolor"
+      },
+      {
+        "visible_if": "{{ section.settings.title != blank }}",
+        "type": "checkbox",
+        "id": "is_h1",
+        "label": "This is the first title of the page (H1)"
+      },
+      {
+        "type": "richtext",
+        "id": "text",
+        "label": "Text"
+      },
+      {
+        "type": "text",
+        "id": "button",
+        "label": "Button"
+      },
+      {
+        "visible_if": "{{ section.settings.button != blank }}",
+        "type": "url",
+        "id": "link",
+        "label": "Link"
+      },
+      {
+        "visible_if": "{{ section.settings.button != blank }}",
+        "type": "select",
+        "id": "button_style",
+        "label": "Button style",
+        "options": [
+            {"value": "link", "label": "Link"},
+            {"value": "btn", "label": "Button"},
+            {"value": "btn v2", "label": "Button V2"}
+        ],
+        "default": "btn"
+      },
+      {
+        "visible_if": "{{ section.settings.button != blank }}",
+        "type": "select",
+        "id": "button_position",
+        "label": "Button position",
+        "options": [
+          {"value": "top","label": "Top"},
+          {"value": "bottom","label": "Bottom"},
+          {"value": "right","label": "Right"}
+        ],
+        "default": "top"
+      },
+      {
+        "type": "header",
+        "content": "Text style"
+      },
+      {
+        "type": "paragraph",
+        "content": "These settings apply to title and text in the head and in the accordion items. Titles in accordion are one size smaller than the title in the head."
+      },
+      {
+        "type": "range",
+        "id": "title_size",
+        "min": -1,
+        "max": 5,
+        "step": 1,
+        "unit": "h",
+        "label": "Title size",
+        "default": 1,
+        "info": "Equivalent to the heading tags."
+      },
+      {
+        "type": "range",
+        "id": "text_size",
+        "min": 1,
+        "max": 5,
+        "step": 1,
+        "unit": "p",
+        "label": "Text size",
+        "default": 3
+      },
+      {
+        "type": "header",
+        "content": "Desktop Media"
+      },
+      {
+        "type": "select",
+        "id": "media_type",
+        "label": "Media type",
+        "options": [
+          {"value": "image", "label": "Image"},
+          {"value": "video", "label": "Video"}
+        ],
+        "default": "image"
+      },
+      {
+        "visible_if": "{{ section.settings.media_type == 'image' }}",
+        "type": "image_picker",
+        "id": "image",
+        "label": "Image"
+      },
+      {
+        "visible_if": "{{ section.settings.media_type == 'video' }}",
+        "type": "video",
+        "id": "video_mp4",
+        "label": "Video (MP4)"
+      },
+      {
+        "visible_if": "{{ section.settings.media_type == 'video' }}",
+        "type": "video_url",
+        "id": "video_iframe",
+        "label": "Video (Youtube/Vimeo)",
+        "accept": ["youtube", "vimeo"]
+      },
+      {
+        "type": "header",
+        "content": "Mobile Media"
+      },
+      {
+        "type": "paragraph",
+        "content": "If left blank, Mobile inherits what was set up for Desktop."
+      },
+      {
+        "type": "select",
+        "id": "media_type_mobile",
+        "label": "Media type",
+        "options": [
+          {"value": "image", "label": "Image"},
+          {"value": "video", "label": "Video"}
+        ],
+        "default": "image"
+      },
+      {
+        "visible_if": "{{ section.settings.media_type_mobile == 'image' }}",
+        "type": "image_picker",
+        "id": "image_mobile",
+        "label": "Image",
+      },
+      {
+        "visible_if": "{{ section.settings.media_type_mobile == 'video' }}",
+        "type": "video",
+        "id": "video_mp4_mobile",
+        "label": "Video (MP4)"
+      },
+      {
+        "visible_if": "{{ section.settings.media_type_mobile == 'video' }}",
+        "type": "video_url",
+        "id": "video_iframe_mobile",
+        "label": "Video (Youtube/Vimeo)",
+        "accept": ["youtube", "vimeo"]
+      },
+      {
+        "type": "header",
+        "content": "Colors"
+      },
+      {
+        "type": "color_scheme",
+        "id": "section_color_scheme",
+        "label": "Section color scheme",
+        "default": "scheme-1",
+        "info": "Only visible when the section is not full width, or the section top/bottom paddings are enabled."
+      },
+      {
+        "type": "color_scheme",
+        "id": "content_color_scheme",
+        "label": "Content color scheme",
+        "default": "scheme-1"
+      },
+      {
+        "type": "header",
+        "content": "Media Settings"
+      },
+      {
+        "type": "select",
+        "id": "image_position",
+        "label": "Media position (Desktop)",
+        "options": [
+          {"value": "normal", "label": "Left"},
+          {"value": "row-reverse", "label": "Right"}
+        ],
+        "default": "row-reverse"
+      },
+      {
+        "type": "select",
+        "id": "image_position_mobile",
+        "label": "Media position (Mobile)",
+        "options": [
+          {"value": "normal", "label": "Top"},
+          {"value": "column-reverse", "label": "Bottom"}
+        ],
+        "default": "normal"
+      },
+      {
+        "type": "range",
+        "id": "image_width",
+        "min": 0,
+        "max": 100,
+        "step": 1,
+        "unit": "%",
+        "label": "Media width",
+        "default": 50
+      },
+      {
+        "type": "radio",
+        "id": "image_height",
+        "label": "Media height (Desktop)",
+        "options": [
+          {"value": "auto", "label": "Auto (media natural height)"},
+          {"value": "cover", "label": "Cover the height of the text column"}
+        ],
+        "default": "cover"
+      },
+      {
+        "type": "range",
+        "id": "image_min_height_desktop",
+        "min": 0,
+        "max": 100,
+        "step": 1,
+        "unit": "rem",
+        "label": "Min-height (Desktop)",
+        "default": 50,
+        "info": "Useful when image height is set to 'Cover...'. Use 0 to ignore."
+      },
+      {
+        "type": "range",
+        "id": "image_max_height_mobile",
+        "min": 0,
+        "max": 100,
+        "step": 1,
+        "unit": "rem",
+        "label": "Max-height (Mobile)",
+        "default": 33,
+        "info": "Helps keep images consistent in size, no matter their original specs. Use 100 to ignore."
+      },
+      {
+        "type": "range",
+        "id": "image_border_radius",
+        "min": 0,
+        "max": 10,
+        "step": 0.2,
+        "unit": "em",
+        "label": "Border radius",
+        "default": 0
+      },
+      {
+        "type": "checkbox",
+        "id": "image_padding",
+        "label": "Padding"
+      },
+      {
+        "type": "header",
+        "content": "Video specific"
+      },
+      {
+        "type": "range",
+        "id": "video_height",
+        "min": 50,
+        "max": 150,
+        "step": 1,
+        "unit": "%",
+        "label": "Video natural height",
+        "default": 56
+      },
+      {
+        "type": "checkbox",
+        "id": "video_autoplay",
+        "label": "Video autoplay"
+      },
+      {
+        "type": "header",
+        "content": "Text Settings"
+      },
+      {
+        "type": "range",
+        "id": "text_width",
+        "min": 0,
+        "max": 100,
+        "step": 1,
+        "unit": "em",
+        "label": "Width",
+        "default": 50
+      },
+      {
+        "type": "select",
+        "id": "text_position",
+        "label": "Position (Desktop)",
+        "options": [
+          {"value": "start", "label": "Left"},
+          {"value": "center", "label": "Center"},
+          {"value": "end", "label": "Right"}
+        ],
+        "default": "center",
+        "info": "Within the Text column"
+      },
+      {
+        "type": "select",
+        "id": "text_align",
+        "label": "Alignment (Desktop)",
+        "options": [
+          {"value": "left", "label": "Left"},
+          {"value": "center", "label": "Center"},
+          {"value": "right", "label": "Right"}
+        ],
+        "default": "left"
+      },
+      {
+        "type": "select",
+        "id": "text_position_mobile",
+        "label": "Position (Mobile)",
+        "options": [
+          {"value": "start", "label": "Left"},
+          {"value": "center", "label": "Center"},
+          {"value": "end", "label": "Right"}
+        ],
+        "default": "center",
+        "info": "Within the Text column"
+      },
+      {
+        "type": "select",
+        "id": "text_align_mobile",
+        "label": "Alignment (Mobile)",
+        "options": [
+          {"value": "left", "label": "Left"},
+          {"value": "center", "label": "Center"},
+          {"value": "right", "label": "Right"}
+        ],
+        "default": "left"
+      },
+      {
+        "type": "range",
+        "id": "text_border_radius",
+        "min": 0,
+        "max": 10,
+        "step": 0.2,
+        "unit": "em",
+        "label": "Border radius (Desktop)",
+        "default": 0
+      },
+      {
+        "type": "range",
+        "id": "text_border_radius_mobile",
+        "min": 0,
+        "max": 10,
+        "step": 0.2,
+        "unit": "em",
+        "label": "Border radius (Mobile)",
+        "default": 0
+      },
+      {
+        "type": "header",
+        "content": "Section Settings"
+      },
+      {
+        "type": "select",
+        "id": "content_vertical_alignment",
+        "label": "Content vertical alignment (Desktop)",
+        "options": [
+          {"value": "start", "label": "Top"},
+          {"value": "center", "label": "Center"},
+          {"value": "end", "label": "Bottom"}
+        ],
+        "default": "center"
+      },
+      {
+        "type": "checkbox",
+        "id": "full_width",
+        "label": "Full width (Desktop)",
+        "default": true
+      },
+      {
+        "type": "checkbox",
+        "id": "full_width_mobile",
+        "label": "Full width (Mobile)",
+        "default": true
+      },
+      {
+        "type": "checkbox",
+        "id": "column_gap",
+        "label": "Column gap"
+      },
+      {
+        "type": "checkbox",
+        "id": "text_overlaps_media",
+        "label": "Text overlaps media",
+        "default": false
+      },
+      {
+        "type": "header",
+        "content": "Padding Desktop"
+      },
+      {
+        "type": "range",
+        "id": "text_padding",
+        "min": 0,
+        "max": 100,
+        "step": 10,
+        "unit": "%",
+        "label": "Inner padding (Desktop)",
+        "default": 100
+      },
+      {
+        "type": "range",
+        "id": "section_padding_top",
+        "min": 0,
+        "max": 100,
+        "step": 10,
+        "unit": "%",
+        "label": "Outer padding top (Desktop)",
+        "default": 0
+      },
+      {
+        "type": "range",
+        "id": "section_padding_bottom",
+        "min": 0,
+        "max": 100,
+        "step": 10,
+        "unit": "%",
+        "label": "Outer padding bottom (Desktop)",
+        "default": 0
+      },
+      {
+        "type": "header",
+        "content": "Padding Mobile"
+      },
+      {
+        "type": "range",
+        "id": "text_padding_mobile",
+        "min": 0,
+        "max": 100,
+        "step": 10,
+        "unit": "%",
+        "label": "Inner padding (Mobile)",
+        "default": 100
+      },
+      {
+        "type": "range",
+        "id": "section_padding_top_mobile",
+        "min": 0,
+        "max": 100,
+        "step": 10,
+        "unit": "%",
+        "label": "Outer padding top (Mobile)",
+        "default": 0
+      },
+      {
+        "type": "range",
+        "id": "section_padding_bottom_mobile",
+        "min": 0,
+        "max": 100,
+        "step": 10,
+        "unit": "%",
+        "label": "Outer padding bottom (Mobile)",
+        "default": 0
+      }
+    ],
+	  "blocks": [
+      {
+        "type": "heading",
+        "name": "Heading",
+        "settings": [
+          {
+            "type": "text",
+            "id": "title",
+            "label": "Category Title",
+            "default": "Category"
+          }
+        ]
+      },
+      {
+        "type": "item",
+        "name": "Item",
+        "settings": [
+          {
+            "type": "text",
+            "id": "title",
+            "label": "Title",
+            "default": "Lorem ipsum dolor sit amet?"
+          },
+          {
+            "type": "richtext",
+            "id": "content",
+            "label": "Content",
+            "default": "<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus ut tellus nec mi tincidunt imperdiet eget vitae sapien. Integer massa velit, commodo at magna eget, semper vehicula quam. Morbi laoreet tellus at neque blandit, eu congue sem congue. Mauris dapibus est ut ipsum malesuada tincidunt. Curabitur tempus commodo suscipit. Sed eu blandit urna, at porttitor ligula. In maximus lobortis tellus.</p>"
+          },
+          {
+            "type": "image_picker",
+            "id": "image",
+            "label": "Image next to title"
+          }
+        ]
+      },
+      {
+        "type": "custom_items_data",
+        "name": "Custom Items Data",
+        "settings": [
+          {
+            "type": "liquid",
+            "id": "custom_items",
+            "label": "Custom items",
+            "info": "Dynamically generate a string with items separated by |__| and each of them must contain the title and content separated by |_|. For example:   question1|_|answer1|__|question2|_|answer2"
+          }
+        ]
+      }
+    ]
+  }
+{% endschema %}

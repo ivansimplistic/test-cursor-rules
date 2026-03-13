@@ -1,0 +1,19 @@
+{{ 'social_share.css' | asset_url | stylesheet_tag }}
+<div class="social-share flex align-items-center justify-content-between">
+  <div class="small-label">{{ 'social_share_pdp.share_product_label' | t }}</div>
+  <div class="flex align-items-center justify-content-center">
+    <div class="native-share-wrap hide">
+      <button type="button" class="btn native-share" aria-label="{{ 'social_share_pdp.share_product_label' | t | escape }}" data-url="{{ shop.url }}{{ product.url }}">{% render 'icons', icon: 'share' %}</button>
+    </div>
+    <div class="custom-share-wrap">
+      <div class="flex align-items-center justify-content-center">
+        {%- assign url = shop.url | append: product.url -%}
+        <a target="_blank" class="btn" aria-label="{{ 'social_share_pdp.share_via_email_caption' | t | escape }}" href="mailto:?subject={{ 'social_share_pdp.share_via_email_subject' | t | escape }}&amp;body={{ 'social_share_pdp.share_via_email_body' | t: url: url | escape }}">{% render 'icons', icon: 'email' %}</a>
+        <a target="_blank" class="btn" aria-label="{{ 'social_share_pdp.share_on_twitter_caption' | t | escape }}" href="https://twitter.com/intent/tweet?text={{ product.title | strip_html | escape | replace: ' ', '%20' }}&url={{ shop.url }}{{ product.url }}">{% render 'icons', icon: 'twitter' %}</a>
+        <a target="_blank" class="btn" aria-label="{{ 'social_share_pdp.share_on_facebook_caption' | t | escape }}" href="https://www.facebook.com/sharer/sharer.php?u={{ shop.url }}{{ product.url }}">{% render 'icons', icon: 'facebook' %}</a>
+        <a target="_blank" class="btn" aria-label="{{ 'social_share_pdp.share_on_pinterest_caption' | t | escape }}" href="//pinterest.com/pin/create/button/?url={{ shop.url }}{{ product.url }}&media={{ product.featured_image | image_url }}&description={{ product.title | strip_html | escape | replace: ' ', '%20' }}">{% render 'icons', icon: 'pinterest' %}</a>
+      </div>
+    </div>
+  </div>
+</div>
+<script src="{{ 'social_share.js' | asset_url }}" defer="defer"></script>

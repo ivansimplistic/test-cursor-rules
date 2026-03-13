@@ -1,0 +1,198 @@
+{%- liquid
+  assign itemLocked = false
+  assign quantityLocked = false
+  assign canRemove = true
+  if item.properties['_locked'] == 'true' or item.properties['_bundle_item'] contains 'related_'
+    assign itemLocked = true
+  endif
+  if itemLocked or item.properties['_locked'] == 'quantity'
+    assign quantityLocked = true
+  endif
+  if item.variant.image
+    assign variantImg = item.variant.image
+  else
+    assign variantImg = item.product.featured_image
+  endif
+  if item.original_line_price and item.original_line_price != item.line_price
+    assign saving = item.original_line_price | minus: item.line_price
+    assign totalSaving = saving | plus: totalSaving
+  elsif item.variant.compare_at_price > item.variant.price
+    assign saving = item.variant.compare_at_price | minus: item.variant.price | times: item.quantity
+    assign totalSaving = saving | plus: totalSaving
+  endif
+  if item.instructions and item.instructions.can_update_quantity == false
+    assign quantityLocked = true
+  endif
+  if item.instructions and item.instructions.can_remove == false
+    assign canRemove = false
+  endif
+
+-%}
+{%- capture itemProperties -%}
+{%- for p in item.properties -%}
+  {%- if p.first.first != '_' %}
+  <div class="property">
+    <strong>{{ p.first }}: </strong>
+    {%- if p.last contains '/uploads/' -%}
+      {%- assign fileName = p.last | split: '/' | last -%}
+      {%- assign truncateEnd = '...' -%}
+      {%- if fileName contains '.' -%}
+        {%- assign truncateEnd = fileName | split: '.' | last | prepend: truncateEnd -%}
+      {%- endif -%}
+      <a href="{{ p.last }}">{{ fileName | truncate: 25, truncateEnd }}</a>
+    {%- else -%}
+      {{ p.last }}
+    {%- endif -%}
+  </div>
+  {%- endif -%}
+{%- endfor -%}
+{%- endcapture -%}
+
+<div class="item {% unless item.properties['_bundle_item'] contains 'related_' %}scheme-border-top{% endunless %}" data-key="{{item.key}}" {% if itemLocked %}data-locked="true"{% endif %}  {% if item.properties['_bundle_id'] != blank %}data-bundle-id="{{ item.properties['_bundle_id'] }}" data-bundle-item="{{ item.properties['_bundle_item'] }}" {% endif %}
+  {%- if settings.subscriptions_cart_item_enabled and settings.subscriptions_enabled -%}
+    data-selling-plans="{% unless item.variant.requires_selling_plan %},{% endunless %}{{ item.variant.selling_plan_allocations | map: 'selling_plan' | map: 'id' | join: ',' }}"
+  {%- endif -%}
+  >
+  <div class="grid">
+    {%- if item.properties['_bundle_item'] contains 'related_' -%}
+      <div class="grid-item one-sixth small--one-fifths">
+        <a href="{{ item.product.url }}" aria-hidden="true" tabindex="-1">
+          <img class="lazyload" data-sizes="auto" src="{% render 'image_placeholder', image: variantImg %}" alt="{{ item.product.title }}" data-srcset="{% render 'lazy_src', image: variantImg %}" width="{{ variantImg.width }}" height="{{ variantImg.height }}" />
+        </a>
+      </div>
+      <div class="grid-item five-sixths small--four-fifths">
+        <div class="info-price flex align-items-end justify-content-between">
+          <div class="info">
+            <div class="title-price flex justify-content-between align-items-start">
+              <a href="{{ item.url }}" class="title flex-1">{{item.quantity}}x {{ item.product.title }}</a>
+              {%- if canRemove -%}
+                <button type="button" class="text-right remove" aria-label="{{ 'cart.item.remove_caption' | t | escape }}">{% render 'icons', icon: 'delete' %}</button>
+              {%- endif -%}
+            </div>
+            <div class="variants">
+              {%- unless item.variant.title contains 'Default' -%}
+              <div class="variant">
+                {{item.variant.title}}
+              </div>
+              {%- endunless -%}
+            </div>
+            {{ itemProperties }}
+            {%- comment -%}
+            REF: FEATURE SELLING PLANS
+            {%- endcomment -%}
+            {%- if item.selling_plan_allocation.selling_plan != blank -%}
+              <div>{{ item.selling_plan_allocation.selling_plan.name }}</div>
+            {%- endif -%}
+          </div>
+          <div class="price flex-1 flex flex-wrap justify-content-end">
+            {% if item.original_line_price and item.original_line_price != item.line_price %}
+              <span class="compare">{{ item.original_line_price | money | remove: '.00' }}</span>
+            {% elsif item.variant.compare_at_price > item.variant.price %}
+              <span class="compare">{{ item.variant.compare_at_price | times: item.quantity | money | remove: '.00' }}</span>
+            {% endif %}
+            <span class="final">{{ item.line_price | money | remove: '.00' }}</span>
+            {% if item.message and item.message != "" %}
+              <div class="one-whole flex justify-content-end"><span class="message badge">{{ item.message | remove: 'have been ' | remove: 'has been ' }}</span></div>
+            {% endif %}
+          </div>
+        </div>
+        <div class="hide">
+          {% render 'product_card_quantity', productCard: item.product, cartItem: item, disabled: quantityLocked %}
+        </div>
+      </div>
+    {%- else -%}
+      <div class="grid-item one-quarter small--two-fifths">
+        <a href="{{ item.product.url }}" aria-hidden="true" tabindex="-1">
+          <img class="lazyload" data-sizes="auto" src="{% render 'image_placeholder', image: variantImg %}" alt="{{ item.product.title }}" data-srcset="{% render 'lazy_src', image: variantImg %}" width="{{ variantImg.width }}" height="{{ variantImg.height }}" />
+        </a>
+      </div>
+      <div class="grid-item three-quarters small--three-fifths">
+        <div class="title-price flex justify-content-between align-items-start">
+          <a href="{{ item.url }}" class="title flex-1">{{ item.product.title }}</a>
+          {%- if canRemove -%}
+          <button type="button" class="text-right remove" aria-label="{{ 'cart.item.remove_caption' | t | escape }}">{% render 'icons', icon: 'delete' %}</button>
+          {%- endif -%}
+        </div>
+        {%- unless item.variant.title contains 'Default' -%}
+        <div class="variants">
+          {%- for option in item.options_with_values -%}
+          <div class="variant">
+            <strong>{{ option.name }}: </strong>{{ option.value }}{%- unless forloop.last -%}<br/>{%- endunless -%}
+          </div>
+          {%- endfor -%}
+        </div>
+        {%- endunless -%}
+        {{ itemProperties }}
+        {%- comment -%}
+        REF: FEATURE SELLING PLANS
+        {%- endcomment -%}
+        {%- liquid 
+          assign purchaseOptions = 1
+          if settings.subscriptions_cart_item_enabled and settings.subscriptions_enabled
+            if item.variant.selling_plan_allocations.size > 1
+              assign purchaseOptions = 2
+            elsif item.variant.selling_plan_allocations.size == 1 and item.variant.requires_selling_plan == false
+              assign purchaseOptions = 2
+            endif
+          endif
+        -%}
+
+        {%- if purchaseOptions > 1 -%}
+          <div class="purchase-options field select">
+            {%- render 'icons', icon: 'chevron-down' -%}
+            {%- assign inputId = 'purchase_options_' | append: item.id | append: '_' | append: forloop.index -%}
+            <select id="{{ inputId }}">
+              <option {% if item.selling_plan_allocation.selling_plan == blank %}selected{% endif %} value="">{{ settings.subscriptions_text_onetime }}</option>
+              {% for group in item.variant.product.selling_plan_groups %}
+                <optgroup label="{{ group.name | escape }}">
+                  {%- for allocation in item.variant.selling_plan_allocations -%}
+                    {%- if allocation.selling_plan.group_id != group.id -%}{% continue %}{%- endif -%}
+                    <option {% if item.selling_plan_allocation.selling_plan.id == allocation.selling_plan.id %}selected{% endif %} value="{{ allocation.selling_plan.id }}">{{ allocation.selling_plan.name }}</option>
+                  {%- endfor -%}
+                </optgroup>
+              {% endfor %}
+            </select>
+            <label for="{{ inputId }}">{{ settings.subscriptions_options_title }}</label>
+          </div>
+        {%- else -%}
+          {%- if item.selling_plan_allocation.selling_plan != blank -%}
+            <div>{{ item.selling_plan_allocation.selling_plan.name }}</div>
+          {%- endif -%}
+        {%- endif -%}
+        <div class="qtty-price flex align-items-center justify-content-between">
+          {% render 'product_card_quantity', productCard: item.product, cartItem: item, disabled: quantityLocked %}
+          <div class="price flex-1 flex flex-wrap justify-content-end">
+            {% if item.original_line_price and item.original_line_price != item.line_price %}
+              <span class="compare">{{ item.original_line_price | money | remove: '.00' }}</span>
+            {% elsif item.variant.compare_at_price > item.variant.price %}
+              <span class="compare">{{ item.variant.compare_at_price | times: item.quantity | money | remove: '.00' }}</span>
+            {% endif %}
+            <span class="final">{{ item.line_price | money | remove: '.00' }}</span>
+            {% if item.message and item.message != "" %}
+              <div class="one-whole flex justify-content-end"><span class="message badge">{{ item.message | remove: 'have been ' | remove: 'has been ' }}</span></div>
+            {% endif %}
+          </div>
+        </div>
+
+
+      </div>
+      {%- if item.properties['_bundle_item'] contains 'main' -%}      
+        <div class="grid-item one-whole">
+          <div class="bundled-items-title"><strong>{{ 'cart.bundles.bundled_items_title' | t}}</strong></div>
+        </div>
+      {%- endif -%}
+    {%- endif -%}
+
+  </div>
+</div>
+{%- liquid 
+  if item.properties['_bundle_item'] == 'main'
+    for childItem in cart.items
+      if childItem.properties['_bundle_item'] contains 'related_' and childItem.properties['_bundle_id'] == item.properties['_bundle_id']
+        # theme-check-disable DeprecatedTag
+        include 'cart_item', item: childItem
+        # theme-check-enable DeprecatedTag
+      endif
+    endfor
+  endif
+-%}

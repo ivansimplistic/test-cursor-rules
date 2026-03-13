@@ -1,0 +1,22 @@
+{
+  "name": "Announcement group",
+  "type": "custom.announcement",
+  "sections": {
+    "announcement_bar": {
+      "type": "announcement_bar",
+      "settings": {
+      },
+      "blocks": {
+        "line-1": {
+          "type": "announcement"
+        }
+      },
+      "block_order": [
+        "line-1"
+      ]
+    }
+  },
+  "order": [
+    "announcement_bar"
+  ]
+}

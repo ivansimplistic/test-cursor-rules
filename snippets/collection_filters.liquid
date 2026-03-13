@@ -1,0 +1,168 @@
+{%- comment -%}
+    Renders collection and search page storefront filters
+
+    Accepts:
+    - source: {Object} Collection Liquid object,
+              {Object} Search Liquid object
+    - settings: {Object} section settings 
+
+    Usage from collection template:
+    {%- render 'collection_filters', source: collection, storefrontTags: section.settings.filters_allowed_storefront_tags -%}
+    Usage from search template:
+    {%- render 'collection_filters', source: search, storefrontTags: section.settings.filters_allowed_storefront_tags -%}
+{%- endcomment -%}
+{%- assign allowedTags = storefrontTags | default: '' | replace: ', ', ',' | replace: ' ,', ',' | split: ',' -%}
+{%- assign colorSwatchesOptions = settings.product_color_swatches | replace: ', ', ',' | split: ',' -%}
+
+{%- liquid 
+  assign expanded = true
+  assign expandMultiple = true
+  if section.settings.filters_layout contains 'horizontal' or section.settings.filters_default_state == 'collapsed'
+    assign expanded = false
+    assign expandMultiple = false
+  endif
+-%}
+
+<collection-filters class="{%- if section.settings.filters_layout contains 'sidebar' -%}medium-down--{%- endif -%}slide-in-modal collection-filters ease-animation flex direction-column layout-{{section.settings.filters_layout}}">
+  <div class="head {% if section.settings.filters_layout contains 'sidebar' %}hide medium-down--show{% endif %} scheme color-{{settings.modals_heading_color_scheme}} {% if settings.modals_heading_border %}scheme-border-bottom{% endif %}">
+    <div class="title heading-font">{{ 'collection_filters.title' | t }}</div>
+    <button class="close close-filters" aria-label="{{ 'collection_filters.close_caption' | t | escape }}">
+      {% render 'icons', icon: 'close' %}
+    </button>
+  </div>
+  <form class="filters-inner scheme {% if section.settings.filters_layout contains 'sidebar' %}large--color-{{section.settings.filters_color_scheme}} medium-down--color-{{settings.modals_main_color_scheme}} medium-down--flex-1 {% if section.settings.filters_border %}scheme-border-box{% endif %} {% if section.settings.filters_color_scheme == section.settings.content_color_scheme %}same-scheme{% endif %}{% else %}color-{{settings.modals_main_color_scheme}} flex-1{% endif %}">
+    {%- if template.name == 'search' -%}
+    <input type="hidden" name="q" value="{{search.terms | escape}}"  aria-label="{{ 'collection_filters.enter_search_terms_caption' | t | escape }}" >
+    <input type="hidden" name="type" value="{{search.types | join: ','}}" />
+    {%- endif -%}
+    {%- unless section.settings.filters_layout == 'button' -%}
+      <div class="visually-hidden medium-down--hide">{{ 'collection_filters.title' | t }}</div>
+      <a class="skip-to-content-link absolute visually-hidden medium-down--hide" href="#collection-wrapper-{{collection.id}}" onclick="document.querySelector('#collection-wrapper-{{collection.id}}').focus()">
+        {{ 'collection_filters.skip_to_collection_button' | t }}
+      </a>
+    {%- endunless -%}
+    {%- assign activeFilters = false -%}
+    {%- capture filtersSummary -%}
+      {%- for filter in source.filters -%}
+        {%- for activeValue in filter.active_values -%}
+          {%- assign activeFilters = true -%}
+          {% capture optionId %}filter-{{filter.label | handle}}-{{activeValue.value | handle}}{% endcapture %}
+          <button type="button" class="flex align-items-center animation" data-option-id="{{optionId}}" arial-label="{{ 'collection_filters.remove_filter_caption' | t: label: activeValue.label | escape }}">{{activeValue.label}} {%- render 'icons', icon: 'close' -%}</button>
+        {%- endfor -%}
+        {% if filter.type == "price_range" %}
+          {%- if filter.min_value.value != nil or filter.max_value.value != nil -%}
+            <button type="button" class="flex align-items-center animation" data-option-id="filter-price" arial-label="{{ 'collection_filters.remove_filter_price_caption' | t | escape }}">
+              {%- assign activeFilters = true -%}
+              {%- if filter.min_value.value -%}
+                {{ filter.min_value.value | money | remove: '.00' }}
+              {%- else -%}
+                {{ 0 | money }}
+              {%- endif -%}
+              -&nbsp;
+              {%- if filter.max_value.value -%}
+                {{ filter.max_value.value | money | remove: '.00' }}
+              {%- else -%}
+                {{ filter.range_max | money | remove: '.00' }}
+              {%- endif -%}
+              {%- render 'icons', icon: 'close' -%}
+            </button>
+          {%- endif -%}
+        {% endif %}
+      {%- endfor -%}
+    {%- endcapture -%}
+
+    {%- if activeFilters -%}
+      {%- if section.settings.product_count_label == 'filters' -%}
+        <div class="results-count">
+          {%- if source.results_count -%}
+            {{ 'search_main.results_with_count' | t: count: source.results_count }}
+          {%- elsif source.products_count < source.all_products_count -%}
+            {{ 'collection_filters.product_count_filtered' | t: product_count: source.products_count, total_count: source.all_products_count }}
+          {%- endif -%}
+        </div>
+      {%- endif -%}
+      <div class="summary flex flex-wrap align-items-center">
+        <button class="animation" type="button" data-clear-all="true">{{ 'collection_filters.clear_all_button' | t }}</button>
+        {{ filtersSummary }}
+      </div>
+    {%- endif -%}
+    <util-accordion data-expand-multiple="{% if expandMultiple %}true{% else %}false{% endif %}">
+
+    {%- for filter in source.filters -%}
+      {%- assign showGroup = false -%}
+      {%- assign itemId = filter.param_name -%}
+      {%- capture filtersGroup -%}
+        <div data-param="{{filter.param_name}}" class="accordion {% if expanded %}open{% endif %} group {% if section.settings.filters_accordion_border_position == 'below_items' %}scheme-border-bottom{% endif %}">
+          <button type="button" aria-expanded="{% if expanded %}true{% else %}false{% endif %}" class="accordion-trigger group-title small-label {% if section.settings.filters_accordion_border_position == 'below_title' %}scheme-border-bottom{% endif %}" aria-controls="panel-{{itemId}}" id="button-{{itemId}}">
+            <span class="accordion-title">
+              {{ filter.label | escape }}
+            </span>
+            <span class="accordion-icon chevron"><i></i></span>
+          </button>
+          <div id="panel-{{itemId}}" role="region" aria-labelledby="button-{{itemId}}" class="accordion-panel list expandable {% if expanded %}expandable-default-open{% endif %}">
+            {%- case filter.type-%}
+              {%- when 'list' -%}
+                <div class="panel-inner">
+                  {%- for value in filter.values -%}
+                    
+                      {%- if value.param_name != 'filter.p.tag' or allowedTags contains value.value or allowedTags == blank -%}
+                        {%- assign showGroup = true -%}
+                        <div class="item {% if value.count == 0 %}disabled{% endif %} ">
+                          {% capture optionId %}filter-{{filter.label | handle}}-{{value.value | handle}}{% endcapture %}
+                          <input {% if value.count == 0 %}disabled{% endif %} class="checkbox-custom" type="checkbox" id="{{optionId}}" name="{{ value.param_name }}" value="{{ value.value }}" {% if value.active %}checked="checked"{% endif %} />
+                          <label class="flex {% if colorSwatchesOptions contains filter.label %}align-items-center{% else %}checkbox-custom-label{% endif %}" for="{{optionId}}">
+                            {%- if colorSwatchesOptions contains filter.label -%}
+                              <div class="color-swatch animation color-{{ value.label | handle }}"></div>
+                            {%- endif -%}
+                            <div>
+                              <span class="txt">{{ value.label }}</span>
+                              <span class="count">({{ value.count }})</span>
+                            </div>
+                          </label>
+                        </div>
+                      {%- endif -%}
+                    
+                  {%- endfor -%}
+                </div>
+              {% when 'price_range' %}
+                {%- assign showGroup = true -%}
+                <div class="panel-inner">
+                  <price-range-filter class="item price-range-filter">
+                    <div class="item-price flex">
+                      <div class="group flex-1 flex align-items-center">
+                        <label class="small-label" for="filter-price-min">{{ 'collection_filters.price_from_label' | t }}:</label> 
+                        <div class="field no-label">
+                          <span class="currency small-label">{{shop.currency | replace: 'USD', '$'}}</span>
+                          <input type="number" id="filter-price-min" class="input-min" name="{{ filter.min_value.param_name }}" value="{{ filter.min_value.value | money_without_currency | replace: ',', '' | replace: '.00', '' }}" placeholder="{{ filter.min_value.value | default: 0 | money_without_currency | replace: ',', '' | replace: '.00', '' }}" />
+                        </div>
+                      </div>
+                      <div class="group flex-1 flex align-items-center">
+                        <label class="small-label" for="filter-price-max">{{ 'collection_filters.price_to_label' | t }}:</label> 
+                        <div class="field no-label">
+                          <span class="currency small-label">{{shop.currency | replace: 'USD', '$'}}</span>
+                          <input type="number" id="filter-price-max" class="input-max" name="{{ filter.max_value.param_name }}" value="{{ filter.max_value.value | money_without_currency | replace: ',', '' | replace: '.00', '' }}" placeholder="{{ filter.range_max | divided_by: 100.0 | ceil | replace: '.00', '' | replace: '.0', '' }}" />
+                        </div>
+                      </div>
+                    </div>
+                    <div class="price-progress scheme-border-background">
+                      <div class="line"></div>
+                    </div>
+                    <div class="range-input">
+                      <input type="range" id="price-range-min" class="range-min" min="0" max="{{filter.range_max | divided_by: 100.0 | ceil}}" value="{{filter.min_value.value | divided_by: 100.0}}" step="1">
+                      <input type="range" id="price-range-max" class="range-max" min="0" max="{{filter.range_max | divided_by: 100.0 | ceil}}" value="{{filter.max_value.value | default: filter.range_max | divided_by: 100.0}}" step="1">
+                    </div>
+                  </price-range-filter>
+                </div>
+
+            {%- endcase -%}
+          </div>
+        </div>
+      {%- endcapture -%}
+      {%- if showGroup -%}
+        {{ filtersGroup }}
+      {%- endif -%}
+    {%- endfor -%}
+    </util-accordion>
+  </form>
+
+</collection-filters>

@@ -1,0 +1,48 @@
+{%- comment -%}
+	Adds a new parameter to an object and returns a json string
+	
+	Accepts:
+    - item: {Object} Liquid object
+    - key: {String} Key of the new parameter
+    - value: {Mixed} Value of the new parameter. It could be a plain value (String, Int, etc.) or a metafield object
+
+	Usage:	
+	{%- render 'json_add_param', item: product, key: 'custom-key', value: 'custom-value' -%}
+	{%- render 'json_add_param', item: product, key: 'custom-key', value: product.metafields.my_fields -%}
+{%- endcomment -%}
+
+{%- liquid
+	capture itemJson 
+		echo item | json
+	endcapture
+
+	unless value == 'true' or value == 'false'
+    if value.first.last.type
+    	capture value
+        echo '{'
+        for v in value
+      	  unless forloop.index == 1
+          	echo ','
+          endunless
+          echo v.first | json | append: ':'
+          echo v.last.value | json
+        endfor 
+        echo '}'
+      endcapture
+    else
+    	if value.value
+      	assign value = value.value | json
+      else
+      	assign value = value | json
+      endif
+    endif 
+	endunless
+	assign itemJson = itemJson | strip
+	assign newParam = key | json | append: ':' | append: value
+
+	assign size = itemJson | size | minus: 1
+	assign itemJson = itemJson | slice: 0, size
+	assign itemJson = itemJson | append: ',' | append: newParam | append: '}'
+
+	echo itemJson
+-%}

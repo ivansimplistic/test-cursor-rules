@@ -1,0 +1,17 @@
+{
+  "sections": {
+    "cart_content": {
+      "type": "cart_content",
+      "settings": {}
+    },
+    "shipping_calculator": {
+      "type": "shipping_calculator",
+      "disabled": true,
+      "settings": {}
+    }
+  },
+  "order": [
+    "cart_content",
+    "shipping_calculator"
+  ]
+}

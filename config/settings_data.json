@@ -1,0 +1,245 @@
+{
+  "current": {
+    "cart_popuplink_title1": "Shipping Calculator",
+    "cart_popuplink_link1": "\/?section_id=shipping_calculator",
+    "cart_popuplink_icon1": "{% render 'icons', icon: 'shipping' %}",
+    "sections": {
+      "color_swatches": {
+        "type": "color_swatches",
+        "blocks": {
+          "cc975abb-a291-40ad-abc7-6d2147ab3551": {
+            "type": "swatch",
+            "settings": {
+              "title": "Black",
+              "color_flat": "#292929",
+              "color_background": ""
+            }
+          },
+          "f383e6f9-61c5-4242-a83c-6b7eefa5ed45": {
+            "type": "swatch",
+            "settings": {
+              "title": "Blue",
+              "color_flat": "#649ee1",
+              "color_background": ""
+            }
+          },
+          "5fb08a96-be3a-4147-ba25-21542899c90a": {
+            "type": "swatch",
+            "settings": {
+              "title": "Gold",
+              "color_flat": "#d4b465",
+              "color_background": ""
+            }
+          },
+          "3075464b-f661-4595-bb56-008d9bec46c7": {
+            "type": "swatch",
+            "settings": {
+              "title": "Green",
+              "color_flat": "#5ac6a9",
+              "color_background": ""
+            }
+          },
+          "fee15cf5-491b-4baf-ad91-f415e415c436": {
+            "type": "swatch",
+            "settings": {
+              "title": "Orange",
+              "color_flat": "#f28346",
+              "color_background": ""
+            }
+          },
+          "4b3fa636-74d2-4e89-87e4-e23cd260c4ce": {
+            "type": "swatch",
+            "settings": {
+              "title": "Pink",
+              "color_flat": "#ea81cc",
+              "color_background": ""
+            }
+          },
+          "0affeb22-4882-4c22-8972-01aacac8c962": {
+            "type": "swatch",
+            "settings": {
+              "title": "Red",
+              "color_flat": "#e13131",
+              "color_background": ""
+            }
+          },
+          "eb39398e-dceb-4963-9913-675c480609f3": {
+            "type": "swatch",
+            "settings": {
+              "title": "Rose Gold",
+              "color_flat": "#e9c2a7",
+              "color_background": ""
+            }
+          },
+          "fabc6edc-9d86-48c1-96a7-fe55fecb91ca": {
+            "type": "swatch",
+            "settings": {
+              "title": "Silver",
+              "color_flat": "#cecece",
+              "color_background": ""
+            }
+          },
+          "eed2edc1-c366-479c-b143-0e987bc212d0": {
+            "type": "swatch",
+            "settings": {
+              "title": "White",
+              "color_flat": "#ffffff",
+              "color_background": ""
+            }
+          }
+        },
+        "block_order": [
+          "cc975abb-a291-40ad-abc7-6d2147ab3551",
+          "f383e6f9-61c5-4242-a83c-6b7eefa5ed45",
+          "5fb08a96-be3a-4147-ba25-21542899c90a",
+          "3075464b-f661-4595-bb56-008d9bec46c7",
+          "fee15cf5-491b-4baf-ad91-f415e415c436",
+          "4b3fa636-74d2-4e89-87e4-e23cd260c4ce",
+          "0affeb22-4882-4c22-8972-01aacac8c962",
+          "eb39398e-dceb-4963-9913-675c480609f3",
+          "fabc6edc-9d86-48c1-96a7-fe55fecb91ca",
+          "eed2edc1-c366-479c-b143-0e987bc212d0"
+        ],
+        "settings": {
+        }
+      },
+      "shipping_calculator": {
+        "type": "shipping_calculator",
+        "settings": {
+          "content_color_scheme": "scheme-1"
+        }
+      }
+    },
+    "content_for_index": [
+
+    ],
+    "color_schemes": {
+      "scheme-1": {
+        "settings": {
+          "background": "#ffffff",
+          "background_gradient": "",
+          "global_borders": "#00000021",
+          "highlights": "#000000",
+          "headings": "#000000",
+          "text": "#000000",
+          "buttons_background": "#000000",
+          "buttons_border": "#000000",
+          "buttons_label": "#ffffff",
+          "buttons_background_hover": "#000000",
+          "buttons_border_hover": "#000000",
+          "buttons_label_hover": "#ffffff",
+          "buttons_border2": "#000000",
+          "buttons_label2": "#000000",
+          "buttons_border_hover2": "#000000",
+          "buttons_label_hover2": "#000000",
+          "fields_background": "#ffffff",
+          "fields_border": "#00000040",
+          "fields_label": "#000000",
+          "errors": "#d50000",
+          "success": "#009b1a",
+          "carousel_arrows_background": "#ffffffb3",
+          "carousel_arrows_border": "#00000033",
+          "carousel_arrows_label": "#000000",
+          "carousel_dots_off": "#0000004d",
+          "carousel_dots_on": "#000000",
+          "badges_background": "#000000",
+          "badges_border": "#000000",
+          "badges_label": "#ffffff",
+          "tabs_background_on": "#000000",
+          "tabs_border_on": "#000000",
+          "tabs_label_on": "#ffffff",
+          "tabs_border_off": "#000000",
+          "tabs_label_off": "#000000",
+          "tabs_border_on2": "#000000",
+          "tabs_label_on2": "#000000",
+          "tabs_border_off2": "#bbbbbb",
+          "tabs_label_off2": "#999999"
+        }
+      },
+      "scheme-2": {
+        "settings": {
+          "background": "#f5f5f5",
+          "background_gradient": "",
+          "global_borders": "#00000026",
+          "highlights": "#000000",
+          "headings": "#000000",
+          "text": "#000000",
+          "buttons_background": "#000000",
+          "buttons_border": "#000000",
+          "buttons_label": "#ffffff",
+          "buttons_background_hover": "#000000",
+          "buttons_border_hover": "#000000",
+          "buttons_label_hover": "#ffffff",
+          "buttons_border2": "#000000",
+          "buttons_label2": "#000000",
+          "buttons_border_hover2": "#000000",
+          "buttons_label_hover2": "#000000",
+          "fields_background": "#ffffff",
+          "fields_border": "#00000040",
+          "fields_label": "#000000",
+          "errors": "#d50000",
+          "success": "#009b1a",
+          "carousel_arrows_background": "#ffffffb3",
+          "carousel_arrows_border": "#00000033",
+          "carousel_arrows_label": "#000000",
+          "carousel_dots_off": "#0000004d",
+          "carousel_dots_on": "#000000",
+          "badges_background": "#000000",
+          "badges_border": "#000000",
+          "badges_label": "#ffffff",
+          "tabs_background_on": "#000000",
+          "tabs_border_on": "#000000",
+          "tabs_label_on": "#ffffff",
+          "tabs_border_off": "#000000",
+          "tabs_label_off": "#000000",
+          "tabs_border_on2": "#000000",
+          "tabs_label_on2": "#000000",
+          "tabs_border_off2": "#b5b5b5",
+          "tabs_label_off2": "#888888"
+        }
+      },
+      "scheme-3": {
+        "settings": {
+          "background": "#000000",
+          "background_gradient": "",
+          "global_borders": "#ffffff33",
+          "highlights": "#ffffff",
+          "headings": "#ffffff",
+          "text": "#ffffff",
+          "buttons_background": "#ffffff", 
+          "buttons_border": "#ffffff",
+          "buttons_label": "#000000",
+          "buttons_background_hover": "#000000",
+          "buttons_border_hover": "#ffffff",
+          "buttons_label_hover": "#ffffff",
+          "buttons_border2": "#ffffff",
+          "buttons_label2": "#ffffff",
+          "buttons_border_hover2": "#ffffff",
+          "buttons_label_hover2": "#ffffff",
+          "fields_background": "#ffffff",
+          "fields_border": "",
+          "fields_label": "#000000",
+          "errors": "#FF2626",
+          "success": "#00b41e",
+          "carousel_arrows_background": "#ffffffb3",
+          "carousel_arrows_border": "#00000033",
+          "carousel_arrows_label": "#000000",
+          "carousel_dots_off": "#ffffff4d",
+          "carousel_dots_on": "#ffffff",
+          "badges_background": "#ffffff",
+          "badges_border": "#ffffff",
+          "badges_label": "#000000",
+          "tabs_background_on": "#ffffff",
+          "tabs_border_on": "#ffffff",
+          "tabs_label_on": "#000000",
+          "tabs_border_off": "#ffffff",
+          "tabs_label_off": "#ffffff",
+          "tabs_border_on2": "#ffffff",
+          "tabs_label_on2": "#ffffff",
+          "tabs_border_off2": "#999999",
+          "tabs_label_off2": "#999999"
+        }
+      }
+    }
+  }
+}

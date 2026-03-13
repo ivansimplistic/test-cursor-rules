@@ -1,0 +1,359 @@
+{%- capture tabsHtml -%}
+  {%- render 'richtext_multi_content', section: section -%}
+{%- endcapture -%}
+
+{%- if tabsHtml contains 'CONTENT: TRUE' -%}
+  {%- render 'section_image_text_structure', section: section, textColumnHtml: tabsHtml -%}
+{%- endif -%}
+
+{% schema %}
+  {
+    "name": "Richtext (Tabs)",
+    "class": "type-richtext-tabs",
+    "tag": "section",
+    "presets": [
+      {
+        "name": "Richtext (Tabs)",
+        "blocks": [
+          {
+            "type": "tab_content",
+            "settings": {
+              "title": "Tab 1",
+              "content_title": "Several lines of text",
+              "text": "<p>Lorem ipsum dolor sit amet, consectur adipiscing elit. Nunc eu eros augue. Cras tempus finibus mi, at aliquet orci vestibulum sit amet. Lorem ipsum dolor sit amet, consectur adipiscing elit. Nunc eu eros augue. Cras tempus finibus mi, at aliquet orci vestibulum sit amet. Lorem ipsum dolor sit amet, consectur adipiscing elit. Nunc eu eros augue. Cras tempus finibus mi, at aliquet orci vestibulum sit amet</p>"
+            }
+          },
+          {
+            "type": "tab_content",
+            "settings": {
+              "title": "Tab 2",
+              "content_title": "Few lines of text",
+              "text": "<p>Lorem ipsum dolor sit amet, consectur adipiscing elit. Nunc eu eros augue. Cras tempus finibus mi, at aliquet orci vestibulum sit amet. </p>"
+            }
+          }
+        ]
+      }
+    ],
+	  "settings": [
+      {
+        "type": "header",
+        "content": "Tabs Settings"
+      },
+      {
+        "type": "select",
+        "id": "tab_style",
+        "label": "Style",
+        "options": [
+          {"value": "v1","label": "Pills"},
+          {"value": "v2","label": "Line"}
+        ],
+        "default": "v1"
+      },
+      {
+        "type": "checkbox",
+        "id": "tabs_one_line_desktop",
+        "label": "Force to one line (Desktop)"
+      },
+      {
+        "type": "checkbox",
+        "id": "tabs_one_line_mobile",
+        "label": "Force to one line (Mobile)"
+      },
+      {
+        "type": "header",
+        "content": "Head"
+      },
+      {
+        "type": "text",
+        "id": "eyebrow",
+        "label": "Eyebrow"
+      },
+      {
+        "visible_if": "{{ section.settings.eyebrow != blank }}",
+        "type": "range",
+        "id": "eyebrow_size",
+        "min": 1,
+        "max": 5,
+        "step": 1,
+        "unit": "p",
+        "label": "Eyebrow size",
+        "default": 3
+      },
+      {
+        "type": "text",
+        "id": "title",
+        "label": "Title",
+      	"default": "Lorem ipsum dolor"
+      },
+      {
+        "visible_if": "{{ section.settings.title != blank }}",
+        "type": "checkbox",
+        "id": "is_h1",
+        "label": "This is the first title of the page (H1)"
+      },
+      {
+        "visible_if": "{{ section.settings.title != blank }}",
+        "type": "range",
+        "id": "title_size",
+        "min": -1,
+        "max": 6,
+        "step": 1,
+        "unit": "h",
+        "label": "Title size",
+        "default": 1,
+        "info": "Equivalent to the heading tags."
+      },
+      {
+        "type": "richtext",
+        "id": "text",
+        "label": "Text"
+      },
+      {
+        "visible_if": "{{ section.settings.text != blank }}",
+        "type": "range",
+        "id": "text_size",
+        "min": 1,
+        "max": 5,
+        "step": 1,
+        "unit": "p",
+        "label": "Text size",
+        "default": 3
+      },
+      {
+        "type": "text",
+        "id": "button",
+        "label": "Button"
+      },
+      {
+        "visible_if": "{{ section.settings.button != blank }}",
+        "type": "url",
+        "id": "link",
+        "label": "Link"
+      },
+      {
+        "type": "header",
+        "content": "Colors"
+      },
+      {
+        "type": "color_scheme",
+        "id": "section_color_scheme",
+        "label": "Section color scheme",
+        "default": "scheme-1",
+        "info": "Only visible when the section is not full width, or the section top/bottom paddings are enabled."
+      },
+      {
+        "type": "color_scheme",
+        "id": "content_color_scheme",
+        "label": "Content color scheme",
+        "default": "scheme-2",
+        "info": "The color behind the text."
+      },
+      {
+        "type": "header",
+        "content": "Text Settings"
+      },
+      {
+        "type": "range",
+        "id": "text_width",
+        "min": 0,
+        "max": 100,
+        "step": 1,
+        "unit": "em",
+        "label": "Width",
+        "default": 50
+      },
+      {
+        "type": "select",
+        "id": "text_position",
+        "label": "Position (Desktop)",
+        "options": [
+          {"value": "start", "label": "Left"},
+          {"value": "center", "label": "Center"},
+          {"value": "end", "label": "Right"}
+        ],
+        "default": "start",
+        "info": "Within the Text column"
+      },
+      {
+        "type": "select",
+        "id": "text_align",
+        "label": "Alignment (Desktop)",
+        "options": [
+          {"value": "left", "label": "Left"},
+          {"value": "center", "label": "Center"},
+          {"value": "right", "label": "Right"}
+        ],
+        "default": "left"
+      },
+      {
+        "type": "select",
+        "id": "text_position_mobile",
+        "label": "Position (Mobile)",
+        "options": [
+          {"value": "start", "label": "Left"},
+          {"value": "center", "label": "Center"},
+          {"value": "end", "label": "Right"}
+        ],
+        "default": "start",
+        "info": "Within the Text column"
+      },
+      {
+        "type": "select",
+        "id": "text_align_mobile",
+        "label": "Alignment (Mobile)",
+        "options": [
+          {"value": "left", "label": "Left"},
+          {"value": "center", "label": "Center"},
+          {"value": "right", "label": "Right"}
+        ],
+        "default": "left"
+      },
+      {
+        "type": "range",
+        "id": "text_border_radius",
+        "min": 0,
+        "max": 10,
+        "step": 0.2,
+        "unit": "em",
+        "label": "Border radius (Desktop)",
+        "default": 0
+      },
+      {
+        "type": "range",
+        "id": "text_border_radius_mobile",
+        "min": 0,
+        "max": 10,
+        "step": 0.2,
+        "unit": "em",
+        "label": "Border radius (Mobile)",
+        "default": 0
+      },
+      {
+        "type": "header",
+        "content": "Section Settings"
+      },
+      {
+        "type": "checkbox",
+        "id": "full_width",
+        "label": "Full width (Desktop)",
+        "default": true
+      },
+      {
+        "type": "checkbox",
+        "id": "full_width_mobile",
+        "label": "Full width (Mobile)",
+        "default": true
+      },
+      {
+        "type": "header",
+        "content": "Padding Desktop"
+      },
+      {
+        "type": "range",
+        "id": "text_padding",
+        "min": 0,
+        "max": 100,
+        "step": 10,
+        "unit": "%",
+        "label": "Inner padding (Desktop)",
+        "default": 100
+      },
+      {
+        "type": "range",
+        "id": "section_padding_top",
+        "min": 0,
+        "max": 100,
+        "step": 10,
+        "unit": "%",
+        "label": "Outer padding top (Desktop)",
+        "default": 0
+      },
+      {
+        "type": "range",
+        "id": "section_padding_bottom",
+        "min": 0,
+        "max": 100,
+        "step": 10,
+        "unit": "%",
+        "label": "Outer padding bottom (Desktop)",
+        "default": 0
+      },
+      {
+        "type": "header",
+        "content": "Padding Mobile"
+      },
+      {
+        "type": "range",
+        "id": "text_padding_mobile",
+        "min": 0,
+        "max": 100,
+        "step": 10,
+        "unit": "%",
+        "label": "Inner padding (Mobile)",
+        "default": 100
+      },
+      {
+        "type": "range",
+        "id": "section_padding_top_mobile",
+        "min": 0,
+        "max": 100,
+        "step": 10,
+        "unit": "%",
+        "label": "Outer padding top (Mobile)",
+        "default": 0
+      },
+      {
+        "type": "range",
+        "id": "section_padding_bottom_mobile",
+        "min": 0,
+        "max": 100,
+        "step": 10,
+        "unit": "%",
+        "label": "Outer padding bottom (Mobile)",
+        "default": 0
+      }
+    ],
+	  "blocks": [
+      {
+        "type": "tab_content",
+        "name": "Tab Text",
+        "settings": [
+          {
+            "type": "text",
+            "id": "eyebrow",
+            "label": "Eyebrow"
+          },
+          {
+            "type": "text",
+            "id": "title",
+            "label": "Tab",
+            "default": "Tab"
+          },
+          {
+            "type": "text",
+            "id": "content_title",
+            "label": "Content title",
+            "default": "Lorem ipsum dolor."
+          },
+          {
+            "type": "richtext",
+            "id": "text",
+            "label": "Text",
+            "default": "<p>Lorem ipsum dolor sit amet, consectur adipiscing elit. Nunc eu eros augue. Cras tempus finibus mi, at aliquet orci vestibulum sit amet.</p>"
+          },
+          {
+            "type": "text",
+            "id": "button",
+            "label": "Button",
+            "default": "Button"
+          },
+          {
+            "type": "url",
+            "id": "link",
+            "label": "Link"
+          }
+        ]
+      }
+    ]
+  }
+{% endschema %}

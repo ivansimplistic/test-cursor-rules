@@ -1,0 +1,17 @@
+<style>
+  .collection-empty {padding: 0 0 var(--global-sections-padding); text-align: center;}
+  .collection-empty .head {font-size: 4em; margin-bottom: 0.3em;}
+  .collection-empty .icon {display: inline-block;}
+  .collection-empty p {margin-bottom: 2em;}
+</style>
+<div class="collection-empty">
+  <div class="head">{% render 'icons', icon: 'tag' %}</div>
+  <p class="p0">
+    {%- if collection.all_products_count == 0 -%}
+      {{ 'collection_main.empty_collection_message' | t }}
+    {%- else -%}
+      {{ 'collection_main.no_results_for_filters_message' | t }}
+    {%- endif -%}
+  </p>
+  <a href="{{ routes.all_products_collection_url }}" class="btn">{{ 'collection_main.see_our_products_message' | t }}</a>
+</div>

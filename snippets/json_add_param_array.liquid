@@ -1,0 +1,26 @@
+{%- comment -%}
+	Adds a new parameter to each object of a given array
+	
+	Accepts:
+    - items: {Array} Array of Liquid objects
+    - key: {String} Key of the new parameter
+    - values: {Array} Array of values (String). The quantity of values in this array needs to match with the quantity of items.
+
+	Usage:	
+	{%- assign metafields = product.variants | map: 'metafields' | map: 'my_fields' | map: 'additional_details' | map: 'value' -%}
+	{%- render 'json_add_param_array', items: product.variants, key: 'additional_details', values: metafields -%}
+{%- endcomment -%}
+
+{%- liquid
+	assign result = ''
+	for item in items
+		assign value = values[forloop.index0]
+		capture itemJson
+			render 'json_add_param', item: item, key: key, value: value
+		endcapture
+		assign result = result | append: ',' | append: itemJson
+	endfor
+	assign result = result | remove_first: ','
+
+	echo '[' | append: result | append: ']'
+-%}

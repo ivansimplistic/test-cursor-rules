@@ -1,0 +1,41 @@
+{% assign r = rating | replace: '"', '' | times: 1.0 %}
+
+<div class="rating-stars" aria-label="{{ 'product_card.reviews_rating_caption' | t: rating: r | escape }}">
+
+  <svg class="icon star" aria-hidden="true"><use href="#rsr-full"/></svg>
+  
+  {% if r >= 2 %}
+    <svg class="icon star" aria-hidden="true"><use href="#rsr-full"/></svg>
+  {% elsif r > 1.2 and r < 2 %}
+    <svg class="icon star" aria-hidden="true"><use href="#rsr-half"/></svg>
+  {% else %}
+    <svg class="icon star" aria-hidden="true"><use href="#rsr-empty"/></svg>
+  {% endif %}
+
+  {% if r >= 3 %}
+    <svg class="icon star" aria-hidden="true"><use href="#rsr-full"/></svg>
+  {% elsif r > 2.2 and r < 3 %}
+    <svg class="icon star" aria-hidden="true"><use href="#rsr-half"/></svg>
+  {% else %}
+    <svg class="icon star" aria-hidden="true"><use href="#rsr-empty"/></svg>
+  {% endif %}
+
+  {% if r >= 4 %}
+    <svg class="icon star" aria-hidden="true"><use href="#rsr-full"/></svg>
+  {% elsif r > 3.2 and r < 4 %}
+    <svg class="icon star" aria-hidden="true"><use href="#rsr-half"/></svg>
+  {% else %}
+    <svg class="icon star" aria-hidden="true"><use href="#rsr-empty"/></svg>
+  {% endif %}
+
+  {% if r >= 5 %}
+    <svg class="icon star" aria-hidden="true"><use href="#rsr-full"/></svg>
+  {% elsif r > 4.2 and r < 5 %}
+    <svg class="icon star" aria-hidden="true"><use href="#rsr-half"/></svg>
+  {% else %}
+    <svg class="icon star" aria-hidden="true"><use href="#rsr-empty"/></svg>
+  {% endif %}
+
+  <div class="rating-stars-number" aria-hidden="true">{{ r }}</div>
+
+</div>

@@ -1,0 +1,89 @@
+{
+  "sections": {
+    "product_main": {
+      "type": "product_main",
+      "blocks": {
+        "breadcrumb": {
+          "type": "breadcrumb"
+        },
+        "custom_badges": {
+          "type": "custom_badges"
+        },
+        "vendor_type": {
+          "type": "vendor_type"
+        },
+        "title": {
+          "type": "title"
+        },
+        "price": {
+          "type": "price",
+          "settings": {
+          }
+        },
+        "variants": {
+          "type": "variants"
+        },
+        "selling_plans": {
+          "type": "selling_plans"
+        },
+        "button": {
+          "type": "button"
+        },
+
+
+        "description": {
+          "type": "description"
+        },
+        "enhanced_description": {
+          "type": "enhanced_description"
+        },
+        "separator": {
+          "type": "separator"
+        },
+        "share": {
+          "type": "share"
+        }
+      },
+      "block_order": [
+        "breadcrumb",
+        "custom_badges",
+        "vendor_type",
+        "title",
+        "price",
+        "variants",
+        "selling_plans",
+        "button",
+
+
+        "description",
+        "enhanced_description",
+        "separator",
+        "share"
+      ]
+    },
+    "product_enhanced_description": {
+      "type": "product_enhanced_description",
+      "disabled": true,
+      "blocks": {
+        "default_content": {
+          "type": "default_content"
+        }
+      },
+      "block_order": [
+        "default_content"
+      ]
+    },
+    "recommended_products": {
+      "type": "recommended_products"
+    },
+    "recently_viewed": {
+      "type": "recently_viewed"
+    }
+  },
+  "order": [
+    "product_main",
+    "product_enhanced_description",
+    "recommended_products",
+    "recently_viewed"
+  ]
+}

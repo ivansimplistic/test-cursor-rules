@@ -1,0 +1,105 @@
+if(!customElements.get('component-carousel')) {
+  class ComponentCarousel extends HTMLElement {
+    constructor() {
+      super();
+      this.sliderElement = this.querySelector('.keen-slider');
+      this.slides = this.querySelectorAll('.keen-slider-slide');
+      this.pageInfo = this.querySelector('.keen-slider-page');
+
+      this.carouselMode = this.dataset.carouselMode;
+      this.carouselAutoplay = this.dataset.carouselAutoplay;
+      this.carouselAutomove = parseFloat(this.dataset.carouselAutomove);
+      this.carouselLoopDesktop = this.dataset.carouselLoopDesktop;
+      this.carouselLoopMobile = this.dataset.carouselLoopMobile;
+      this.carouselCenteredDesktop = this.dataset.carouselCenteredDesktop;
+      this.carouselCenteredMobile = this.dataset.carouselCenteredMobile;
+      this.carouselSpacingDesktop = this.dataset.carouselSpacingDesktop;
+      this.carouselSpacingTablet = this.dataset.carouselSpacingTablet;
+      this.carouselSpacingMobile = this.dataset.carouselSpacingMobile;
+      this.slidesScrollMode = this.dataset.slidesScrollMode;
+      this.slidesPerViewDesktop = this.dataset.slidesPerViewDesktop;
+      this.slidesPerViewTablet = this.dataset.slidesPerViewTablet;
+      this.slidesPerViewMobile = this.dataset.slidesPerViewMobile;
+
+      if (this.dataset.initOndemand!='true') {
+        setTimeout(()=>{ //The timeout is for the customizer
+          this.initSlider();
+        }, 1);
+      }
+    }
+    
+    initSlider() {
+      if(this.slides.length > 0 && !this.initialized) {
+        this.initialized = true;
+        var config = {
+          mode: this.carouselMode,
+          prevButton: this.querySelector('.keen-arrow.prev'),
+          nextButton: this.querySelector('.keen-arrow.next'),
+          autoplay: this.carouselAutoplay,
+          automove: this.carouselAutomove,
+          pauseOnHover: true,
+          pageInfo: this.pageInfo,
+          breakpoints: {
+            '(min-width: {{settings.breakpoint_tablet | plus: 0.001}}em)': {
+              loop: this.carouselLoopDesktop=="true",
+              centered: this.carouselCenteredDesktop=="true",
+              spacing: this.carouselSpacingDesktop,
+              slidesPerView: this.slidesPerViewDesktop,
+              slidesToScroll: this.slidesScrollMode=='slide' ? 1 : Math.floor(this.slidesPerViewDesktop)
+            },
+            '(min-width: {{settings.breakpoint_mobile | plus: 0.001}}em) and (max-width: {{settings.breakpoint_tablet}})': {
+              loop: this.carouselLoopMobile=="true",
+              centered: this.carouselCenteredMobile=="true",
+              spacing: this.carouselSpacingTablet,
+              slidesPerView: this.slidesPerViewTablet,
+              slidesToScroll: this.slidesScrollMode=='slide' ? 1 : Math.floor(this.slidesPerViewTablet)
+            },
+            '(max-width: {{settings.breakpoint_mobile}})': {
+              loop: this.carouselLoopMobile=="true",
+              centered: this.carouselCenteredMobile=="true",
+              spacing: this.carouselSpacingMobile,
+              slidesPerView: this.slidesPerViewMobile,
+              slidesToScroll: this.slidesScrollMode=='slide' ? 1 : Math.floor(this.slidesPerViewMobile)
+            }
+          }
+        }
+        var dots = this.querySelector('.keen-dots');
+        if (dots) {
+          config = {...config, dots: dots};
+        } else {
+          var bar = this.querySelector('.keen-nav-bar');
+          config = {...config, navBar: bar, rubberband: false};
+        }
+        this.sliderObj = new KeenSlider(this.sliderElement, config);
+  
+        var matchHeightSelectors = this.dataset.matchHeightSelectors;
+        if (matchHeightSelectors) {
+          var layoutTId = 0;
+          var slider = this.sliderElement;
+          function layout() {
+            clearTimeout(layoutTId);
+            layoutTId = setTimeout(function() {
+              var selectors = matchHeightSelectors.split(',');
+              selectors.forEach(selector=> {
+                $s.matchHeight(slider.querySelectorAll(selector));
+              });
+            }, 10);
+          }
+          $s.resizeWidthHandle(layout);
+        }
+
+        if(Shopify.designMode) {
+          this.addEventListener('shopify:block:select', (e)=>{
+            let index = Array.from(this.slides).findIndex(x=>x==e.target);
+            if(index>=0) {
+              setTimeout(()=>{
+                this.sliderObj.moveToSlideRelative(index, true, 0)
+              }, 10);
+            }
+          });
+        }
+      }
+    }
+  }
+  customElements.define('component-carousel', ComponentCarousel);
+}

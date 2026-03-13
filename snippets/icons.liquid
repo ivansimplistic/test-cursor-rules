@@ -1,0 +1,140 @@
+{%- comment -%}
+snippet parameters: 
+interface 1) icon:* [string]
+             iconAriaHidden:(optional) [string], values: 'true' or 'false',
+             iconTabIndex:(optional) [number],
+             iconRole:(optional) [string]
+Add class "stroke" to the paths that require a stroke/border.
+Add class "fill" to the paths that must be filled with color. 
+{%- endcomment -%}
+
+{%- liquid
+if iconAriaHidden == blank
+  assign iconAriaHidden = 'true'
+endif
+if iconTabIndex == blank
+  assign iconTabIndex = '-1'
+endif
+if iconRole == blank
+  assign iconRole = 'presentation'
+endif
+-%}
+{%- case icon -%}
+  {%- when 'chevron-up' -%} 
+  <svg aria-hidden="{{iconAriaHidden}}" {% if iconTabIndex != '-1' %}tabindex="{{iconTabIndex}}"{% endif %} role="{{iconRole}}" class="icon icon-{{icon}}" viewBox="0 0 32 32"><path class="stroke" d="M5,22,16,10,27,22"/></svg>
+  {%- when 'chevron-down' -%}
+  <svg aria-hidden="{{iconAriaHidden}}" {% if iconTabIndex != '-1' %}tabindex="{{iconTabIndex}}"{% endif %} role="{{iconRole}}" class="icon icon-{{icon}}" viewBox="0 0 32 32"><path class="stroke" d="M27,10,16,22,5,10"/></svg> 
+  {%- when 'chevron-left' -%}
+  <svg aria-hidden="{{iconAriaHidden}}" {% if iconTabIndex != '-1' %}tabindex="{{iconTabIndex}}"{% endif %} role="{{iconRole}}" class="icon icon-{{icon}}" viewBox="0 0 32 32"><path class="stroke" d="M22,27,10,16,22,5"/></svg>
+  {%- when 'chevron-right' -%} 
+  <svg aria-hidden="{{iconAriaHidden}}" {% if iconTabIndex != '-1' %}tabindex="{{iconTabIndex}}"{% endif %} role="{{iconRole}}" class="icon icon-{{icon}}" viewBox="0 0 32 32"><path class="stroke" d="M10,5,22,16,10,27"/></svg>
+  {%- when 'arrow-up' -%} 
+  <svg aria-hidden="{{iconAriaHidden}}" {% if iconTabIndex != '-1' %}tabindex="{{iconTabIndex}}"{% endif %} role="{{iconRole}}" class="icon icon-{{icon}}" viewBox="0 0 32 32"><path class="stroke" d="M5,17,16,5.8,27,17M16,26.2V5.8"/></svg>
+  {%- when 'arrow-down' -%} 
+  <svg aria-hidden="{{iconAriaHidden}}" {% if iconTabIndex != '-1' %}tabindex="{{iconTabIndex}}"{% endif %} role="{{iconRole}}" class="icon icon-{{icon}}" viewBox="0 0 32 32"><path class="stroke" d="M27,15,16,26.2,5,15M16,5.8V26.2"/></svg>
+  {%- when 'arrow-left' -%} 
+  <svg aria-hidden="{{iconAriaHidden}}" {% if iconTabIndex != '-1' %}tabindex="{{iconTabIndex}}"{% endif %} role="{{iconRole}}" class="icon icon-{{icon}}" viewBox="0 0 32 32"><path class="stroke" d="M17,27,5.8,16,17,5m9.2,11H5.8"/></svg>
+  {%- when 'arrow-right' -%} 
+  <svg aria-hidden="{{iconAriaHidden}}" {% if iconTabIndex != '-1' %}tabindex="{{iconTabIndex}}"{% endif %} role="{{iconRole}}" class="icon icon-{{icon}}" viewBox="0 0 32 32"><path class="stroke" d="M15,5,26.2,16,15,27M5.8,16H26.2"/></svg>
+  {%- when '3d' -%}
+  <svg aria-hidden="{{iconAriaHidden}}" {% if iconTabIndex != '-1' %}tabindex="{{iconTabIndex}}"{% endif %} role="{{iconRole}}" class="icon icon-{{icon}}" viewBox="0 0 32 32"><path class="stroke" d="M16,31.3,2.8,23.6V8.4L16,.7,29.2,8.4V23.6Z"/><path class="fill" d="M16,16V31.3l13.2-7.7V8.4Z"/></svg>
+  {%- when 'bag' -%} 
+  <svg aria-hidden="{{iconAriaHidden}}" {% if iconTabIndex != '-1' %}tabindex="{{iconTabIndex}}"{% endif %} role="{{iconRole}}" class="icon icon-{{icon}}" viewBox="0 0 32 32"><path class="stroke" d="M29,31.3H3V7.8H29ZM23.1,7.8a7.1,7.1,0,0,0-14.2,0"/></svg>
+  {%- when 'bell' -%} 
+  <svg aria-hidden="{{iconAriaHidden}}" {% if iconTabIndex != '-1' %}tabindex="{{iconTabIndex}}"{% endif %} role="{{iconRole}}" class="icon icon-{{icon}}" viewBox="0 0 32 32"><path class="stroke" d="M3.2,26.4c0-4.3,3.5-3.7,3.5-5.8V13a9.3,9.3,0,0,1,18.6,0v7.6c0,2.1,3.5,1.5,3.5,5.8ZM16,3.8V0M10.8,26.4a5.2,5.2,0,0,0,10.4,0"/></svg>
+  {%- when 'bubble' -%} 
+  <svg aria-hidden="{{iconAriaHidden}}" {% if iconTabIndex != '-1' %}tabindex="{{iconTabIndex}}"{% endif %} role="{{iconRole}}" class="icon icon-{{icon}}" viewBox="0 0 32 32"><path class="stroke" d="M16,2.1C7.7,2.1.9,7.6.9,14.4a11.4,11.4,0,0,0,5.4,9.4,15.1,15.1,0,0,1-5.4,6c6.5.3,9.4-3.4,9.8-3.9a17.8,17.8,0,0,0,5.3.8c8.3,0,15.1-5.5,15.1-12.3S24.3,2.1,16,2.1Z"/></svg>
+  {%- when 'calendar' -%} 
+  <svg aria-hidden="{{iconAriaHidden}}" {% if iconTabIndex != '-1' %}tabindex="{{iconTabIndex}}"{% endif %} role="{{iconRole}}" class="icon icon-{{icon}}" viewBox="0 0 32 32"><path class="stroke" d="M26.7 31H5.3A3.4 3.4 0 0 1 2 27.6V8c0-1.9 1.6-3.4 3.4-3.4h21.4C28.6 4.7 30 6.2 30 8v19.5c0 1.9-1.6 3.4-3.4 3.4ZM1.9 12h28.2M8 4.7V0m15.3 4.7V0m2.4 23.5a2.8 2.8 0 1 1-5.7 0 2.8 2.8 0 0 1 5.7 0Z"/></svg>
+  {%- when 'carrot' -%} 
+  <svg aria-hidden="{{iconAriaHidden}}" {% if iconTabIndex != '-1' %}tabindex="{{iconTabIndex}}"{% endif %} role="{{iconRole}}" class="icon icon-{{icon}}" viewBox="0 0 32 32"><path class="stroke" d="M18.17,13.67c2.65,2.65,5.29,5.29-1.32,9.26C10.23,26.9.46,31.38.46,31.38c0,0,4.47-9.77,8.44-16.38,3.97-6.61,6.61-3.97,9.26-1.32M25.46,13.01c-.94.67-2.24.63-3.08-.21-.67-.67-.83-1.62-.56-2.45-.84.28-1.79.11-2.45-.56-.84-.84-.89-2.14-.21-3.08-1.1-1.51-1.14-3.45,0-4.59s3.13-1.09,4.66.05c.12-.29.3-.57.53-.8.98-.98,2.57-.98,3.55,0,.62.62.8,1.48.64,2.28.8-.17,1.66.02,2.28.64.98.98.98,2.57,0,3.55-.24.24-.51.41-.8.53,1.15,1.52,1.21,3.5.05,4.66s-3.08,1.1-4.59,0ZM21.82,10.34l-3.49,3.49"/></svg>
+  {%- when 'cart' -%} 
+  <svg aria-hidden="{{iconAriaHidden}}" {% if iconTabIndex != '-1' %}tabindex="{{iconTabIndex}}"{% endif %} role="{{iconRole}}" class="icon icon-{{icon}}" viewBox="0 0 32 32"><path class="stroke" d="M0,0H3.6l.7,3.6M7.1,17.8H24.9L32,3.6H4.3M7.1,17.8,4.3,3.6M7.1,17.8,3,21.9a1.8,1.8,0,0,0,1.3,3H24.9m0,0a3.6,3.6,0,1,0,0,7.1,3.6,3.6,0,0,0,0-7.1ZM10.7,28.4A3.6,3.6,0,0,1,7.1,32a3.6,3.6,0,0,1,0-7.1A3.6,3.6,0,0,1,10.7,28.4Z"/></svg>
+  {%- when 'checkmark' -%} 
+  <svg aria-hidden="{{iconAriaHidden}}" {% if iconTabIndex != '-1' %}tabindex="{{iconTabIndex}}"{% endif %} role="{{iconRole}}" class="icon icon-{{icon}}" viewBox="0 0 32 32"><path class="stroke" d="M22.9,11.2l-9.5,9.6L7.9,15.3M16,0A16,16,0,1,0,32,16,16,16,0,0,0,16,0Z"/></svg>
+  {%- when 'clock' -%} 
+  <svg aria-hidden="{{iconAriaHidden}}" {% if iconTabIndex != '-1' %}tabindex="{{iconTabIndex}}"{% endif %} role="{{iconRole}}" class="icon icon-{{icon}}" viewBox="0 0 32 32"><path class="stroke" d="M16,9v7l5.3,5.3M31.9,16A15.9,15.9,0,1,1,16,.1,15.9,15.9,0,0,1,31.9,16Z"/></svg>
+  {%- when 'close' -%} 
+  <svg aria-hidden="{{iconAriaHidden}}" {% if iconTabIndex != '-1' %}tabindex="{{iconTabIndex}}"{% endif %} role="{{iconRole}}" class="icon icon-{{icon}}" viewBox="0 0 32 32"><path class="stroke" d="M4.2,4.2,27.8,27.8m-23.6,0L27.8,4.2"/></svg>
+  {%- when 'delete' -%} 
+  <svg aria-hidden="{{iconAriaHidden}}" {% if iconTabIndex != '-1' %}tabindex="{{iconTabIndex}}"{% endif %} role="{{iconRole}}" class="icon icon-{{icon}}" viewBox="0 0 32 32"><path class="stroke" d="M.8,6.9H31.2m-9.7,0V2.2A2.2,2.2,0,0,0,19.3,0H12.5a2.2,2.2,0,0,0-2.2,2.2V6.9m2.1,6.8V25.2m7.2-11.5V25.2M28.4,6.9H3.6L5.2,28.7A3.5,3.5,0,0,0,8.5,32h15a3.4,3.4,0,0,0,3.3-3.3Z"/></svg>
+  {%- when 'edit' -%}
+  <svg aria-hidden="{{iconAriaHidden}}" {% if iconTabIndex != '-1' %}tabindex="{{iconTabIndex}}"{% endif %} role="{{iconRole}}" class="icon icon-{{icon}}" viewBox="0 0 32 32"><path class="stroke" d="M.7,22.9H5.1l-.2,4.2,4.2-.2v4.4M30.5,9.9a2.8,2.8,0,0,0,0-3.8L25.9,1.5a2.8,2.8,0,0,0-3.8,0L.7,22.9v8.4H9.1ZM3.3,31.3.7,28.7M18.3,5.3l8.4,8.4"/></svg>
+  {%- when 'edit-paper' -%}
+  <svg aria-hidden="{{iconAriaHidden}}" {% if iconTabIndex != '-1' %}tabindex="{{iconTabIndex}}"{% endif %} role="{{iconRole}}" class="icon icon-{{icon}}" viewBox="0 0 32 32"><path class="stroke" d="M25.6,16.33v11.2c0,1.31-1.07,2.38-2.38,2.38H3.98c-1.31,0-2.38-1.07-2.38-2.38V7.09c0-1.31,1.07-2.38,2.38-2.38h13.61M24.05,4.09l4.36,4.36M17.46,19.39l-6.3,1.93,1.93-6.3L25.14,2.99c1.21-1.2,3.16-1.2,4.36,0,1.2,1.2,1.21,3.16,0,4.36l-12.03,12.03ZM13.1,15.03l4.36,4.36M1.6,21.51h7.2"/></svg>
+  {%- when 'eye' -%}
+  <svg aria-hidden="{{iconAriaHidden}}" {% if iconTabIndex != '-1' %}tabindex="{{iconTabIndex}}"{% endif %} role="{{iconRole}}" class="icon icon-{{icon}}" viewBox="0 0 32 32"><path class="stroke" d="M17.1,13.9a1.1,1.1,0,0,1,1,1,1.1,1.1,0,0,1-1,1.1A1.1,1.1,0,0,1,16,14.9,1.1,1.1,0,0,1,17.1,13.9ZM16,9.6A6.4,6.4,0,1,1,9.6,16,6.4,6.4,0,0,1,16,9.6ZM-1.1,16S5,3.8,16,3.8,33.1,16,33.1,16,27,28.2,16,28.2-1.1,16-1.1,16Z"/></svg>
+  {%- when 'filters' -%} 
+  <svg aria-hidden="{{iconAriaHidden}}" {% if iconTabIndex != '-1' %}tabindex="{{iconTabIndex}}"{% endif %} role="{{iconRole}}" class="icon icon-{{icon}}" viewBox="0 0 32 32"><path class="stroke" d="M5.7,3.8v9.6m0,5.2v9.6M1.5,18.6H9.8M26.3,3.8v9.6m0,5.2v9.6m-4.1-9.6h8.3M16.1,28.2V15.5m0-4.6V3.8m4.2,7.1H12"/></svg>
+  {%- when 'fullscreen' -%} 
+  <svg aria-hidden="{{iconAriaHidden}}" {% if iconTabIndex != '-1' %}tabindex="{{iconTabIndex}}"{% endif %} role="{{iconRole}}" class="icon icon-{{icon}}" viewBox="0 0 32 32"><path class="stroke" d="M2.2,11.3V5.2h8.9M2.2,20.7v6.1h8.9M29.8,11.3V5.2H20.9m0,21.6h8.9V20.7"/></svg>
+  {%- when 'gift' -%} 
+  <svg aria-hidden="{{iconAriaHidden}}" {% if iconTabIndex != '-1' %}tabindex="{{iconTabIndex}}"{% endif %} role="{{iconRole}}" class="icon icon-{{icon}}" viewBox="0 0 32 32"><path class="stroke" d="M16 15.45h13v14.67c0 1.04-.84 1.88-1.88 1.88H4.88C3.84 32 3 31.16 3 30.12V15.45h13Zm0-7.94-.59-3.57A4.703 4.703 0 0 0 10.77 0c-2.2 0-3.98 1.78-3.98 3.98s1.78 3.98 3.98 3.98h10.47c2.2 0 3.98-1.78 3.98-3.98S23.43 0 21.23 0c-2.3 0-4.26 1.66-4.64 3.93L16 7.5m0 .46H2.89c-.84 0-1.52.68-1.52 1.52v4.45c0 .84.68 1.52 1.52 1.52h26.22c.84 0 1.52-.68 1.52-1.52V9.48c0-.84-.68-1.52-1.52-1.52H16Zm-3.6 0V32m7.02-24.04V32"/></svg>
+  {%- when 'hamburger' -%} 
+  <svg aria-hidden="{{iconAriaHidden}}" {% if iconTabIndex != '-1' %}tabindex="{{iconTabIndex}}"{% endif %} role="{{iconRole}}" class="icon icon-{{icon}}" viewBox="0 0 32 32"><path class="stroke" d="M1.6,16H30.4M1.6,27.3H30.4m0-22.6H1.6"/></svg>
+  {%- when 'hand' -%} 
+  <svg aria-hidden="{{iconAriaHidden}}" {% if iconTabIndex != '-1' %}tabindex="{{iconTabIndex}}"{% endif %} role="{{iconRole}}" class="icon icon-{{icon}}" viewBox="0 0 32 32"><path class="stroke" d="M8,15.1v4.5m0-4.5V4.4a2.7,2.7,0,0,1,5.3,0M8,15.1a2.7,2.7,0,0,0-2.7-2.7,2.7,2.7,0,0,0-2.6,2.7v3.6a13.3,13.3,0,0,0,26.6,0V9.8a2.7,2.7,0,1,0-5.3,0M13.3,4.4v9.8m0-9.8V2.7a2.7,2.7,0,0,1,5.4,0V4.4m0,0v9.8m0-9.8a2.7,2.7,0,0,1,5.3,0V9.8m0,0v4.4"/></svg>
+  {%- when 'heart' -%} 
+  <svg aria-hidden="{{iconAriaHidden}}" {% if iconTabIndex != '-1' %}tabindex="{{iconTabIndex}}"{% endif %} role="{{iconRole}}" class="icon icon-{{icon}}" viewBox="0 0 32 32"><path class="stroke" d="M16,7.9s2.5-5.8,7.9-5.8,7.9,4.6,7.9,8.6C31.8,20.3,16,30.5,16,30.5S.2,20.6.2,10.7c0-4,2.4-8.6,7.9-8.6S16,7.9,16,7.9Z"/></svg>
+  {%- when 'help' -%} 
+  <svg aria-hidden="{{iconAriaHidden}}" {% if iconTabIndex != '-1' %}tabindex="{{iconTabIndex}}"{% endif %} role="{{iconRole}}" class="icon icon-{{icon}}" viewBox="0 0 32 32"><path class="stroke" d="M16 .88a15.12 15.12 0 1 0 0 30.24A15.12 15.12 0 0 0 16 .88Zm-3.87 11.44a3.78 3.78 0 1 1 7.56 0c0 3.68-3.78 3.12-3.78 6.99m0 4.4v.51"/></svg>
+  {%- when 'email' -%}
+  <svg aria-hidden="{{iconAriaHidden}}" {% if iconTabIndex != '-1' %}tabindex="{{iconTabIndex}}"{% endif %} role="{{iconRole}}" class="icon icon-{{icon}}" viewBox="0 0 32 32"><path class="stroke" d="M30.2,27.2H1.8V4.8H30.2ZM1.8,4.8,16,18.9,30.2,4.8"/></svg>
+  {%- when 'map' -%} 
+  <svg aria-hidden="{{iconAriaHidden}}" {% if iconTabIndex != '-1' %}tabindex="{{iconTabIndex}}"{% endif %} role="{{iconRole}}" class="icon icon-{{icon}}" viewBox="0 0 32 32"><path class="stroke" d="M20.5,12.2A4.5,4.5,0,1,1,16,7.7,4.5,4.5,0,0,1,20.5,12.2Zm5.3,6.5a12.2,12.2,0,0,0,2-6.5,11.8,11.8,0,0,0-23.6,0,11.4,11.4,0,0,0,2,6.5c2.4,3.5,10,12.9,10,12.9S23.4,22.2,25.8,18.7Z"/></svg>
+  {%- when 'minus' -%} 
+  <svg aria-hidden="{{iconAriaHidden}}" {% if iconTabIndex != '-1' %}tabindex="{{iconTabIndex}}"{% endif %} role="{{iconRole}}" class="icon icon-{{icon}}" viewBox="0 0 32 32"><path class="stroke" d="M1.8,16H30.2"/></svg>
+  {%- when 'piggybank' -%} 
+  <svg aria-hidden="{{iconAriaHidden}}" {% if iconTabIndex != '-1' %}tabindex="{{iconTabIndex}}"{% endif %} role="{{iconRole}}" class="icon icon-{{icon}}" viewBox="0 0 32 32"><path class="stroke" d="M8.8,25.26s3,1.61,3,2.81,0,2.4-1.74,2.4h-4.26c-2.4,0-2.4-2.4-2.4-6s-2.4-4.2-2.4-10.8c0-3.6,2.4-8.4,6.6-8.4h9c3.6-4.8,7.2-3.6,7.2-3.6.6,3-.07,4.75-.07,4.75,2.33,3.55,7.27,4.2,7.27,4.2v9.05c-4.8,0-6.6,4.8-6.6,7.37,0,0,.6,3.43-1.8,3.43h-3.51c-3.51,0-2.49-3.43-2.49-3.43h-5.25M23.2,10.67c-.66,0-1.2.54-1.2,1.2s.54,1.2,1.2,1.2,1.2-.54,1.2-1.2-.54-1.2-1.2-1.2ZM7,10.07h8.4"/></svg>
+  {%- when 'plus' -%} 
+  <svg aria-hidden="{{iconAriaHidden}}" {% if iconTabIndex != '-1' %}tabindex="{{iconTabIndex}}"{% endif %} role="{{iconRole}}" class="icon icon-{{icon}}" viewBox="0 0 32 32"><path class="stroke" d="M16,1.8V30.2M1.8,16H30.2"/></svg>
+  {%- when 'play' -%} 
+  <svg aria-hidden="{{iconAriaHidden}}" {% if iconTabIndex != '-1' %}tabindex="{{iconTabIndex}}"{% endif %} role="{{iconRole}}" class="icon icon-{{icon}}" viewBox="0 0 32 32"><path class="fill" d="M10,28V4L26,16Z"/></svg>
+  {%- when 'pause' -%} 
+  <svg aria-hidden="{{iconAriaHidden}}" {% if iconTabIndex != '-1' %}tabindex="{{iconTabIndex}}"{% endif %} role="{{iconRole}}" class="icon icon-{{icon}}" viewBox="0 0 32 32"><path class="stroke" d="M9,5V27M23,5V27"/></svg>
+  {%- when 'search' -%} 
+  <svg aria-hidden="{{iconAriaHidden}}" {% if iconTabIndex != '-1' %}tabindex="{{iconTabIndex}}"{% endif %} role="{{iconRole}}" class="icon icon-{{icon}}" viewBox="0 0 32 32"><path class="stroke" d="M32,32,21.3,21.3m3.6-8.9A12.5,12.5,0,1,1,12.4,0,12.5,12.5,0,0,1,24.9,12.4Z"/></svg>
+  {%- when 'share' -%} 
+  <svg aria-hidden="{{iconAriaHidden}}" {% if iconTabIndex != '-1' %}tabindex="{{iconTabIndex}}"{% endif %} role="{{iconRole}}" class="icon icon-{{icon}}" viewBox="0 0 32 32"><path class="stroke" d="M20.4,10.5h7.2V31.3H4.4V10.5h7.2M16,20.9V.7m4.7,5L16,.7l-4.7,5"/></svg>
+  {%- when 'shipping' -%} 
+  <svg aria-hidden="{{iconAriaHidden}}" {% if iconTabIndex != '-1' %}tabindex="{{iconTabIndex}}"{% endif %} role="{{iconRole}}" class="icon icon-{{icon}}" viewBox="0 0 32 32"><path class="stroke" d="M11.3,25a3.7,3.7,0,0,1-3.7,3.7A3.6,3.6,0,0,1,3.9,25a3.7,3.7,0,0,1,3.7-3.7A3.8,3.8,0,0,1,11.3,25Zm13.4-3.7A3.8,3.8,0,0,0,21,25a3.7,3.7,0,0,0,3.7,3.7A3.6,3.6,0,0,0,28.4,25,3.7,3.7,0,0,0,24.7,21.3ZM11.3,24.6H21V4.6H0v20H3.9m24.5,0H32v-7l-4.9-7.1H21"/></svg>
+  {%- when 'shipping-fast' -%} 
+  <svg aria-hidden="{{iconAriaHidden}}" {% if iconTabIndex != '-1' %}tabindex="{{iconTabIndex}}"{% endif %} role="{{iconRole}}" class="icon icon-{{icon}}" viewBox="0 0 32 32"><path class="stroke" d="M12.7,22.8a3.9,3.9,0,0,1-3.6,2.9A2.1,2.1,0,0,1,7,22.8a3.9,3.9,0,0,1,3.6-2.9A2.1,2.1,0,0,1,12.7,22.8Zm12.7-2.9a4.2,4.2,0,0,0-3.7,2.9,2.2,2.2,0,0,0,2.1,2.9,4.2,4.2,0,0,0,3.7-2.9A2.2,2.2,0,0,0,25.4,19.9ZM12.8,22.5h8.8L26.1,6.3H8.1L7.6,8.2M4.7,18.8l-1,3.7H7.1m20.4,0h2.8L31.7,17l-2.3-5.4H24.7M12.8,10.3H3.5m8.4,3.2H0m11,3.1H1.7"/></svg>
+  {%- when 'star' -%} 
+  <svg aria-hidden="{{iconAriaHidden}}" {% if iconTabIndex != '-1' %}tabindex="{{iconTabIndex}}"{% endif %} role="{{iconRole}}" class="icon icon-{{icon}}" viewBox="0 0 32 32"><path class="stroke" d="M16,1.3,20.8,11l10.6,1.5-7.7,7.6,1.8,10.6-9.5-5-9.5,5L8.3,20.1.6,12.5,11.2,11Z"/></svg>
+  {%- when 'star-half' -%} 
+  <svg aria-hidden="{{iconAriaHidden}}" {% if iconTabIndex != '-1' %}tabindex="{{iconTabIndex}}"{% endif %} role="{{iconRole}}" class="icon icon-{{icon}}" viewBox="0 0 32 32"><path class="stroke" d="M16,25.7l-9.5,5,1.8-10.6L.6,12.5l10.6-1.5L16,1.3"/><path class="stroke" style="opacity: 0.2;" d="M16,1.3l4.8,9.7,10.6,1.5-7.7,7.6,1.8,10.6-9.5-5"/></svg>
+  {%- when 'store' -%} 
+  <svg aria-hidden="{{iconAriaHidden}}" {% if iconTabIndex != '-1' %}tabindex="{{iconTabIndex}}"{% endif %} role="{{iconRole}}" class="icon icon-{{icon}}" viewBox="0 0 32 32"><path class="stroke" d="M3,13.7V30.6H29v-17m-13,17V18.5h8V30.6m-12.5-12V24H7V18.6ZM28,1.4l4,8.2a3.9,3.9,0,0,1-4,4,4,4,0,0,1-4-4,4,4,0,1,1-8,0,4.1,4.1,0,0,1-4.1,4A3.9,3.9,0,0,1,8,9.6a4.1,4.1,0,0,1-4.1,4A3.9,3.9,0,0,1,0,9.6L4,1.4Z"/></svg>
+  {%- when 'tag' -%} 
+  <svg aria-hidden="{{iconAriaHidden}}" {% if iconTabIndex != '-1' %}tabindex="{{iconTabIndex}}"{% endif %} role="{{iconRole}}" class="icon icon-{{icon}}" viewBox="0 0 32 32"><path class="stroke" d="M31.3,14.3l-17,17L.7,17.7l17-17H31.3ZM26.2,5.7a2.5,2.5,0,0,0-3.6,0,2.7,2.7,0,0,0,0,3.6,2.7,2.7,0,0,0,3.6,0A2.5,2.5,0,0,0,26.2,5.7Z"/></svg>
+  {%- when 'user' -%}
+  <svg aria-hidden="{{iconAriaHidden}}" {% if iconTabIndex != '-1' %}tabindex="{{iconTabIndex}}"{% endif %} role="{{iconRole}}" class="icon icon-{{icon}}" viewBox="0 0 32 32"><path class="stroke" d="M23.1,7.1A7.1,7.1,0,1,1,16,0,7.1,7.1,0,0,1,23.1,7.1ZM16,19.6A12.3,12.3,0,0,0,3.6,32H28.4A12.3,12.3,0,0,0,16,19.6Z"/></svg>
+  {%- when 'user-logout' -%}
+  <svg aria-hidden="{{iconAriaHidden}}" {% if iconTabIndex != '-1' %}tabindex="{{iconTabIndex}}"{% endif %} role="{{iconRole}}" class="icon icon-{{icon}}" viewBox="0 0 32 32"><path class="stroke" d="M23.2,8.7a7.2,7.2,0,1,1-14.4,0,7.2,7.2,0,0,1,14.4,0ZM16,19.2c-7.4,0-13.4,5.1-13.4,11.3H16M16,25H32m-5.3,5.3L32,25l-5.3-5.3"/></svg>
+  {%- when 'zoom' -%} 
+  <svg aria-hidden="{{iconAriaHidden}}" {% if iconTabIndex != '-1' %}tabindex="{{iconTabIndex}}"{% endif %} role="{{iconRole}}" class="icon icon-{{icon}}" viewBox="0 0 32 32"><path class="stroke" d="M24.2,12.8A11.3,11.3,0,1,1,12.9,1.5,11.3,11.3,0,0,1,24.2,12.8Zm-3.3,8,9.4,9.7M12.9,8.1v9.4M8.2,12.8h9.5"/></svg>
+  {%- when 'facebook' -%} 
+  <svg aria-hidden="{{iconAriaHidden}}" {% if iconTabIndex != '-1' %}tabindex="{{iconTabIndex}}"{% endif %} role="{{iconRole}}" class="icon icon-{{icon}}" viewBox="0 0 32 32"><path class="fill" d="M18.2,11.6V8.9c0-1.2.3-1.8,2.1-1.8h2.4V2.7H18.8c-4.8,0-6.3,2.1-6.3,5.9v3H9.3V16h3.2V29.3h5.7V16h3.9l.6-4.4Z"/></svg>
+  {%- when 'instagram' -%} 
+  <svg aria-hidden="{{iconAriaHidden}}" {% if iconTabIndex != '-1' %}tabindex="{{iconTabIndex}}"{% endif %} role="{{iconRole}}" class="icon icon-{{icon}}" viewBox="0 0 32 32"><path class="fill" d="M16,8.9A7.1,7.1,0,1,0,23.1,16,7.1,7.1,0,0,0,16,8.9Zm0,11.7A4.6,4.6,0,1,1,20.6,16,4.7,4.7,0,0,1,16,20.6ZM23.3,7A1.7,1.7,0,0,1,25,8.7a1.7,1.7,0,0,1-1.7,1.6,1.6,1.6,0,0,1-1.6-1.6A1.6,1.6,0,0,1,23.3,7ZM22.1,29.5H9.9a7.4,7.4,0,0,1-7.4-7.4V9.9A7.4,7.4,0,0,1,9.9,2.5H22.1a7.4,7.4,0,0,1,7.4,7.4V22.1A7.4,7.4,0,0,1,22.1,29.5ZM9.9,5A4.9,4.9,0,0,0,5,9.9V22.1A4.9,4.9,0,0,0,9.9,27H22.1A4.9,4.9,0,0,0,27,22.1V9.9A4.9,4.9,0,0,0,22.1,5Z"/></svg>
+  {%- when 'linkedin' -%}
+  <svg aria-hidden="{{iconAriaHidden}}" {% if iconTabIndex != '-1' %}tabindex="{{iconTabIndex}}"{% endif %} role="{{iconRole}}" class="icon icon-{{icon}}" viewBox="0 0 32 32"><path class="fill" d="M9.3,28.1h-5V11.9h5ZM6.8,9.7A2.9,2.9,0,1,1,9.7,6.8,2.9,2.9,0,0,1,6.8,9.7ZM28.1,28.1h-5V20.2c0-1.8-.1-4.2-2.6-4.2s-3,2-3,4.1v8h-5V11.9h4.8v2.2h0a5.5,5.5,0,0,1,4.8-2.6c5.1,0,6,3.4,6,7.7v8.9Z"/></svg>
+  {%- when 'pinterest' -%} 
+  <svg aria-hidden="{{iconAriaHidden}}" {% if iconTabIndex != '-1' %}tabindex="{{iconTabIndex}}"{% endif %} role="{{iconRole}}" class="icon icon-{{icon}}" viewBox="0 0 32 32"><path class="fill" d="M16.7,1.2C10.6,1.2,4.6,5.3,4.6,11.8c0,4.2,2.4,6.6,3.8,6.6s.9-1.7.9-2.1-1.4-1.8-1.4-4.1a8,8,0,0,1,8.3-8.1c4.1,0,7.1,2.3,7.1,6.5s-1.3,9.1-5.4,9.1a2.6,2.6,0,0,1-2.7-2.6c0-2.3,1.5-4.4,1.5-6.8,0-3.9-5.5-3.2-5.5,1.6a7.6,7.6,0,0,0,.5,3c-.8,3.5-2.5,8.7-2.5,12.4,0,1.1.2,2.2.3,3.3s.1.2.4.1c3-4.1,2.9-4.9,4.3-10.2.7,1.4,2.6,2.1,4.1,2.1,6.3,0,9.1-6.1,9.1-11.7S22.3,1.2,16.7,1.2Z"/></svg>
+  {%- when 'snapchat' -%} 
+  <svg aria-hidden="{{iconAriaHidden}}" {% if iconTabIndex != '-1' %}tabindex="{{iconTabIndex}}"{% endif %} role="{{iconRole}}" class="icon icon-{{icon}}" viewBox="0 0 32 32"><path class="fill" d="M23.4,7.1c.8,2,.4,4.4.3,6.5.8.4,1.5-.4,2.3-.4a1.4,1.4,0,0,1,1.5,1.2c0,.7-4.7,1.3-3.4,3.6a8.3,8.3,0,0,0,5.8,4.8c2,1.3-2.5,2.4-3.4,2.4s-.1,1.9-1,1.9a12.2,12.2,0,0,0-3.3-.2c-2.1.4-2.8,2.6-6.2,2.6s-4.1-2.2-6.2-2.6a12.2,12.2,0,0,0-3.3.2c-1,0-.7-1.3-1-1.9S.1,24.1,2.1,22.8A8.5,8.5,0,0,0,7.9,18c1.3-2.3-3.3-1.8-3.4-3.6s.8-1.1,1.5-1.1,1.5.7,2.3.3c-.1-2.1-.5-4.5.3-6.5C11.2.9,20.9,1,23.4,7.1Z"/></svg>
+  {%- when 'threads' -%} 
+  <svg aria-hidden="{{iconAriaHidden}}" {% if iconTabIndex != '-1' %}tabindex="{{iconTabIndex}}"{% endif %} role="{{iconRole}}" class="icon icon-{{icon}}" viewBox="0 0 32 32"><path class="fill" d="M23.7,14.8c-.1,0-.3-.1-.4-.2-.2-4.6-2.7-7.2-6.9-7.2,0,0,0,0,0,0-2.5,0-4.6,1.1-5.9,3l2.3,1.6c1-1.4,2.5-1.8,3.6-1.8s0,0,0,0c1.4,0,2.4.4,3.1,1.2.5.6.8,1.4,1,2.3-1.2-.2-2.5-.3-3.9-.2-4,.2-6.5,2.5-6.4,5.8,0,1.6.9,3,2.3,4,1.2.8,2.7,1.2,4.3,1.1,2.1-.1,3.7-.9,4.8-2.4.9-1.1,1.4-2.5,1.6-4.3,1,.6,1.7,1.4,2.1,2.3.7,1.6.7,4.2-1.4,6.4-1.9,1.9-4.2,2.7-7.6,2.7-3.8,0-6.7-1.2-8.5-3.6-1.8-2.2-2.7-5.4-2.7-9.6,0-4.1.9-7.3,2.7-9.6,1.9-2.4,4.7-3.6,8.5-3.6,3.8,0,6.8,1.3,8.7,3.6,1,1.2,1.7,2.6,2.1,4.4l2.7-.7c-.6-2.1-1.5-3.9-2.7-5.4C24.6,1.6,20.9,0,16.2,0h0C11.5,0,8,1.6,5.5,4.7c-2.2,2.7-3.3,6.5-3.3,11.3h0s0,0,0,0c0,4.8,1.1,8.6,3.3,11.3,2.4,3.1,6,4.6,10.7,4.7h0c4.2,0,7.1-1.1,9.5-3.5,3.2-3.2,3.1-7.1,2-9.5-.7-1.7-2.2-3.2-4.1-4.1ZM16.5,21.6c-1.7,0-3.5-.7-3.6-2.4,0-1.2.9-2.6,3.7-2.8.3,0,.6,0,1,0,1,0,2,.1,2.9.3-.3,4.1-2.3,4.8-4,4.9Z"/></svg>
+  {%- when 'tiktok' -%} 
+  <svg aria-hidden="{{iconAriaHidden}}" {% if iconTabIndex != '-1' %}tabindex="{{iconTabIndex}}"{% endif %} role="{{iconRole}}" class="icon icon-{{icon}}" viewBox="0 0 32 32"><path class="fill" d="M21.6,1.5c.5,4.1,2.8,6.6,6.8,6.9V13c-2.3.2-4.3-.6-6.7-2v8.6C21.7,30.6,9.8,34,5,26.2c-3.1-5.1-1.2-14,8.7-14.3v4.9l-2.3.5c-2.2.8-3.5,2.2-3.1,4.6.6,4.7,9.3,6.1,8.6-3.1V1.6h4.7Z"/></svg>
+  {%- when 'twitter' -%} 
+  <svg aria-hidden="{{iconAriaHidden}}" {% if iconTabIndex != '-1' %}tabindex="{{iconTabIndex}}"{% endif %} role="{{iconRole}}" class="icon icon-{{icon}}" viewBox="0 0 32 32"><path class="fill" d="M24.2 3.2h4.4L19 14l11.2 14.7h-8.8l-6.8-9-7.9 9H2.4l10.1-11.6-10.7-14h9l6.2 8.2 7.2-8.2Zm-1.5 23h2.4L9.5 5.8H7l15.8 20.6Z"/></svg>
+  {%- when 'vimeo' -%} 
+  <svg aria-hidden="{{iconAriaHidden}}" {% if iconTabIndex != '-1' %}tabindex="{{iconTabIndex}}"{% endif %} role="{{iconRole}}" class="icon icon-{{icon}}" viewBox="0 0 32 32"><path class="fill" d="M.7,9.7l1.4,1.9a10.5,10.5,0,0,1,2.4-1.5q1.6,0,3,5.1l1.2,4.5c.5,2.1,1,3.7,1.3,4.8q1.8,5.1,4.5,5.1,4.3,0,10.5-8.4c4.1-5.2,6.2-9.4,6.3-12.5V8.2c0-3.8-1.5-5.7-4.5-5.8h-.3c-4,0-6.8,2.5-8.3,7.4a5.6,5.6,0,0,1,2.3-.6,1.9,1.9,0,0,1,2.1,2.2,1.3,1.3,0,0,1-.1.6,11.3,11.3,0,0,1-2,4.7c-1.3,2.1-2.3,3.1-2.9,3.1s-1.6-1.6-2.2-4.7c-.2-.8-.7-3.2-1.3-7.3a8.8,8.8,0,0,0-1.5-3.9,3.4,3.4,0,0,0-2.5-1.1H9.7c-1,.1-2.5,1-4.5,2.8L.7,9.7Z"/></svg>
+  {%- when 'youtube' -%} 
+  <svg aria-hidden="{{iconAriaHidden}}" {% if iconTabIndex != '-1' %}tabindex="{{iconTabIndex}}"{% endif %} role="{{iconRole}}" class="icon icon-{{icon}}" viewBox="0 0 32 32"><path class="fill" d="M24.6,5.3H7.4A3.8,3.8,0,0,0,3.7,9V23a3.8,3.8,0,0,0,3.7,3.7H24.6A3.8,3.8,0,0,0,28.3,23V9A3.8,3.8,0,0,0,24.6,5.3Zm-12,15.9V10.8l9,5.2Z"/></svg>
+{%- endcase -%}
+{%- assign iconAriaHidden = nil -%}
+{%- assign iconTabIndex = nil -%}
+{%- assign iconRole = nil -%}

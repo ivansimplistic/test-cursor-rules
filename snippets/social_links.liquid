@@ -1,0 +1,49 @@
+{%- if settings.social_instagram != '' or settings.social_facebook != '' or settings.social_twitter != '' or settings.social_pinterest != '' or settings.social_tiktok != '' or settings.social_snapchat != '' or settings.social_linkedin != '' or settings.social_vimeo != '' or settings.social_youtube != '' -%}
+  <div class="social-links flex flex-wrap">
+    {%- if settings.social_instagram != '' -%}
+      <a class="btn" target="_blank" href="{{ settings.social_instagram }}" aria-label="{{ 'social.follow_instagram' | t | escape }}" title="{{ 'social.opens_new_window' | t | escape }}" rel="noopener">
+        {% render 'icons', icon: 'instagram' %}
+      </a>
+    {%- endif -%}
+    {%- if settings.social_facebook != '' -%}
+      <a class="btn" target="_blank" href="{{ settings.social_facebook }}" aria-label="{{ 'social.follow_facebook' | t | escape }}" title="{{ 'social.opens_new_window' | t | escape }}" rel="noopener">
+        {% render 'icons', icon: 'facebook' %}
+      </a>
+    {%- endif -%}
+    {%- if settings.social_twitter != '' -%}
+      <a class="btn" target="_blank" href="{{ settings.social_twitter }}" aria-label="{{ 'social.follow_twitter' | t | escape }}" title="{{ 'social.opens_new_window' | t | escape }}" rel="noopener">
+        {% render 'icons', icon: 'twitter' %}
+      </a>
+    {%- endif -%}
+    {%- if settings.social_pinterest != '' -%}
+      <a class="btn" target="_blank" href="{{ settings.social_pinterest }}" aria-label="{{ 'social.follow_pinterest' | t | escape }}" title="{{ 'social.opens_new_window' | t | escape }}" rel="noopener">
+        {% render 'icons', icon: 'pinterest' %}
+      </a>
+    {%- endif -%}
+    {%- if settings.social_tiktok != '' -%}
+      <a class="btn" target="_blank" href="{{ settings.social_tiktok }}" aria-label="{{ 'social.follow_tiktok' | t | escape }}" title="{{ 'social.opens_new_window' | t | escape }}" rel="noopener">
+        {% render 'icons', icon: 'tiktok' %}
+      </a>
+    {%- endif -%}
+    {%- if settings.social_snapchat != '' -%}
+      <a class="btn" target="_blank" href="{{ settings.social_snapchat }}" aria-label="{{ 'social.follow_snapchat' | t | escape }}" title="{{ 'social.opens_new_window' | t | escape }}" rel="noopener">
+        {% render 'icons', icon: 'snapchat' %}
+      </a>
+    {%- endif -%}
+    {%- if settings.social_linkedin != '' -%}
+      <a class="btn" target="_blank" href="{{ settings.social_linkedin }}" aria-label="{{ 'social.follow_linkedin' | t | escape }}" title="{{ 'social.opens_new_window' | t | escape }}" rel="noopener">
+        {% render 'icons', icon: 'linkedin' %}
+      </a>
+    {%- endif -%}
+    {%- if settings.social_vimeo != '' -%}
+      <a class="btn" target="_blank" href="{{ settings.social_vimeo }}" aria-label="{{ 'social.follow_vimeo' | t | escape }}" title="{{ 'social.opens_new_window' | t | escape }}" rel="noopener">
+        {% render 'icons', icon: 'vimeo' %}
+      </a>
+    {%- endif -%}
+    {%- if settings.social_youtube != '' -%}
+      <a class="btn" target="_blank" href="{{ settings.social_youtube }}" aria-label="{{ 'social.follow_youtube' | t | escape }}" title="{{ 'social.opens_new_window' | t | escape }}" rel="noopener">
+        {% render 'icons', icon: 'youtube' %}
+      </a>
+    {%- endif -%}
+  </div>
+{%- endif -%}

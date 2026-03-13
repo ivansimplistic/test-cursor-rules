@@ -1,0 +1,23 @@
+{%- comment -%}
+    Renders image urls for data-srcset and data-bgset
+
+    Accepts:
+    - image: {Object} Image Liquid object
+
+    Usage:
+    <img class="lazyload" alt="{{section.settings.image.alt}}" data-sizes="auto" data-srcset="{% render 'lazy_src', image: section.settings.image %}" />
+    <div class="lazyload" data-bgset="{% render 'lazy_src', image: section.settings.image %}"></div>
+{%- endcomment -%}
+
+{%- if image != blank -%}
+  {%- assign sizes = '300, 450, 600, 750, 900, 1300, 1800, 2500, 4100' | split: ', ' -%}
+  {%- for s in sizes -%}
+    {%- assign size = s | times: 1 -%}
+    {%- if image.width >= size -%}{{ image | image_url: width: size }} {{size}}w {{ size | divided_by: image.aspect_ratio | round }}h,{%- endif -%}
+  {%- endfor -%}
+
+  {{ image | image_url }} {{ image.width }}w {{ image.height }}h
+
+{%- else -%}
+  {{- 'placeholder_image.svg' | asset_url -}}
+{%- endif -%}

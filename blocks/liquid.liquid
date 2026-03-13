@@ -1,0 +1,24 @@
+<div class="grid-item">
+  {%- render 'richtext_blocks', blockType: 'content_liquid', block: block -%}
+</div>
+{% schema %}
+{
+  "name": "Liquid code",
+  "tag": null,
+  "presets": [
+    {
+      "name": "Liquid code",
+      "category": "Content",
+      "blocks": [
+      ]
+    }
+  ],
+  "settings": [
+    {
+      "type": "liquid",
+      "id": "liquid",
+      "label": "Liquid code"
+    }
+  ]
+}
+{% endschema %}

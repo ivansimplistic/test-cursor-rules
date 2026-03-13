@@ -1,0 +1,309 @@
+<style>
+  .blog-sidebar-inner {
+    --border-radius: {{section.settings.border_radius}}em;
+    --articles-border-radius: {{section.settings.articles_border_radius}}%;
+  }
+  @media (min-width: {{settings.breakpoint_tablet | plus: 0.001}}em) {
+    #main-content {display: flex; flex-wrap: wrap; justify-content: center; align-items: stretch;}  
+    #main-content > * {width: 100%;}
+    .blog-sidebar {box-sizing: border-box;}
+    #main-content .blog-sidebar-sibling {width: calc(100% - {{section.settings.width}}%); max-width: calc(var(--container-width) - {{section.settings.width}}% + var(--container-padding) * 2);}
+    #main-content #shopify-section-{{section.id}} {width: {{section.settings.width}}%; box-sizing: border-box; padding: 0 var(--container-padding); }
+  }
+  {%- for block in section.blocks -%}
+    {% if block.settings.social_media_size != blank %}
+      .blog-sidebar-inner .social-links {--social-media-size: {{block.settings.social_media_size}}%;}
+    {% endif %}
+  {%- endfor -%}
+</style>
+
+{%- unless blog -%}
+	{%- assign blog = blogs['news'] -%}
+{%- endunless -%}
+
+<aside data-ga-category="" class="blog-sidebar-inner scheme color-{{section.settings.color_scheme}} {% if section.settings.border %}scheme-border-box{% endif %} {% if section.settings.color_scheme == 'scheme-1' and section.settings.border == false %}same-scheme{% endif %}">
+  {%- for block in section.blocks -%}
+    {%- if block.type == "search" -%}
+      <div class="block search" {{ block.shopify_attributes }}>
+        <div class="group-title small-label scheme-border-bottom">{{block.settings.title}}</div>
+        <search-form>
+          <form action="{{ routes.search_url }}" method="get" role="search">
+            <div class="field">
+              <input type="text" name="q" id="blog-sidebar-search-input" placeholder="Search" value="{{ search.terms | remove: '*' }}" aria-label="{{ 'blog_sidebar.search_field_caption' | t | escape }}" />
+              <label for="blog-sidebar-search-input">{{ 'blog_sidebar.search_label' | t }}</label>
+              <input type="hidden" name="type" value="article" />
+              <input type="hidden" name="view" value="blog" />
+              <button aria-label="{{ 'blog_sidebar.search_submit_caption' | t | escape }}" tabindex="-1">
+                {%- render 'icons', icon: 'search' -%}
+              </button>
+            </div>
+          </form>
+        </search-form>
+      </div>
+    {%- elsif block.type == "featured_posts" -%}
+      {%- if block.settings.article1 != blank -%}
+        <div class="block featured-posts" {{ block.shopify_attributes }}>
+          <div class="group-title small-label scheme-border-bottom">{{block.settings.title}}</div>
+          <div class="wrap">
+            {%- for i in (1..5) -%}
+            {%- assign featuredArticle = "article" | append: i -%}
+              {%- if block.settings[featuredArticle] != blank -%}
+                {%- assign art = articles[block.settings[featuredArticle]] -%}
+                <a href="{{ art.url }}" class="art flex align-items-center">
+                  {% if art.image != blank %}<div class="art-thumb lazyload" data-bgset="{%- render 'lazy_src', image: art.image -%}"></div>{% endif %}
+                  <div class="art-info flex-1">
+                    <span class="art-title">{{art.title}}</span>
+                  </div>
+                </a>
+              {%- endif -%}
+            {%- endfor -%}
+          </div>
+        </div>
+      {%- endif -%}
+    {%- elsif block.type == "recent_posts" -%}
+      <div class="block recent-posts" {{ block.shopify_attributes }}>
+        <div class="group-title small-label scheme-border-bottom">{{block.settings.title}}</div>
+        <div class="wrap">
+          {%- for art in blog.articles limit:5 -%}
+            <a href="{{ art.url }}" class="art flex align-items-center">
+              {% if art.image != blank %}<div class="art-thumb lazyload" data-bgset="{%- render 'lazy_src', image: art.image -%}"></div>{% endif %}
+              <div class="art-info flex-1">
+                <span class="art-title">{{art.title}}</span>
+              </div>
+            </a>
+          {%- endfor -%}
+        </div>
+      </div>
+    {%- elsif block.type == "categories" -%}
+      {%- if blog.all_tags.size > 0 -%}
+        <div class="block categories" {{ block.shopify_attributes }}>
+          <div class="group-title small-label scheme-border-bottom">{{block.settings.title}}</div>
+          <div class="wrap flex flex-wrap">
+            <a href="{{ blog.url }}" class="badge">{{ 'blog_sidebar.categories_all_label' | t}}</a>
+            {%- for tag in blog.all_tags -%}
+              {%- if current_tags contains tag -%}
+                <div class="badge active">{{ tag }}</div>
+              {%- else -%}
+                <a href="{{blog.url}}/tagged/{{tag | handle}}" class="badge">{{ tag }}</a>
+              {%- endif -%}
+            {%- endfor -%}
+          </div>
+        </div>
+      {%- endif -%}
+    {%- elsif block.type == 'newsletter' -%}
+      <div class="block newsletter-form" {{ block.shopify_attributes }}>
+        <div class="group-title small-label scheme-border-bottom">{{block.settings.title}}</div>
+        {%- if block.settings.text != "" -%}
+          {{block.settings.text}}
+        {%- endif -%}
+        {%- render 'newsletter_form', block: block -%}
+        {%- if block.settings.social_links -%}
+          {%- render 'social_links' -%}
+        {%- endif -%}
+      </div>
+    {%- endif -%}
+  {%- endfor -%}
+</aside>
+
+{% schema %}
+  {
+    "name": "Blog Sidebar",
+    "class": "blog-sidebar medium-down--hide nobkmk type-blog-sidebar",
+    "settings": [
+      {
+        "type": "range",
+        "id": "width",
+        "min": 20,
+        "max": 50,
+        "step": 1,
+        "unit": "%",
+        "label": "Width",
+        "default": 23
+      },
+      {
+        "type": "color_scheme",
+        "id": "color_scheme",
+        "label": "Color scheme",
+        "default": "scheme-2"
+      },
+      {
+        "type": "range",
+        "id": "border_radius",
+        "min": 0,
+        "max": 10,
+        "step": 0.2,
+        "unit": "em",
+        "label": "Border radius",
+        "default": 0
+      },
+      {
+        "type": "checkbox",
+        "id": "border",
+        "label": "Border"
+      },
+      {
+        "type": "header",
+        "content": "Featured articles"
+      },
+      {
+        "type": "range",
+        "id": "articles_border_radius",
+        "min": 0,
+        "max": 50,
+        "step": 1,
+        "unit": "%",
+        "label": "Articles border radius",
+        "default": 0
+      }
+    ],
+    "blocks": [
+      {
+        "type": "newsletter",
+        "name": "Newsletter / Social",
+        "limit": 1,
+        "settings": [
+          {
+            "type": "text",
+            "id": "title",
+            "label": "Title",
+            "default": "Join our mailing list"
+          },
+          {
+            "type": "richtext",
+            "id": "text",
+            "label": "Text",
+            "default": "<p>Lorem ipsum dolor sit amet, consectur adipiscing elit. Nunc eu eros augue tempus finibus mi.</p>"
+          },
+          {
+            "type": "richtext",
+            "id": "success_message",
+            "label": "Success",
+            "default": "<p>Thanks for subscribing!</p>"
+          },
+          {
+            "type": "select",
+            "id": "submit_style",
+            "label": "Submit style",
+            "options": [
+              {"value": "btn","label": "Button"},
+              {"value": "arrow","label": "Arrow"}
+            ],
+            "default": "arrow"
+          },
+          {
+            "type": "text",
+            "id": "submit_label",
+            "label": "Submit label",
+            "default": "Subscribe"
+          },
+          {
+            "type": "richtext",
+            "id": "legal",
+            "label": "Legal footnote"
+          },
+          {
+            "type": "header",
+            "content": "Social media links"
+          },
+          {
+            "type": "checkbox",
+            "id": "social_links",
+            "label": "Show social media links"
+          },
+          {
+            "type": "range",
+            "id": "social_media_size",
+            "min": 100,
+            "max": 200,
+            "step": 1,
+            "unit": "%",
+            "label": "Font size",
+            "default": 100
+          }
+        ]
+      },
+      {
+        "type": "search",
+        "name": "Search",
+        "limit": 1,
+        "settings": [
+          {
+            "type": "text",
+            "id": "title",
+            "label": "Title",
+          	"default": "Search"
+          }          
+        ]
+      },
+      {
+        "type": "categories",
+        "name": "Categories",
+        "limit": 1,
+        "settings": [
+          {
+            "type": "text",
+            "id": "title",
+            "label": "Title",
+          	"default": "Categories"
+          }          
+        ]
+      },
+      {
+        "type": "recent_posts",
+        "name": "Recent Posts",
+        "limit": 1,
+        "settings": [
+          {
+            "type": "text",
+            "id": "title",
+            "label": "Title",
+          	"default": "Recent Posts"
+          }
+        ]
+      },
+	    {
+        "type": "featured_posts",
+        "name": "Featured Posts",
+        "limit": 1,
+        "settings": [
+          {
+            "type": "text",
+            "id": "title",
+            "label": "Title",
+        	  "default": "Featured Posts"
+          },
+          {
+            "type": "article",
+            "id": "article1",
+            "label": "Article #1"
+          },
+          {
+            "type": "article",
+            "id": "article2",
+            "label": "Article #2"
+          },
+          {
+            "type": "article",
+            "id": "article3",
+            "label": "Article #3"
+          },
+          {
+            "type": "article",
+            "id": "article4",
+            "label": "Article #4"
+          },
+          {
+            "type": "article",
+            "id": "article5",
+            "label": "Article #5"
+          },
+          {
+            "type": "article",
+            "id": "article6",
+            "label": "Article #6"
+          }
+		    ]
+      }
+    ]
+  }
+{% endschema %}

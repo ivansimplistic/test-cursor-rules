@@ -1,0 +1,43 @@
+{%- assign collection = link.object -%}
+{%- if link.url == '/collections/all' -%}
+  {%- assign collection = collections['all'] -%}
+{%- endif -%}
+{%- if link.links != blank -%}
+  {%- assign itemCount = 0 -%}
+  {%- for child in link.links -%}
+    {%- if child.url contains '/collections/' -%}
+      {%- assign itemCount = itemCount | plus: 1 -%}
+    {%- endif -%}
+  {%- endfor -%}
+{%- endif -%}
+{%- if link.url == '/collections/all' and section.settings.include_shop_all == false -%}
+  {%- for child in link.links -%}
+    {%- if child.url contains '/collections/' -%}
+      {%- render 'collections_card_loop', link: child, level: level -%}
+    {%- endif -%}
+  {%- endfor -%}
+{%- else -%}
+  <div class="grid-item {% if itemCount > 0 %}one-whole{% else %}large--one-third {% if level == 2 %}medium--one-half{% elsif level == 3 %}medium--one-whole{% else %}medium--one-third{% endif %}{% endif %} small--one-whole">
+    <div class="grid align-items-start">
+      <div class="grid-item margin-bottom {% if itemCount > 0 %}has-children large--one-third {% if level == 2 %}medium--one-half{% elsif level == 3 %}medium--one-half{% else %}medium--one-third{% endif %} sticky{% else %}one-whole{% endif %} small--one-whole">
+        {%- render 'collection_card', collection: collection -%}
+      </div>
+      {%- if itemCount > 0 -%}
+        <div class="grid-item large--two-thirds {% if level == 2 %}medium--one-half{% elsif level == 3 %}medium--one-whole{% else %}medium--two-thirds{% endif %} small--one-whole">
+          <div class="grid align-items-start border-left">
+            {%- if level == 2 -%}
+              {%- assign level = 3 -%}
+            {%- elsif level == blank -%}
+              {%- assign level = 2 -%}
+            {%- endif -%}
+            {%- for child in link.links -%}
+              {%- if child.url contains '/collections/' -%}
+                {%- render 'collections_card_loop', section: section, link: child, level: level -%}
+              {%- endif -%}
+            {%- endfor -%}
+          </div>
+        </div>
+      {%- endif -%}
+    </div>
+  </div>
+{%- endif -%}

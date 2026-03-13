@@ -1,0 +1,162 @@
+{%- if cart.items.size > 0 -%}
+
+<style>
+  #shipping-calculator {padding: var(--global-sections-padding) 0; text-align: left; position: relative;}
+  #shipping-calculator .grid {row-gap: var(--grid-gap);}
+  #shipping-calculator .title {margin-bottom: 2.5rem;}
+  #shipping-calculator .wrapper {padding: calc(var(--container-padding) * 2) 0; border-radius: {{section.settings.border_radius}}em;}
+  #shipping-calculator .wrapper .container {padding: 0 calc(var(--container-padding) * 2);}
+  #shipping-calculator .wrapper.same-scheme:not(.scheme-border-box),
+  #shipping-calculator .wrapper.same-scheme:not(.scheme-border-box) .container {padding: 0;}
+  #shipping-calculator .form-rates {--grid-gap: 1.2rem;}
+  #shipping-calculator .response {position: relative; text-align: left; line-height: normal; font-size: {{settings.fields_size}}%; border: {{settings.fields_border_thickness}}px solid var(--scheme-fields-border-color); padding: var(--fields-padding-vertical) var(--fields-padding-horizontal); border-radius: {{settings.fields_border_radius | at_most: 1.2}}em; display: flex; flex-flow: column; justify-content: center;}
+  #shipping-calculator .response p:last-child {margin: 0;}
+  #shipping-calculator .response .default {padding: 0; text-align: center; width: 100%;}
+  #shipping-calculator .response i.fa-check {color: {{settings.content_main_color}};}
+  #shipping-calculator .response i.fa-close {color: {{settings.content_red_details_color}};}
+  #shipping-calculator .btn {width: 100%; height: 100%;}
+  #shipping-calculator #shipping-rates {list-style: none;}
+  
+  @media (max-width: {{settings.breakpoint_tablet}}){
+    #shipping-calculator .response {padding: 1.5em;}
+  }
+
+  .cart-popuplink-modal #shopify-section-shipping_calculator {max-width: 60em;}
+  .cart-popuplink-modal #shipping-calculator {--global-sections-padding: 2em;}
+  @media (min-width: {{settings.breakpoint_tablet | plus: 0.001}}em){
+    .cart-popuplink-modal #shipping-calculator .form-rates .grid-item {width: 50%;}
+  }
+  @media (min-width: {{settings.breakpoint_mobile | plus: 0.001}}em){
+    .cart-popuplink-modal #shipping-calculator .item-form-rates {width: 50%;}
+    .cart-popuplink-modal #shipping-calculator .item-feedback {width: 50%;}
+  }
+
+
+</style>
+
+<div id="shipping-calculator" class="scheme color-{{section.settings.section_color_scheme}}">
+  <div class="{%- unless section.settings.full_width -%}container{%- endunless -%}">
+    <div class="wrapper scheme color-{{section.settings.content_color_scheme}} {% if section.settings.border %}scheme-border-box{% endif %} {% if section.settings.section_color_scheme == section.settings.content_color_scheme %}same-scheme{% endif %}">
+      <div class="container">
+        <h2 class="title h3">{{ section.settings.shipping_calculator_heading }}</h2>
+        <div class="grid">
+          <div class="grid-item item-form-rates three-quarters medium--one-half small--one-whole">
+            <form class="form-rates">
+              <div class="grid">
+                <div class="selection grid-item one-quarter medium-down--one-whole">
+                  <div class="field select">
+                    <select placeholder="{{ 'shipping_calculator.country_label' | t }}" class="medium-down--one-whole" id="sc_address_country" name="address[country]" data-default="{% if shop.customer_accounts_enabled and customer %}{{ customer.default_address.country }}{% elsif section.settings.shipping_calculator_default_country != '' %}{{ section.settings.shipping_calculator_default_country }}{% endif %}">{{ country_option_tags }}</select>
+                    <label for="sc_address_country">{{ 'shipping_calculator.country_label' | t }}</label>
+                    {%- render 'icons', icon: 'chevron-down' -%}
+                  </div>
+                </div>
+                <div class="selection grid-item one-quarter medium-down--one-whole" id="address_province_container" style="display:none;">
+                  <div class="field select">
+                    <select placeholder="{{ 'shipping_calculator.state_province_label' | t }}" class="medium-down--one-whole" id="sc_address_province" name="address[province]" data-default="{% if shop.customer_accounts_enabled and customer and customer.default_address.province != '' %}{{ customer.default_address.province }}{% endif %}"></select>
+                    <label for="sc_address_province" id="address_province_label">{{ 'shipping_calculator.state_province_label' | t }}</label>
+                    {%- render 'icons', icon: 'chevron-down' -%}
+                  </div>
+                </div>  
+                <div class="selection grid-item one-quarter medium-down--one-whole">
+                  <div class="field">
+                    <input placeholder="{{ 'shipping_calculator.zip_postal_code_label' | t }}" type="text" id="sc_address_zip" name="address[zip]"{% if shop.customer_accounts_enabled and customer %} value="{{ customer.default_address.zip }}"{% endif %} />
+                    <label for="sc_address_zip">{{ 'shipping_calculator.zip_postal_code_label' | t }}</label>
+                  </div>
+                </div>
+                <div class="grid-item one-quarter medium-down--one-whole">
+                  <button class="get-rates btn" aria-label="{{ 'shipping_calculator.calculate_shipping_rates_caption' | t }}">{{ section.settings.shipping_calculator_submit_button_label | default: 'Calculate' }}</button>
+                </div>
+              </div>
+            </form>
+          </div>
+          <div class="grid-item item-feedback flex direction-column one-quarter medium--one-half small--one-whole">
+            <div id="shipping-rates-feedback" class="response flex-1 scheme-border-box">
+              <div id="wrapper-response">
+                <p class="default">{{ 'shipping_calculator.complete_to_see_results_message' | t }}</p>
+              </div>
+            </div>
+            <div id="shipping-rates" style="display: none" class="response flex-1 scheme-border-box">
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="{{ '/services/countries.js' }}" defer></script>
+<script src="{{ 'shipping_calculator.js' | asset_url }}" defer="defer"></script>
+
+{%- endif -%}
+{% schema %}
+  {
+    "name": "Shipping Calculator",
+    "class": "type-shipping-calculator",
+    "settings": [
+      {
+        "type": "header",
+        "content": "Content"
+      },
+      {
+        "type": "text",
+        "id": "shipping_calculator_heading",
+        "label": "Title",
+        "default": "Shipping Rates Calculator"
+      },
+      {
+        "type": "text",
+        "id": "shipping_calculator_default_country",
+        "label": "Default country selection",
+        "default": "United States"
+      },
+      {
+        "type": "paragraph",
+        "content": "If your customer is logged-in, the country in his default shipping address will be selected. If you are not sure about the  spelling to use here, refer to the first checkout page."
+      },
+      {
+        "type": "text",
+        "id": "shipping_calculator_submit_button_label",
+        "label": "Submit button label",
+        "default": "Calculate"
+      },
+      {
+        "type": "text",
+        "id": "shipping_calculator_submit_button_label_disabled",
+        "label": "Submit button label when calculating",
+        "default": "Calculating..."
+      },
+      {
+        "type": "header",
+        "content": "Colors"
+      },
+      {
+        "type": "color_scheme",
+        "id": "section_color_scheme",
+        "label": "Section color scheme",
+        "default": "scheme-1"
+      },
+      {
+        "type": "color_scheme",
+        "id": "content_color_scheme",
+        "label": "Content color scheme",
+        "default": "scheme-2"
+      },
+      {
+        "type": "range",
+        "id": "border_radius",
+        "min": 0,
+        "max": 10,
+        "step": 0.2,
+        "unit": "em",
+        "label": "Border radius",
+        "default": 0
+      },
+      {
+        "type": "checkbox",
+        "id": "border",
+        "label": "Border",
+        "default": false
+      }
+    ]
+  }
+{% endschema %}

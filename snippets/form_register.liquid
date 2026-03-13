@@ -1,0 +1,27 @@
+<div id="customer-register">
+  <h2 class="h1 title">{{ 'account.register.title' | t }}</h2>
+  {%- form 'create_customer' -%}
+    <div class="error-msg">{{ form.errors | default_errors }}</div>
+    <div class="field required">
+      <input placeholder="{{ 'account.register.first_name_label' | t }}" type="text" value="{{ form.first_name }}" name="customer[first_name]" id="customer-first-name" class="name required" aria-required="true" autocomplete="given-name" />
+      <label for="customer-first-name">{{ 'account.register.first_name_label' | t }}</label>
+    </div>
+    <div class="field required">
+      <input placeholder="{{ 'account.register.last_name_label' | t }}" type="text" value="{{ form.last_name }}" name="customer[last_name]" id="customer-last-name" class="last-name required" aria-required="true" autocomplete="family-name" />
+      <label for="customer-last-name">{{ 'account.register.last_name_label' | t }}</label>
+    </div>
+    <div class="field required">
+      <input placeholder="{{ 'account.register.email_label' | t }}" type="email" value="{{ form.email }}" name="customer[email]" id="register-customer-email" class="email required" aria-required="true" autocomplete="email" />
+      <label for="register-customer-email">{{ 'account.register.email_label' | t }}</label>
+    </div>
+    <div class="field required"> 
+      <input placeholder="{{ 'account.register.password_label' | t }}" type="password" name="customer[password]" id="register-password" class="password required" aria-required="true" autocomplete="password" />
+      <label for="register-password">{{ 'account.register.password_label' | t }}</label> 
+    </div>
+    {%- if section.settings.login_redirect_url != blank -%}
+      <input type="hidden" name="checkout_url" value="{{section.settings.register_redirect_url}}" />
+      <input type="hidden" name="return_to" value="{{section.settings.register_redirect_url}}" />
+    {%- endif -%}
+    <button class="btn" type="submit">{{ 'account.register.register_button' | t }}</button>
+  {%- endform -%}
+</div>

@@ -1,0 +1,13 @@
+{% if settings.customer_portal_announcement != blank %}
+  <style>
+    .announcement-customer {padding: 2rem; background: var(--scheme-overlay-color); margin-bottom: 3em; border-radius: {{settings.customer_portal_menu_border_radius}}em;}
+    .announcement-customer .icon {font-size: 1.5em; margin-right: 2rem; margin-top: 0.2em;}
+    @media (max-width: {{settings.breakpoint_tablet}}) {
+      .announcement-customer {margin-top: 1em; margin-bottom: 0;}
+    }
+  </style>
+  <div class="announcement-customer flex justify-content-between align-items-start {{type}} scheme color-{{settings.customer_portal_menu_color_scheme}} {% if settings.customer_portal_menu_border %}scheme-border-box{% endif %}">
+    {%- render 'icons', icon: 'bell' -%}
+    {{ settings.customer_portal_announcement }}
+  </div>
+{% endif %}

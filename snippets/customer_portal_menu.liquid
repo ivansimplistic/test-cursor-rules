@@ -1,0 +1,62 @@
+<div class="customer-portal-menu scheme color-{{settings.customer_portal_menu_color_scheme}} {% if settings.customer_portal_menu_border %}scheme-border-box{% endif %} sticky-below-header ease-animation large--one-fifth medium-down--one-whole medium-down--flex medium-down--align-items-center">
+  <div class="medium-down--hide">
+    <h2 class="h3 medium-down--hide">{{ 'account.customer_portal_menu.title' | t: user_name: customer.first_name }}</h2>
+    <div class="links">
+      <div class="wrap">
+        {%- assign templateOrder = false -%}
+        {%- if template contains 'order' -%}
+          {%- assign templateOrder = true -%}
+        {%- endif -%}
+        <a href="{{ routes.account_url }}" class="{{settings.customer_portal_links_style}} {% if template contains 'account' and templateOrder == false %}active{% endif %}">{{ 'account.customer_portal_menu.account_details_link' | t }}</a>
+        <a href="{{ routes.account_addresses_url }}" class="{{settings.customer_portal_links_style}} {% if template contains 'address' %}active{% endif %}">{{ 'account.customer_portal_menu.address_book_link' | t }}</a>
+        <a href="{{ routes.account_url }}?view=order_history" class="{{settings.customer_portal_links_style}} {% if template contains 'order' %}active{% endif %}">{{ 'account.customer_portal_menu.order_history_link' | t }}</a>
+
+        {%- if customer.metafields.subscriptions.customer_string != blank -%}
+          <!-- Begin ReCharge code -->
+          <div id="rc_link_container">
+            {% comment %}<a class="link" href="/tools/recurring/login">{{ 'account.customer_portal_menu.subscriptions_link' | t }}</a>{% endcomment %}
+            <a href="/tools/recurring/customer/{{customer.metafields.subscriptions.customer_string}}/subscriptions/" class="{{settings.customer_portal_links_style}} ">{{ 'account.customer_portal_menu.subscriptions_link' | t }}</a>
+          </div>
+          <!-- End ReCharge code -->           
+        {%- endif -%}
+
+        {%- if settings.customer_portal_menu -%}
+          {%- for link in linklists[settings.customer_portal_menu].links -%}
+            <a href="{{link.url}}" class="{{settings.customer_portal_links_style}} {% if link.current %}active{% endif %}">{{link.title}}</a>
+          {%- endfor -%}
+        {%- endif -%}
+
+        {%- if settings.customer_portal_help_link != blank -%}
+          <div class="help-link flex">
+            {{ settings.customer_portal_help_link }}
+          </div>
+        {%- endif -%}
+      </div>
+    </div>
+  </div>
+  <div class="flex flex-1">
+    <div class="hide medium-down--show flex-1">
+      <div class="field">
+        {% render 'icons', icon: 'chevron-down' %}
+        <select class="trigger" aria-label="{{ 'general.go_to_label' | t | escape }}" onchange="this.options[this.selectedIndex].value && (window.location = this.options[this.selectedIndex].value);">
+          <option value="" disabled>{{ 'general.go_to_label' | t }}</option>
+          <option value="{{ routes.account_url }}" {% if template contains 'account' %}selected{% endif %}>{{ 'account.customer_portal_menu.account_details_link' | t }}</option>
+          <option value="{{ routes.account_addresses_url }}" {% if template contains 'address' %}selected{% endif %}>{{ 'account.customer_portal_menu.address_book_link' | t }}</option>
+          <option value="{{ routes.account_url }}?view=order_history" {% if template contains 'order' %}selected{% endif %}>{{ 'account.customer_portal_menu.order_history_link' | t }}</option>
+          {%- if customer.metafields.subscriptions.customer_string != blank -%}
+            <!-- Begin ReCharge code -->
+            <option value="/tools/recurring/customer/{{customer.metafields.subscriptions.customer_string}}/subscriptions/">{{ 'account.customer_portal_menu.subscriptions_link' | t }}</option>
+            <!-- End ReCharge code -->           
+          {%- endif -%}
+          {%- if settings.customer_portal_menu -%}
+            {%- for link in linklists[settings.customer_portal_menu].links -%}
+              <option value="{{link.url}}" {% if link.current %}selected{% endif %}>{{link.title}}</option>
+            {%- endfor -%}
+          {%- endif -%}
+        </select>
+      </div>
+    </div>
+    <a href="{{ routes.account_logout_url }}" class="logout {{settings.customer_portal_logout_style}} {{settings.customer_portal_logout_size}}">{{ 'account.customer_portal_menu.logout_button' | t }}</a>
+  </div>
+</div>
+<div class="customer-portal-menu-shadow ease-animation"></div>

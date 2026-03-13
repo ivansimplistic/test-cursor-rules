@@ -1,0 +1,46 @@
+<style>
+  #error-page {padding-top: var(--global-sections-padding); text-align: center;}
+  #error-page.padding-bottom-true {padding-bottom: var(--global-sections-padding);}
+  #error-page .head {font-size: 7em; margin-bottom: 0.3em; line-height: 1;}
+  #error-page .btn {margin-top: 1em;}
+</style>
+
+<div id="error-page" class="scheme color-{{section.settings.color_scheme}} {% if section.settings.border %}scheme-border-bottom{% endif %} padding-bottom-{{section.settings.padding_bottom}}">
+  <div class="container">
+    <h1>{{ '404.title' | t}}</h1>
+    <p>{{ '404.message' | t}}</p>
+    <a href="{{ routes.root_url }}" class="btn">{{ '404.link_text' | t}}</a>
+  </div>
+</div>
+
+{% schema %}
+  {
+    "name": "404",
+    "class": "type-404",
+    "tag": "section",
+    "settings": [
+      {
+        "type": "header",
+        "content": "Colors"
+      },
+      {
+        "type": "color_scheme",
+        "id": "color_scheme",
+        "label": "Color scheme",
+        "default": "scheme-1"
+      },
+      {
+        "type": "checkbox",
+        "id": "border",
+        "label": "Border bottom",
+        "default": false
+      },
+      {
+        "type": "checkbox",
+        "id": "padding_bottom",
+        "label": "Padding bottom",
+        "default": true
+      }
+    ]
+  }
+{% endschema %}

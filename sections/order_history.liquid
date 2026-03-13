@@ -1,0 +1,21 @@
+{{ 'customer_portal.css' | asset_url | stylesheet_tag }}
+<script src="{{ 'customer_portal.js' | asset_url }}" defer="defer"></script>
+<div class="customer-portal-page scheme color-{{settings.customer_portal_color_scheme}}">
+  <div class="container flex flex-wrap align-items-start">
+
+    {%- render 'customer_portal_menu', template: template -%}
+
+    <div class="flex-1 customer-portal-content">
+      <h1>{{ 'account.order_history.title' | t }}</h1>
+      
+      {%- render 'order_history_content' -%}
+    </div>
+  </div>
+</div>
+
+{% schema %}
+  {
+    "name": "Order History",
+    "class": "type-order-history"
+  }
+{% endschema %}

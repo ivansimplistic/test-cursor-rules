@@ -1,0 +1,395 @@
+if(!customElements.get('collection-layout')) {
+  class CollectionLayout extends HTMLElement {
+    constructor() {
+      super();
+      var grids = document.querySelectorAll('.collection-grid');
+      var inputs = document.querySelectorAll('.collection-utils input[name="grid-layout"]');
+      var saveAttribute = $s.debounce(function(layout) {
+        {% if settings.dz_enable_cart_attribute_grid_layout %}
+        $s.post({type: 'POST', url: routes.cart_url + '/update.js', data: {attributes: {'_grid_layout': layout}}, dataType: 'json'});
+        {% endif %}
+      }, 1000);
+      this.setOptionByCookie = function() {
+        var layout = Cookies.get(getCookieKey());
+        var input = layout ? document.querySelector('.collection-utils input[name="grid-layout"][value="'+layout+'"]') : null;
+        updateLayout(input);
+      }
+      function updateLayout(selectedOption) {
+        if (!selectedOption) {
+          if (grids[0]) {
+            grids.forEach(x=>{x.removeAttribute('data-grid-layout')});
+            var ipr = (window.getComputedStyle(grids[0]).getPropertyValue('--items-per-row')||'').trim();
+            inputs.forEach(input=>{
+              if (input.dataset.value == ipr && $s.isVisible(input)) {
+                selectedOption = input;
+              }
+            });
+          }
+        }
+        var layout = (selectedOption ? selectedOption.value : '');
+        if (layout) {
+          selectedOption.checked = true;
+          grids.forEach(x=>{x.setAttribute('data-grid-layout', layout)});
+          Cookies.set(getCookieKey(), layout, { expires: 7 });
+        }
+        if (prevLayout!=layout) {
+          saveAttribute(layout);
+          prevLayout = layout;
+        }
+
+        window.dispatchEvent(new CustomEvent('resize')); //trigger event resize to update images and any other feature that depends on product card size.
+      }
+      function getCookieKey() {
+        return 'grid_layout_' + ($s.media.isSmall ? 's' : ($s.media.isMedium ? 'm' : 'l'))
+      }
+      inputs.forEach(input=>{
+        input.addEventListener('change', (e)=>{updateLayout(input);});
+        input.removeAttribute('disabled');
+      });
+      var prevLayout = Cookies.get(getCookieKey());
+      this.setOptionByCookie();
+    }
+
+    connectedCallback() {
+      window.addEventListener('mediaChange', this.setOptionByCookie);
+    }
+
+    disconnectedCallback() {
+      window.removeEventListener('mediaChange', this.setOptionByCookie);
+    }
+  }
+  customElements.define('collection-layout', CollectionLayout);
+}
+
+if(!customElements.get('collection-filters') && !customElements.get('collection-filters-tags')) {
+  class CollectionFiltersAbstract extends HTMLElement {
+    constructor() {
+      super();
+      this.pageManager = this.closest('page-manager');
+      this.form = this.querySelector('form');
+      this.summary = this.querySelector('.summary');
+      this.documentClickHandler = this.documentClick.bind(this);
+      this.ajax = true;
+
+      if(this.dataset.open) {
+        this.showFilters();
+      }
+      this.form.addEventListener('submit', (e)=>{
+        e.preventDefault();
+      });
+      this.pageManager.querySelectorAll('.open-filters').forEach(x=>{
+        x.addEventListener('click', ()=>{
+          this.showFilters();
+        });
+      });
+      this.querySelector('.close-filters').addEventListener('click', ()=>{
+        this.hideFilters();
+      });
+    }
+
+    disconnectedCallback() {
+      document.removeEventListener('click', this.documentClickHandler);
+      if (this.classList.contains('open')) {
+        this.hideFilters();
+      }
+    }
+
+    documentClick(e) {
+      if(!this.contains(e.target)) {
+        this.hideFilters();
+      }
+    }
+
+    isOpen() {
+      return this.classList.contains('open');
+    }
+
+    showFilters() {
+      $s.closeModal();
+      $s.showOverlay();
+      this.classList.add('open');
+      setTimeout(()=>{
+        const elementToFocus = this.contains(document.activeElement) ? document.activeElement : false;
+        $s.trapFocus(this, elementToFocus);
+        document.addEventListener('click', this.documentClickHandler);
+      }, 100);
+    }
+
+    hideFilters() {
+      $s.hideOverlay();
+      this.classList.remove('open');
+      $s.removeTrapFocus();
+      document.removeEventListener('click', this.documentClickHandler);
+    }
+  }
+
+  if(!customElements.get('collection-filters')) {
+    class CollectionFilters extends CollectionFiltersAbstract {
+      constructor() {
+        super();
+
+        this.querySelectorAll('input').forEach((option)=>{
+          option.addEventListener('change', (e)=>{
+            setTimeout(()=>{ {% comment %}trigger after setting focus on another input when using the tab key{% endcomment %}
+              this.filterResults();
+            }, 10)
+          });
+        });
+        this.initSummary();
+
+        if (this.classList.contains('layout-horizontal')) {
+          document.addEventListener('click', this._documentClick.bind(this));
+        }
+        this.querySelector('collection-filters util-accordion').addEventListener('keydown', (e)=>{
+          if (e.keyCode==27) { //escape
+            var closestAccordion = document.activeElement.closest('.accordion.open');
+            if (closestAccordion) {
+              var btn = closestAccordion.querySelector('button')
+              btn.click();
+              btn.focus();
+            }
+          }
+        })
+      }
+
+      initSummary() {
+        if(this.summary) {
+          this.summary.querySelectorAll('button').forEach((button)=>{
+            button.addEventListener('click', (e)=>{
+              e.preventDefault();
+              if(button.dataset.optionId=='filter-price') {
+                this.querySelector('#filter-price-min').value = '';
+                this.querySelector('#filter-price-max').value = '';
+              } else {
+                if(button.dataset.clearAll) {
+                  this.querySelectorAll('.group input').forEach((element)=>{
+                    element.value = '';
+                    element.checked = false;
+                  });
+                } else {
+                  (this.querySelector('#'+button.dataset.optionId) || {}).checked = false;
+                }
+              }
+              this.filterResults();
+            });
+          });
+        }
+      }
+
+      //do not shadow inherited 'documentClick' function
+      _documentClick(e) {
+        if ($s.media.isLarge) {
+          var openedAccordion = this.querySelector('.accordion-trigger[aria-expanded="true"]');
+          if (openedAccordion && !openedAccordion.closest('.accordion').contains(e.target)) {
+            e.preventDefault();
+            openedAccordion.click()
+          }
+        }
+      }
+      
+
+      getSearchParams() {
+        const formData = new FormData(this.form);
+        const searchParams = new URLSearchParams(formData);
+
+        var params = new URLSearchParams();
+        const keys = Array.from(searchParams.keys()).filter((x, i, a) => a.indexOf(x)==i);
+        keys.forEach((key)=>{
+          let values = searchParams.getAll(key).filter(x=>x!="");
+          params.delete(key);
+          values.forEach((x)=>params.append(key,x));
+        });
+
+        var currenSearch = new URLSearchParams(location.search);
+        if(currenSearch.has('sort_by')) {
+          params.set('sort_by', currenSearch.get('sort_by'));
+        }
+
+        return params;
+      }
+
+      updateContentKeepFilters(currentPageManager, newContent) {
+        var currentScrollDiv = currentPageManager.querySelector('.filters-inner');
+        var positionBottom = currentScrollDiv.scrollHeight - currentScrollDiv.scrollTop;
+        var currentAccordion = currentPageManager.querySelector('collection-filters util-accordion');
+        var newAccordion = newContent.querySelector('collection-filters util-accordion');
+        var currentAccordionItems = currentAccordion.querySelectorAll(':scope > .accordion');
+        var newAccordionItems = newAccordion.querySelectorAll(':scope > .accordion');
+        currentAccordionItems.forEach((e,ix)=>{
+          e.style.display = "none";
+        })
+        newAccordionItems.forEach((newItem,ix)=>{
+          let currentItem = Array.from(currentAccordionItems).find(x=>x.dataset.param==newItem.dataset.param);
+          if (currentItem) {
+            currentItem.style.display = "";
+            currentItem.querySelector('.accordion-panel').innerHTML = newItem.querySelector('.accordion-panel').innerHTML;
+          } else {
+            currentItem = newItem.cloneNode(true);
+          }
+          currentAccordion.appendChild(currentItem); //appending item to the end makes it reorder to match newAccordionItems order.
+        })
+        currentAccordion.init(); //reinit with any added accordions.
+
+        newAccordion.parentNode.replaceChild(currentAccordion, newAccordion);
+        newContent.querySelector('collection-filters').style.transition = "none"; //prevent mobile reopen animation
+        currentPageManager.parentNode.replaceChild(newContent, currentPageManager);
+        newContent.querySelector('collection-filters').style.transition = "";
+
+        //avoid the following on horizontal dropdown layout
+        //doesn't do anything if the sidebar doesn't have overflow (for example on Pager mode)
+        if ($s.media.isLarge && !newContent.querySelector('collection-filters').classList.contains('layout-horizontal')) {
+          var newScrollDiv = newContent.querySelector('.filters-inner');
+          newScrollDiv.scrollTop = newScrollDiv.scrollHeight - positionBottom;
+        }
+      }
+
+      filterResults() {
+        var url;
+        var params = this.getSearchParams();
+        var paramsString = params.toString();
+        if(this.ajax) {
+          this.activeElementPath = $s.getDomPath(document.activeElement);
+          $s.showLoadingOverlay();
+          url = window.location.pathname + (paramsString ? '?'+paramsString : '');
+          var isOpen = this.isOpen();
+          this.pageManager.loadPage(url, ()=>{
+            $s.hideLoadingOverlay();
+            if (document.querySelector(this.pageManager.dataset.itemsContainerSelector)) {
+              if (!$s.media.isLarge || !document.querySelector('.collection-filters.layout-horizontal')) {
+                var newTop = document.querySelector(this.pageManager.dataset.itemsContainerSelector).offsetTop - document.getElementById('header').offsetHeight - 80
+                if (newTop<60) {
+                  newTop = 0;
+                }
+                window.scrollTo(0, newTop);
+              }
+            };
+            if (this.activeElementPath) {
+              var el = document.querySelector(this.activeElementPath);
+              if (el) {
+                el.focus();
+              }
+            }
+          }, true, (doc)=> {
+            if (isOpen) {
+              doc.querySelector('.collection-filters').dataset.open = true;
+            }
+          }, this.updateContentKeepFilters.bind(this));
+        } else {
+          url = window.location.pathname + (paramsString ? '?'+paramsString : '');
+          location = url;
+        }
+      }
+    }
+    customElements.define('collection-filters', CollectionFilters);
+  }
+
+  if(!customElements.get('price-range-filter')) {
+    class PriceRangeFilter extends HTMLElement {
+      constructor() {
+        super();
+  
+        const rangeInput = this.querySelectorAll('.range-input input');
+        const priceInput = this.querySelectorAll('input[type="number"]');
+        const range = this.querySelector('.price-progress .line');
+        let priceGap = 0;
+  
+        priceInput.forEach((input, ix) =>{
+            input.addEventListener('input', e =>{
+                handleZIndex(ix);
+                let minPrice = parseFloat(priceInput[0].value);
+                let maxPrice = parseFloat(priceInput[1].value);
+                
+                if((maxPrice - minPrice >= priceGap) && maxPrice <= rangeInput[1].max){
+                    if(e.target.classList.contains('input-min')){
+                        rangeInput[0].value = minPrice;
+                        range.style.left = ((minPrice / rangeInput[0].max) * 100) + '%';
+                    }else{
+                        rangeInput[1].value = maxPrice;
+                        range.style.right = 100 - (maxPrice / rangeInput[1].max) * 100 + '%';
+                    }
+                }
+            });
+        });
+  
+        function handleZIndex(activeInputIndex) {
+          rangeInput.forEach((input,ix)=>{
+            input.style.zIndex = activeInputIndex!=ix ? '' : '1';
+          });
+        }
+  
+        rangeInput.forEach((input, ix) =>{
+            input.addEventListener('input', e =>{
+                let minVal = parseFloat(rangeInput[0].value);
+                let maxVal = parseFloat(rangeInput[1].value);
+                handleZIndex(ix);
+  
+                if((maxVal - minVal) < priceGap){
+                    if(e.target.classList.contains('range-min')){
+                        rangeInput[0].value = maxVal - priceGap
+                    }else{
+                        rangeInput[1].value = minVal + priceGap;
+                    }
+                }else{
+                    priceInput[0].value = minVal;
+                    priceInput[1].value = maxVal;
+                    range.style.left = ((minVal / rangeInput[0].max) * 100) + '%';
+                    range.style.right = 100 - (maxVal / rangeInput[1].max) * 100 + '%';
+                }
+            });
+        });
+  
+        function init() {
+          let minVal = parseFloat(rangeInput[0].value);
+          let maxVal = parseFloat(rangeInput[1].value);
+          range.style.left = ((minVal / rangeInput[0].max) * 100) + '%';
+          range.style.right = 100 - (maxVal / rangeInput[1].max) * 100 + '%';
+  
+          if (rangeInput[0].value==rangeInput[0].max) {
+            //bring range-min to front
+            handleZIndex(0);
+          }
+        }
+        init();
+      }
+  
+      
+    }
+    customElements.define('price-range-filter', PriceRangeFilter);
+  }
+  
+}
+
+if(!customElements.get('collection-sort')) {
+  class CollectionSort extends HTMLElement {
+    constructor() {
+      super();
+      this.pageManager = this.closest('page-manager');
+      this.dropdown = this.querySelector('#sort-by');
+      this.ajax = true;
+
+      var search = new URLSearchParams(location.search)
+      this.dropdown.value = search.get('sort_by') || this.dataset.sortBy;
+
+      this.dropdown.addEventListener('change', ()=>{
+        var search = new URLSearchParams(location.search); //get new instance
+        search.set('sort_by', this.dropdown.value);
+        search.delete(this.pageManager.getPageParam());
+        var paramsString = search.toString();
+
+        if(this.ajax) {
+          $s.showLoadingOverlay();
+          const url = window.location.pathname + (paramsString ? '?'+paramsString : '');
+          this.pageManager.loadPage(url, ()=>{
+            $s.hideLoadingOverlay();
+          });
+        } else {
+          location.search = paramsString;
+        }
+      });
+    }
+  }
+  customElements.define('collection-sort', CollectionSort);
+}
+
+
+

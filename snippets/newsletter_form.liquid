@@ -1,0 +1,58 @@
+{%- assign submitStyle = submitStyle | default: block.settings.submit_style -%}
+{%- assign submitSize = submitSize | default: block.settings.cta_size -%}
+
+{%- capture submitCta -%}
+{%- assign submitLabel = block.settings.submit_label | default: 'Subscribe' -%}
+<button class="{{submitStyle}} {{submitSize}}" type="submit" aria-label="{{submitLabel}}">
+  {%- if block.settings.submit_style == 'btn' -%}
+    {{submitLabel}}
+  {%- else -%}
+    {%- render 'icons', icon: settings.newsletter_icon -%}
+  {%- endif -%}
+</button>
+{%- endcapture -%}
+
+{%- capture formContentHtml -%}
+  <div class="field">
+    <input aria-label="{{ 'newsletter_form.email_aria_label' | t }}" id="email-{{block.id}}" placeholder="{{ 'newsletter_form.email_visible_label' | t | escape }}" type="email" name="{% if settings.use_klaviyo_form %}email{%else%}contact[email]{% endif %}" class="required email" aria-required="true" autocomplete="email" />
+    <label for="email-{{block.id}}">{{ 'newsletter_form.email_visible_label' | t }}</label>
+    {%- if block.settings.submit_style == 'arrow' -%}
+      {{submitCta}}
+    {%- endif -%}
+  </div>
+  {%- if block.settings.legal != blank and block.settings.legal != '<p></p>' -%}
+    <div class="legal p4">{{block.settings.legal}}</div>
+  {%- endif -%}
+  {%- if block.settings.submit_style == 'btn' -%}
+    <div class="btn-wrap">
+      {{submitCta}}
+    </div>
+  {%- endif -%}
+{%- endcapture -%}
+
+<div class="mailing-list">
+  <contact-form {% if settings.use_klaviyo_form %}data-use-klaviyo="true"{% endif %}>
+    {%- if settings.use_klaviyo_form -%}
+      <form action="//manage.kmail-lists.com/subscriptions/subscribe" data-ajax-submit="//manage.kmail-lists.com/ajax/subscriptions/subscribe" method="GET" target="_blank" novalidate="novalidate">
+        <div class="success-msg hide" aria-live="assertive">{{block.settings.success_message}}</div>
+        <div class="error-msg hide" aria-live="assertive"></div>
+        <div class="form-wrap">
+          <input type="hidden" name="g" value="{{settings.klaviyo_list_id}}">
+          <input type="hidden" name="$fields" value="source">
+          <input type="hidden" name="source" value="Shopify newsletter section">
+          {{ formContentHtml }}
+        </div>
+      </form>
+    {%- else -%}
+      {%- assign formId = 'section_subscribe_' | append: block.id  -%}
+      {%- form 'customer', id: formId -%}
+        <div class="success-msg hide" aria-live="assertive" {% if form.posted_successfully? %}style="display: block"{% endif %}>{{block.settings.success_message}}</div>
+        <div class="error-msg hide" aria-live="assertive" {% if form.posted_successfully? == false %}style="display: block"{% endif %}>{{ form.errors | default_errors }}</div>
+        <div class="form-wrap" {% if form.posted_successfully? %}style="display: none"{% endif %}>
+          <input type="hidden" name="contact[tags]" value="prospect,newsletter"/>
+          {{ formContentHtml }}
+        </div>
+      {%- endform -%}
+    {%- endif -%}
+  </contact-form>
+</div>

@@ -1,0 +1,40 @@
+.timeline-section .heading {margin-bottom: 4em;}
+.timeline-section .line {position: absolute; font-size: var(--dots-width); left: 1em; border-right: var(--line-thickness) solid var(--line-color); -webkit-transform: translateX(-50%); transform: translateX(-50%); clip-path: polygon(0 0.75em, 100% 0.75em, 100% 100%, 0 100%)}
+.timeline-section .image-column img {border-radius: var(--image-border-radius);}
+.timeline-section .steps {position: relative;}
+.timeline-section .item {position: relative; margin-bottom: 4em;}
+.timeline-section .item:last-child {margin-bottom: 0; }
+.timeline-section .item .info {padding: 0 2em; gap: 2rem; opacity: 0; transform: scale(0.7); transform-origin: 0% 0%; width: 100%; max-width: var(--items-text-width);}
+.timeline-section .item .eyebrow {margin-bottom: 1rem;}
+.timeline-section .item .title {margin-bottom: 0; font-weight: var(--items-title-weight); text-transform: var(--items-title-text-transform); letter-spacing: var(--items-title-letter-spacing);}
+.timeline-section .item .description {margin-top: 1.5rem;}
+.timeline-section .item .number-wrap {position: relative;}
+.timeline-section .item .number {border-radius: 50%;}
+.timeline-section .item .number span {width: 2em; height: 2em; opacity: 0; font-size: var(--dots-width); display: flex; align-items: center; justify-content: center; background: var(--dots-color); color: var(--dots-label); position: relative; border-radius: 50%;}
+.timeline-section .item img {max-width: var(--items-image-width); border-radius: var(--items-image-border-radius);}
+.timeline-section .item .number {transform: scale(0.5);}
+.timeline-section .item.appear .number {transform: scale(1);}
+.timeline-section .item.appear .number span, 
+.timeline-section .item.appear .info {opacity: 1; transform: scale(1);}
+
+@media (min-width: {{settings.breakpoint_tablet | plus: 0.001}}em){
+  .timeline-section {--grid-gap: max(var(--text-padding), 3em);}
+  .timeline-section .image-column {width: var(--image-width);}
+  .timeline-section .image-column img {height: calc(100vh - calc(var(--text-padding) * 2) - var(--header-offset)); position: sticky; top: calc(var(--text-padding) + var(--header-offset)); object-fit: var(--image-fit);}
+  .content-full-width .timeline-section .image-column {width: calc(var(--image-width) + max(var(--container-padding),calc(calc(100% / 2 - var(--container-width) / 2))));}
+  .timeline-section.image-full-height .image-column {margin: calc(var(--text-padding) * -1) 0;}
+  .timeline-section.image-full-height .image-column img {height: calc(100vh - var(--header-offset)); top: var(--header-offset);}
+  .timeline-section:not(.alternate) .item .info {padding-right: 0;}
+  .timeline-section.alternate .info {flex: 1 0 50%;}
+  .timeline-section.alternate .line {left: 50%;}
+  .timeline-section.alternate .item:nth-child(2n+2) {-webkit-box-direction: reverse;  -ms-flex-direction: row-reverse; flex-direction: row-reverse;}
+  .timeline-section.alternate .item:nth-child(2n+2) .info:not(.opposite),
+  .timeline-section.alternate .item:nth-child(2n+1) .info.opposite {text-align: right; transform-origin: 100% 0%;}
+  .timeline-section.alternate .item:nth-child(2n+2) .info:not(.opposite) img,
+  .timeline-section.alternate .item:nth-child(2n+1) .info.opposite img {margin-left: auto;}
+}  
+
+@media (max-width: {{settings.breakpoint_tablet}}){
+  .timeline-section .image-column {margin-bottom: 2em;}
+  .timeline-section.image-full-height .image-column {margin-top: calc(var(--text-padding) * -1);}
+}

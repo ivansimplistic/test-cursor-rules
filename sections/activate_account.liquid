@@ -1,0 +1,33 @@
+{{ 'customer_forms.css' | asset_url | stylesheet_tag }}
+{%- render 'customer_forms_js_inc' -%}
+<div class="customer-form-page text-center scheme color-{{settings.customer_portal_color_scheme}}">
+  <div class="container">
+    <div id="customer-activate">
+      <h1>{{ 'account.activate_account.title' | t }}</h1>
+      <p>{{ 'account.activate_account.text' | t }}</p>
+      {%- form 'activate_customer_password' -%}
+        {{ form.errors | default_errors }}
+        <p class="error-msg"></p>
+        <div class="field required">
+          <input type="password" placeholder="{{ 'account.activate_account.label_password' | t | escape }}" name="customer[password]" id="customer-password" class="password required" aria-required="true" />
+          <label for="customer-password">{{ 'account.activate_account.label_password' | t }}</label>
+        </div>
+        <div class="field required">
+          <input type="password" placeholder="{{ 'account.activate_account.label_confirm_password' | t | escape }}" name="customer[password_confirmation]" id="customer-confirm-password" class="password-confirm required" aria-required="true" />
+          <label for="customer-confirm-password">{{ 'account.activate_account.label_confirm_password' | t }}</label>
+        </div>
+        <button type="submit" class="btn">{{ 'account.activate_account.accept_button' | t }}</button>
+        <div class="note">
+          or <button class="link" type="submit" name="decline">{{ 'account.activate_account.decline_button' | t }}</button>
+        </div>
+      {%- endform -%}
+    </div>
+  </div>
+</div>
+
+{% schema %}
+  {
+    "name": "Activate Account",
+    "class": "type-activate-account"
+  }
+{% endschema %}

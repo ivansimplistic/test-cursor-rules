@@ -1,0 +1,18 @@
+{{ 'social_share.css' | asset_url | stylesheet_tag }}
+<div class="social-share">
+  <div class="flex align-items-center justify-content-{{section.settings.text_align | replace: 'left', 'start' | replace: 'right', 'end'}}">
+    <div class="native-share-wrap hide">
+      <button class="btn social native-share" aria-label="{{ 'social_share_article.share_post_caption' | t | escape }}" data-url="{{ shop.url }}{{ article.url }}">{% render 'icons', icon: 'share' %}</button>
+    </div>
+    <div class="custom-share-wrap">
+      <div class="flex align-items-center justify-content-center">
+        {%- assign url = shop.url | append: article.url -%}
+        <a target="_blank" class="btn social" aria-label="{{ 'social_share_article.share_via_email_caption' | t | escape }}" href="mailto:?subject={{ 'social_share_article.share_via_email_subject' | t | escape }}&amp;body={{ 'social_share_article.share_via_email_body' | t: url: url | escape }}">{% render 'icons', icon: 'email' %}</a>
+        <a target="_blank" class="btn social" aria-label="{{ 'social_share_article.share_on_twitter_caption' | t | escape }}" href="https://twitter.com/intent/tweet?url={{ shop.url }}{{ product.url }}&text={{ article.title | strip_html | escape | replace: ' ', '%20' }}">{% render 'icons', icon: 'twitter' %}</a>
+        <a target="_blank" class="btn social" aria-label="{{ 'social_share_article.share_on_facebook_caption' | t | escape }}" href="https://www.facebook.com/sharer/sharer.php?u={{ shop.url }}{{ article.url }}&text={{ article.title }}">{% render 'icons', icon: 'facebook' %}</a>
+        <a target="_blank" class="btn social" aria-label="{{ 'social_share_article.share_on_pinterest_caption' | t | escape }}" href="//pinterest.com/pin/create/button/?url={{ shop.url }}{{ article.url }}&media={{ article.image.src | image_url }}&description={{ article.title | strip_html }}">{% render 'icons', icon: 'pinterest' %}</a>
+      </div>
+    </div>
+  </div>
+</div>
+<script src="{{ 'social_share.js' | asset_url }}" defer="defer"></script>

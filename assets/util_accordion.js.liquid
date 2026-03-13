@@ -1,0 +1,65 @@
+if(!customElements.get('util-accordion')) {
+  class UtilAccordion extends HTMLElement {
+    constructor() {
+      super();
+      this.init();
+    }
+    
+    /* init can be called multiple times when new accordions are added dynamically */
+    init() {
+      var self = this;
+      var expandMultiple = this.dataset.expandMultiple=='true';
+      var filters = this.querySelectorAll('.category-filter');
+      this.accordions = Array.from(this.querySelectorAll('.accordion'));
+      filters.forEach(filter=>{
+        if (filter.initialized) {
+          return;
+        }
+        filter.initialized = true;
+        filter.addEventListener('change', ()=>{
+          const filterWrap = filter.closest('.category-filter-wrap');
+          const siblingAccordions = filterWrap.parentNode.querySelectorAll(':not(.accordion) .accordion');
+          siblingAccordions.forEach(function(accordionItem){
+            accordionItem.style.display = accordionItem.dataset.category==filter.value ? '' : 'none';
+          });
+        });
+      });
+      this.accordions.forEach(function(accordionItem) {
+        if (accordionItem.initialized) {
+          return;
+        }
+        accordionItem.initialized = true;
+        var button = accordionItem.querySelector('button[aria-expanded]');
+        var panel = accordionItem.querySelector('[role="region"]');
+        button.addEventListener('click', function(event) {
+          if (button.getAttribute('aria-expanded')=='true') {
+            button.setAttribute('aria-expanded', 'false');
+            accordionItem.classList.remove('open');
+            $s.collapse(panel);
+          } else {
+            button.setAttribute('aria-expanded', 'true');
+            accordionItem.classList.add('open');
+            $s.expand(panel);
+            if (!expandMultiple) {
+              //close other panels
+              const accordionParent = button.closest('.accordion').parentNode.parentNode;
+              var allButtonsExpanded = accordionParent.querySelectorAll('.accordion' + (accordionItem.dataset.category ? '[data-category="'+accordionItem.dataset.category+'"]' : '') + ' button[aria-expanded="true"]');
+              allButtonsExpanded.forEach(function(buttonExpanded) {
+                if (buttonExpanded!=button && buttonExpanded.parentNode.parentNode.parentNode==button.parentNode.parentNode.parentNode) {
+                  var thisAccordion = buttonExpanded.closest('.accordion');
+                  var thisPanel = thisAccordion.querySelector('[role="region"]');
+                  buttonExpanded.setAttribute('aria-expanded', 'false');
+                  thisAccordion.classList.remove('open');
+                  $s.collapse(thisPanel);
+                }
+              })
+            }
+          }
+        });
+      });
+    }
+
+  }
+  customElements.define('util-accordion', UtilAccordion);
+
+}

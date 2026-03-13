@@ -1,0 +1,35 @@
+<div class="grid-item">
+  {%- render 'richtext_blocks', blockType: 'content_badge', block: block -%}
+</div>
+{% schema %}
+{
+  "name": "Badge",
+  "tag": null,
+  "presets": [
+    {
+      "name": "Badge",
+      "category": "Content",
+      "blocks": [
+      ]
+    }
+  ],
+  "settings": [
+    {
+      "type": "text",
+      "id": "badge",
+      "label": "Badge",
+      "default": "Limited"
+    },
+    {
+      "type": "select",
+      "id": "style",
+      "label": "Style",
+      "options": [
+        {"value": "pill", "label": "Pill"},
+        {"value": "round", "label": "Round"}
+      ],
+      "default": "pill"
+    }
+  ]
+}
+{% endschema %}

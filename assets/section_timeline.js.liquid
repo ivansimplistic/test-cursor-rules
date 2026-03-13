@@ -1,0 +1,35 @@
+if(!customElements.get('section-timeline')) {
+  class SectionTimeline extends HTMLElement {
+    constructor() {
+      super();
+      var section = this;
+
+      var beginEnd = function(){
+        var stepsOffset = section.querySelector('.steps').getBoundingClientRect().top + window.scrollY;
+        var begin = stepsOffset - window.innerHeight + (window.innerHeight / 2.75);
+        var end = begin + section.querySelector('.steps').offsetHeight - section.querySelector('.steps .item.last').offsetHeight + 2;
+        var lineHeight = end - begin;
+        if (window.scrollY >= begin && window.scrollY <= end){
+          lineHeight = window.scrollY - begin;
+        } else if (window.scrollY < begin) {
+          lineHeight = 0;
+        }
+        section.querySelector('.line').style.height = lineHeight + 'px';
+        section.querySelectorAll('.item').forEach(function(element){
+          var appear = (element.getBoundingClientRect().top + window.scrollY) - window.innerHeight + (window.innerHeight / 2.75);
+          if (window.scrollY >= appear){
+            element.classList.add('appear');
+          }else{
+            element.classList.remove('appear');
+          }
+        });
+      }
+      beginEnd();
+      window.addEventListener('scroll', (e)=> {
+        beginEnd();
+      });
+    
+    }
+  }
+  customElements.define('section-timeline', SectionTimeline);
+}

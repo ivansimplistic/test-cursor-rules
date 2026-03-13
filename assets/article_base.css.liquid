@@ -1,0 +1,36 @@
+.article {margin: var(--global-sections-padding) auto;}
+.article h1 {text-align: center;}
+.article hr {border: none; border-bottom: 1px solid #999; width: 10%; margin: 2em auto;}
+.article .excerpt {opacity: 0.7; padding-bottom: 1em; margin-bottom: 1em;}
+.article .featured-image {margin-top: 2em;}
+
+.article .body h2:not(:first-child), .article .body h3, .article .body h4, .article .body h5, .article .body h6 {margin-top: 1em;}
+.article .body img {max-width: 40em;}
+.article .body th {text-align: inherit; font-weight: 700; padding: 0.4em;}
+.article .body td {padding: 0.4em;}
+
+.article .foot {padding-top: 2em; margin-top: 4em;}
+.article .foot a {margin-bottom: 1.5em;}
+.article .foot a svg {margin-right: 0.5em; -webkit-transition: all var(--animation-speed-fast) ease-out; -moz-transition: all var(--animation-speed-fast) ease-out; -o-transition: all var(--animation-speed-fast) ease-out; -ms-transition: all var(--animation-speed-fast) ease-out; transition: all var(--animation-speed-fast) ease-out;}
+.article .foot .nav a:last-child:not(:first-child) {margin-left: 1.5em; padding-left: 1.5em; border-left: 1px solid var(--scheme-borders-color);;}
+.article .foot a.next svg {margin-left: 0.5em; margin-right: 0;}
+.not-mobile .article .foot a:hover svg {-webkit-transform: translateX(-3px); transform: translateX(-3px);}
+.not-mobile .article .foot a.next:hover svg {-webkit-transform: translateX(3px); transform: translateX(3px);}
+
+.comments .sharing {margin-top: 2rem;}
+.comments .sharing a {margin-left: 0.5em;}
+.comments .comment {position: relative; margin-bottom: 2em; padding-bottom: 2em;}
+.comments .comment .comment-author {font-weight: 700;}
+.comments .comment .content {margin-top: 1.5rem; font-style: italic;}
+.comments .new-comment {--grid-gap: 1.5rem;}
+.comments .new-comment .field {margin-bottom: var(--grid-gap);}
+.comments .form-success {color: {{settings.color_success}};}
+
+.comments {padding: 3em; margin-top: 3em; position: relative; border-radius: var(--comments-border-radius);}
+.comments > * {position: relative;}
+.comments.same-scheme:not(.scheme-border-box) {padding: 0 !important;}
+
+@media (max-width: {{settings.breakpoint_tablet}}){
+  .article .foot {margin-top: 2em;}
+  .comments {padding: 1.5em; margin-top: 2em;}
+}

@@ -1,0 +1,18 @@
+.contact-main {display: block; width: 100%;}
+.contact-main .success-msg, 
+.contact-main .error-msg:not(:empty) {margin-bottom: 1rem;}
+.contact-main .success-msg {font-size: 1.5em;}
+.contact-main .grid-item {margin-bottom: 1.5em;}
+.contact-main .grid {margin-left: -1em;}
+.contact-main .grid-item {padding-left: 1em;}
+.contact-main .grid-item:last-child .field {margin-bottom: 0;}
+.contact-main .btn-wrap {margin-top: 0;}
+.contact-main .radio-group .small-label {margin-bottom: 1em;}
+.contact-main .radio-group .options.flex .radio-field:not(:last-child) {margin-right: 1.5em;}
+.contact-main .radio-group .options:not(.flex) .radio-field:not(:last-child) {margin-bottom: 0.5em;}
+@media (min-width: {{settings.breakpoint_mobile | plus: 0.001}}em){
+  .contact-main .grid-item:not(.one-whole) {flex: 1 0 50%;}
+}
+@media (max-width: {{settings.breakpoint_mobile}}){
+  .contact-main .grid-item:not(.one-whole) {flex: 1 0 100%;}
+}

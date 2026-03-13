@@ -1,0 +1,36 @@
+{
+  "name": "Bottom sections group",
+  "type": "footer",
+  "sections": {
+    "richtext": {
+      "type": "richtext",
+      "blocks": {
+        "content_text-0": {
+          "type": "content_text",
+          "settings": {
+            "text": "<p>Bottom Global Sections</p>",
+            "text_style": "subheading"
+          }
+        }
+      },
+      "settings": {
+        "text_position": "center",
+        "text_align": "center",
+        "text_position_mobile": "center",
+        "text_align_mobile": "center",
+        "text_border_radius": 0,
+        "full_width": true,
+        "text_padding": 10,
+        "text_padding_mobile": 10,
+        "section_padding_top": 0,
+        "section_padding_bottom": 0        
+      },
+      "block_order": [
+        "content_text-0"
+      ]
+    }
+  },
+  "order": [
+    "richtext"
+  ]
+}

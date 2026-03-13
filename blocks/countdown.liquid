@@ -1,0 +1,112 @@
+<div class="grid-item">
+  {%- render 'richtext_blocks', blockType: 'countdown', block: block -%}
+</div>
+{% schema %}
+{
+  "name": "Countdown",
+  "tag": null,
+  "presets": [
+    {
+      "name": "Countdown",
+      "category": "Content",
+      "blocks": [
+      ]
+    }
+  ],
+  "settings": [
+    {
+      "type": "paragraph",
+      "content": "Block disabled when the Date is empty (useful for dynamic source)."
+    },
+    {
+      "type": "text",
+      "id": "date",
+      "label": "Date (count down from)",
+      "default": "Jan 1, 2024 00:00:01",
+      "info": "For the countdown. Format: Jan 1, 2023 00:00:01."
+    },
+    {
+      "type": "text",
+      "id": "timezone",
+      "label": "Timezone",
+      "default": "-5",
+      "info": "Write -4 for EDT (summer time). Write -5 for EST (winter time)."
+    }, 
+    {
+      "type": "richtext",
+      "id": "text_while_countdown",
+      "label": "Text before time is up",
+      "info": "Show this text while the countdown is active."
+    }, 
+    {
+      "type": "richtext",
+      "id": "default",
+      "label": "Show when time is up",
+      "default": "<p>Time is up! You can always subscribe to our newsletter to get first dibs on our deals.</p>",
+      "info": "This text is displayed instead of the countdown when the time is up."
+    },
+    {
+      "type": "header",
+      "content": "Styles"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_days",
+      "label": "Show 'days' module",
+      "default": true
+    },
+    {
+      "type": "select",
+      "id": "numbers_text_style",
+      "label": "Numbers text style",
+      "options": [
+        {"value": "normal","label": "Body"},
+        {"value": "heading-font","label": "Heading"}
+      ],
+      "default": "normal"
+    },
+    {
+      "type": "select",
+      "id": "size",
+      "label": "Size",
+      "options": [
+        {"value": "small","label": "Small"},
+        {"value": "medium","label": "Medium"},
+        {"value": "large","label": "Large"}
+      ],
+      "default": "small"
+    },
+    {
+      "type": "header",
+      "content": "Colors"
+    },
+    {
+      "type": "color",
+      "alpha": true,
+      "id": "background_color",
+      "label": "Background color",
+      "default": "#ffffff99"
+    },
+    {
+      "type": "color",
+      "id": "border_color",
+      "label": "Border color",
+      "alpha": true,
+      "default": "#ffffff33"
+    },
+    {
+      "type": "color",
+      "id": "label_color",
+      "label": "Numbers color",
+      "default": "#000000"
+    },
+    {
+      "type": "color",
+      "id": "extras_color",
+      "label": "Extras color",
+      "alpha": true,
+      "default": "#ffffff66"
+    }
+  ]
+}
+{% endschema %}

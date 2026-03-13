@@ -1,0 +1,212 @@
+{%- assign blockType = blockType | default: block.type -%}
+
+{%- liquid 
+  assign disableLazySizes = false
+  if section.index == 1 
+    assign disableLazySizes = true
+  endif
+-%}
+
+{% if blockType contains 'content_' %}
+  {%- if block.settings.badge != blank -%}
+    {%- assign showContent = true -%}
+    <div class="badge-wrap {{block.settings.style}}" {{ block.shopify_attributes }}>
+      <div class="badge {{block.settings.style}} {{block.settings.badge | handle}}">{{block.settings.badge | replace: '[Store Name]', shop.name}}</div>
+    </div>
+  {%- endif -%}
+  {%- if block.settings.title != blank -%}
+    {%- assign showContent = true -%}
+    {{ '<' }}{%- if block.settings.is_h1 -%}h1{%- else -%}h2{%- endif %} class="title {{block.settings.title_size | replace: 0, '1-xl' | replace: -1, '1-xxl' | prepend: 'h' }}" {{ block.shopify_attributes }}{{ '>' }}
+      {{block.settings.title | replace: '[br]', '<br aria-hidden="true" />' | replace: '[hi]', '<span class="highlight">' | replace: '[/hi]', '</span>' |  replace: '[hi2]', '<span class="highlight2">' | replace: '[/hi2]', '</span>'}}
+    {{ '</' }}{%- if block.settings.is_h1 -%}h1{%- else -%}h2{%- endif -%}{{ '>' }}
+  {%- endif -%}
+  {%- if block.settings.text != blank and block.settings.text != '<p></p>' -%}
+    {%- assign showContent = true -%}
+    <div class="text {{block.settings.text_style}} {{block.settings.text_size | prepend: 'p'}}" {{ block.shopify_attributes }}>{{block.settings.text | replace: '[Store Name]', shop.name | replace: '[[', '<span class="code highlight">' | replace: ']]', '</span>'}}</div>
+  {%- endif -%}
+  {%- liquid
+    if block.settings.block_height != blank
+      assign height = block.settings.block_height | replace: 'small', '40rem' | replace: 'medium', '55rem' | replace: 'large', '70rem' | replace: 'window_height', 'var(--visible-height)'
+      assign heightMobile = block.settings.block_height_mobile | replace: 'small', '30rem' | replace: 'medium', '45rem' | replace: 'large', '60rem' | replace: 'window_height', 'var(--visible-height)'
+    else
+      assign height = ''
+      assign heightMobile = ''
+    endif
+  -%}
+  {%- if blockType == 'content_image' -%}
+    {% comment %}If image==blank, image will be rendered as a placeholder{% endcomment %}
+    {%- assign showContent = true -%}
+    <div class="media-block block-{{block.id}} {% if block.settings.caption != blank %}caption-true{% endif %} {% if block.settings.caption_position == 'right' %}caption-right{% endif %}" {{ block.shopify_attributes }}>
+      <style>
+        .block-{{block.id}} {
+          --media-block-width: {{block.settings.width}}{%- if block.settings.caption != blank -%}rem{%- else -%}%{%- endif -%};
+          --media-block-border-radius: {{block.settings.border_radius}}em;
+          {%- if height != blank -%}
+            --media-block-height: {{ height }};
+          {%- endif -%}
+          --media-block-caption-spacing: {{block.settings.caption_spacing}}rem;
+        }
+        @media(max-width:{{settings.breakpoint_mobile}}){
+          .block-{{block.id}} {
+            --media-block-width: {{block.settings.width_mobile}}{%- if block.settings.caption != blank -%}rem{%- else -%}%{%- endif -%};
+            {%- if heightMobile != blank -%}
+              --media-block-height: {{ heightMobile }};
+            {%- endif -%}
+            --media-block-caption-spacing: {{block.settings.caption_spacing_mobile}}rem;
+          }
+        }
+      </style>
+      {{ '<' }}{%- if block.settings.link != blank -%}a href="{{block.settings.link}}"{%- else -%}div{%- endif %} class="{% if block.settings.caption_position == 'right' %}flex align-items-center{% endif %}"{{ '>' }}
+        <img alt="{{block.settings.image.alt}}" class="{% unless disableLazySizes %}lazyload{% endunless %} {% if block.settings.border %}scheme-border-box{% endif %} {% if block.settings.caption != blank %}{% if section.settings.text_align == 'center' %}large--center{% endif %} {% if section.settings.text_align_mobile == 'center' %}medium-down--center{% endif %}{% endif %}" data-sizes="auto" src="{% render 'image_placeholder', image: block.settings.image %}" {% if disableLazySizes %}fetchpriority="high" {% else %}data-{% endif %}srcset="{% render 'lazy_src', image: block.settings.image %}" width="{{ block.settings.image.width }}" height="{{ block.settings.image.height }}" {% if block.settings.image.presentation.focal_point != blank %}style="object-position: {{block.settings.image.presentation.focal_point}};"{% endif %} />
+        {%- if block.settings.caption != blank and block.settings.caption != '<p></p>' -%}
+          <div class="caption {{block.settings.caption_size | prepend: 'p'}} {{block.settings.caption_style}}">{{block.settings.caption}}</div>
+        {%- endif -%}
+      {{ '</' }}{%- if block.settings.link != blank -%}a{%- else -%}div{%- endif %}{{ '>' }}
+    </div>
+  {%- endif -%}
+  {%- if block.settings.video_mp4 != blank or block.settings.video_iframe != blank -%}
+    {%- assign showContent = true -%}
+    <div class="media-block block-{{block.id}}" {{ block.shopify_attributes }}>
+      <style>
+        .block-{{block.id}} {
+          --media-block-width: {{block.settings.width}}%;
+          --media-block-border-radius: {{block.settings.border_radius}}em; 
+          {%- if height != blank -%}
+            --media-block-height: {{ height | replace: 'auto', '56.25%' }};
+          {%- else -%}
+            --media-block-height: {{block.settings.video_orientation | replace: 'landscape', '56.25%' | replace: 'square', '100%' | replace: 'portrait', '150%' | default: '100%' }};
+          {%- endif -%}
+          --media-block-caption-spacing: {{block.settings.caption_spacing}}rem;
+        }
+        @media(max-width:{{settings.breakpoint_mobile}}){
+          .block-{{block.id}} {
+            --media-block-width: {{block.settings.width_mobile}}%; 
+            --media-block-caption-spacing: {{block.settings.caption_spacing_mobile}}rem;
+            {%- if heightMobile != blank -%}
+              --media-block-height: {{ heightMobile | replace: 'auto', '56.25%'}};
+            {%- endif -%}
+          }
+        }
+      </style>
+      {%- if block.settings.video_mp4 != blank -%}
+        <div class="media-wrap block-mp4 {% if block.settings.border %}scheme-border-box{% endif %}">
+          {%- render 'media_video_html', section: block -%}
+        </div>
+      {%- elsif block.settings.video_iframe != blank -%}
+        <div class="iframe-block-wrap {% if block.settings.border %}scheme-border-box{% endif %}">
+          {%- render 'media_video_html', section: block -%}
+        </div>
+      {%- endif -%}
+      {%- if block.settings.caption != blank and block.settings.caption != '<p></p>' -%}
+        <div class="caption {{block.settings.caption_size | prepend: 'p'}} {{block.settings.caption_style}}">{{block.settings.caption}}</div>
+      {%- endif -%}
+    </div>
+  {%- endif -%}
+  {%- if block.settings.liquid != blank -%}
+    {%- assign showContent = true -%}
+    <div class="liquid" {{ block.shopify_attributes }}>{{block.settings.liquid}}</div>
+  {%- endif -%}
+  {%- if block.settings.button != blank or block.settings.button_2 != blank -%}
+    {%- assign showContent = true -%}
+    <div class="btn-wrap" {{ block.shopify_attributes }}>
+      {%- if block.settings.button != blank -%}
+        {%- if block.settings.cta_style contains 'link' and settings.links_arrow != 'none' -%}
+          {%- capture linkIcon -%}{%- render 'icons', icon: settings.links_arrow -%}{%- endcapture -%}
+        {%- endif -%}
+        <a href="{{block.settings.link}}" class="{{block.settings.cta_style}}">
+          {{block.settings.button}}{{linkIcon}}
+        </a>
+      {%- endif -%}
+      {%- if block.settings.button_2 != blank -%}
+        {%- if block.settings.cta_style2 contains 'link' and settings.links_arrow != 'none' -%}
+          {%- capture linkIcon2 -%}{%- render 'icons', icon: settings.links_arrow -%}{%- endcapture -%}
+        {%- endif -%}
+        <a href="{{block.settings.link_2}}" class="{{block.settings.cta_style2}}">
+          {{block.settings.button_2}}{{linkIcon2}}
+        </a>
+      {%- endif -%}
+    </div>
+  {%- endif -%}
+{%- elsif blockType == 'separator' -%}
+  <div class="separator large--border-{{block.settings.border}} medium-down--border-{{block.settings.border_mobile}} block-{{block.id}}" {{ block.shopify_attributes }}>
+    <style>@media (min-width: {{settings.breakpoint_tablet | plus: 0.001}}em){.block-{{block.id}} {--padding: {{block.settings.padding}}rem;}} @media (max-width: {{settings.breakpoint_tablet}}){.block-{{block.id}} {--padding: {{block.settings.padding_mobile}}rem;}}</style>
+  </div>
+{%- elsif blockType == 'info_cards' -%}
+  {%- assign showContent = true -%}
+  <div class="richtext-info-cards block-{{block.id}} {% if block.settings.border_around %}scheme-border-box{% endif %}" {{ block.shopify_attributes }}>
+    <div class="grid">
+      {%- render 'richtext_info_cards', section: section, block: block -%}
+    </div>
+  </div>
+{%- elsif blockType == 'decorative_image' -%}
+  {%- if block.settings.image != blank -%}
+    <div class="block-{{block.id}} decorative-image one-whole {% unless block.settings.show_on_desktop %}large--hide{% endunless %} {% unless block.settings.show_on_tablet %}medium--hide{% endunless %} {% unless block.settings.show_on_mobile %}small--hide{% endunless %}" {{ block.shopify_attributes }}>
+      <style>
+        .block-{{block.id}} { margin: 0; {% if block.settings.relative_to == 'block' %}position: relative;{% endif %} }
+        .block-{{block.id}} .img-wrapper {position: absolute; z-index: 1; border-radius: {{block.settings.border_radius | replace: '10', '1000'}}em; {% if block.settings.shadow %}box-shadow: var(--floating-box-shadow);{% endif %}}
+        .block-{{block.id}} .img-wrapper > * {border-radius: inherit;}
+        @media (min-width: {{settings.breakpoint_tablet | plus: 0.001}}em) {
+          .block-{{block.id}} .img-wrapper {width: {{block.settings.image_width_desktop}}%; {{block.settings.image_css_desktop}}; }
+        }
+        @media (max-width: {{settings.breakpoint_tablet}}) and (min-width: {{settings.breakpoint_mobile | plus: 0.001}}em) {
+          .block-{{block.id}} .img-wrapper {width: {{block.settings.image_width_tablet}}%; {{block.settings.image_css_tablet}}; }
+        }
+        @media (max-width: {{settings.breakpoint_mobile}}){
+          .block-{{block.id}} .img-wrapper {width: {{block.settings.image_width_mobile}}%; {{block.settings.image_css_mobile}}; }
+        }
+        {%- assign blockId = '.block-' | append: block.id -%}
+        {{block.settings.custom_css | replace: '[BLOCKID]', blockId}}
+      </style>
+      <div class="decorative-image-inner">
+        <div class="img-wrapper">
+          {%- if block.settings.image != blank -%}
+            <img alt="{{block.settings.image.alt | escape}}" class="{% unless disableLazySizes %}lazyload{% endunless %} {% if block.settings.border %}scheme-border-box{% endif %}" data-sizes="auto" src="{% render 'image_placeholder', image: block.settings.image %}" {% if disableLazySizes %}fetchpriority="high" {% else %}data-{% endif %}srcset="{% render 'lazy_src', image: block.settings.image %}" width="{{ block.settings.image.width }}" height="{{ block.settings.image.height }}" {% if block.settings.image.presentation.focal_point != blank %}style="object-position: {{block.settings.image.presentation.focal_point}};"{% endif %} />
+          {%- endif -%}
+        </div>
+      </div>
+    </div>
+  {%- endif -%}
+{%- elsif blockType == 'accordion_item' -%}
+  {%- assign showContent = true -%}
+  <div class="accordion {% if block.settings.accordion_border_bottom %}scheme-border-bottom{% endif %} {% if block.settings.accordion_border_top %}scheme-border-top{% endif %} block-{{block.id}}" {{ block.shopify_attributes }}>
+    {%- if block.settings.image != blank -%}
+      <style>
+        .block-{{block.id}} {
+          --accordion-image-width: {{block.settings.image_width}}em;
+          --accordion-image-border-radius: {{block.settings.image_border_radius}}em;
+        }
+      </style>
+    {%- endif -%}
+    <button type="button" aria-expanded="false" class="accordion-trigger {% if block.settings.image != blank %}has-image{% endif %}" aria-controls="panel-{{section.id}}-{{block.id}}" id="button-{{section.id}}-{{block.id}}">
+      <div class="accordion-title flex align-items-center">
+        {%- if block.settings.image != blank -%}
+          <img alt="{{block.settings.image.alt}}" class="{% unless disableLazySizes %}lazyload{% endunless %} {% if block.settings.image_border %}scheme-border-box{% endif %}" data-sizes="auto" src="{% render 'image_placeholder', image: block.settings.image %}" {% if disableLazySizes %}fetchpriority="high" {% else %}data-{% endif %}srcset="{% render 'lazy_src', image: block.settings.image %}" width="{{ block.settings.image.width }}" height="{{ block.settings.image.height }}" {% if block.settings.image.presentation.focal_point != blank %}style="object-position: {{block.settings.image.presentation.focal_point}};"{% endif %} />
+        {%- endif -%}
+        <div class="{{block.settings.title_style}} {{block.settings.title_size | prepend: 'p'}}">{{block.settings.title}}</div>
+      </div>
+      <div class="accordion-icon {{settings.accordions_icon}}"><i></i></div>
+    </button>
+    <div id="panel-{{section.id}}-{{block.id}}" role="region" aria-labelledby="button-{{section.id}}-{{block.id}}" class="accordion-panel expandable">
+      <div class="{{block.settings.text_size | prepend: 'p'}}">{{block.settings.content}}</div>
+      {{ customContent }}
+    </div>
+  </div>
+{%- elsif blockType == 'newsletter_form' -%}
+  {%- assign showContent = true -%}
+  <div class="newsletter-form block-{{block.id}}" {{ block.shopify_attributes }}>
+    {%- render 'newsletter_form', block: block -%}
+  </div>
+{%- elsif blockType == 'password_form' -%}
+  {%- assign showContent = true -%}
+  <div class="password-block" {{ block.shopify_attributes }}>
+    {%- render 'password_form', block: block -%}
+  </div>
+{%- elsif blockType == 'countdown' and block.settings.date != blank -%}
+  {%- assign showContent = true -%}
+  <div class="countdown-block" {{ block.shopify_attributes }}>
+    {%- render 'util_countdown', block: block -%}
+  </div>
+{%- endif -%}
+{%- if showContent -%}
+<!-- CONTENT: TRUE -->
+{%- endif -%}

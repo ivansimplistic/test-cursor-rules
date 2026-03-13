@@ -1,0 +1,167 @@
+{%- liquid 
+  assign disableLazySizes = false
+  assign deferContent = false
+  if section.index <= 1
+    assign disableLazySizes = true
+  elsif section.settings.video_mp4 != blank or section.settings.video_iframe != blank or section.settings.video_mp4_mobile != blank or section.settings.video_iframe_mobile != blank
+    assign deferContent = true
+  endif
+-%}
+<style>
+  #shopify-section-{{section.id}} {display: none;}
+</style>
+
+<div id="{{section.id}}">
+  {%- if deferContent -%}
+    <script src="{{ 'component_deferred_content.js' | asset_url }}" defer="defer"></script>
+    <deferred-content data-mode="scroll" data-offset="75%">
+      <template id="deferred-content-{{section.id}}">
+    {%- endif -%}
+    
+  {%- if section.settings.video_mp4 != blank or section.settings.video_iframe != blank -%}
+    <div class="media-wrap video-wrap {% if section.settings.video_mp4_mobile != blank or section.settings.video_iframe_mobile != blank or section.settings.image_mobile != blank %}medium-down--hide{% endif %}">
+      {%- render 'media_video_html', section: section -%}
+    </div>
+  {%- elsif section.settings.image != blank -%}
+    <div class="media-wrap {% if section.settings.video_mp4_mobile != blank or section.settings.video_iframe_mobile != blank or section.settings.image_mobile != blank %}medium-down--hide{% endif %}">
+      <img alt="{{section.settings.image.alt}}" class="img media {% unless disableLazySizes %}lazyload{% endunless %}" data-sizes="auto" src="{% render 'image_placeholder', image: section.settings.image %}" {% if disableLazySizes %}fetchpriority="high" {% else %}data-{% endif %}srcset="{% render 'lazy_src', image: section.settings.image %}" width="{{ section.settings.image.width }}" height="{{ section.settings.image.height }}" {% if section.settings.image.presentation.focal_point != blank %}style="object-position: {{section.settings.image.presentation.focal_point}};"{% endif %} />
+    </div>
+  {%- endif -%}
+  {%- if section.settings.video_mp4_mobile != blank or section.settings.video_iframe_mobile != blank -%}
+    <div class="media-wrap video-wrap hide medium-down--show">
+      {%- render 'media_video_html', section: section, videoMp4: section.settings.video_mp4_mobile, videoIframe: section.settings.video_iframe_mobile -%}
+    </div>
+  {%- elsif section.settings.image_mobile != blank -%}
+    <div class="media-wrap hide medium-down--show">
+      <img alt="{{section.settings.image_mobile.alt}}" class="img media {% unless disableLazySizes %}lazyload{% endunless %}" data-sizes="auto" src="{% render 'image_placeholder', image: section.settings.image_mobile %}" {% if disableLazySizes %}fetchpriority="high" {% else %}data-{% endif %}srcset="{% render 'lazy_src', image: section.settings.image_mobile %}" width="{{ section.settings.image_mobile.width }}" height="{{ section.settings.image_mobile.height }}" {% if section.settings.image_mobile.presentation.focal_point != blank %}style="object-position: {{section.settings.image_mobile.presentation.focal_point}};"{% endif %} />
+    </div>
+  {%- endif -%}
+  
+  {%- if deferContent -%}
+      </template>
+    </deferred-content>
+  {%- endif -%}
+    
+</div>
+
+<script>
+  (function() {
+    const bg = document.getElementById('{{section.id}}');
+    const section = (bg.closest('.shopify-section') || bg).previousElementSibling;
+    bg.classList.remove('shopify-section');
+    bg.classList.add('background');
+    section.insertAdjacentElement('afterbegin', bg);
+    section.classList.add('custom-background', 'level-{{section.settings.child_level_transparency}}');
+  })()
+</script>
+
+{% schema %}
+  {
+    "name": "Prev Section Background",
+    "tag": "div",
+    "presets": [
+      {
+        "name": "Previous Section Background"
+      }
+    ],
+    "settings": [
+      {
+        "type": "paragraph",
+        "content": "This section moves itself into the previous section and gets styled to look as background. Using the same section and content color scheme settings could provide a different look than using different schemes. Limitations: this is a quick way to add a background to existing sections that don't have such feature, however it may not work properly for all sections."
+      },
+      {
+        "type": "select",
+        "id": "child_level_transparency",
+        "label": "Child level with transparency",
+        "options": [
+          {"value": "all", "label": "all"},
+          {"value": "1", "label": "1 (section)"},
+          {"value": "2", "label": "2 (content)"},
+          {"value": "3", "label": "3 (items)"}
+        ],
+        "default": "2",
+        "info": "It could be affected by other section settings."
+      },
+      {
+        "type": "header",
+        "content": "Desktop Media"
+      },
+      {
+        "type": "select",
+        "id": "media_type",
+        "label": "Media type",
+        "options": [
+          {"value": "image", "label": "Image"},
+          {"value": "video", "label": "Video"}
+        ],
+        "default": "image"
+      },
+      {
+        "visible_if": "{{ section.settings.media_type == 'image' }}",
+        "type": "image_picker",
+        "id": "image",
+        "label": "Image"
+      },
+      {
+        "visible_if": "{{ section.settings.media_type == 'video' }}",
+        "type": "video",
+        "id": "video_mp4",
+        "label": "Video (MP4)"
+      },
+      {
+        "visible_if": "{{ section.settings.media_type == 'video' }}",
+        "type": "video_url",
+        "id": "video_iframe",
+        "label": "Video (Youtube/Vimeo)",
+        "accept": ["youtube", "vimeo"]
+      },
+      {
+        "type": "header",
+        "content": "Mobile Media"
+      },
+      {
+        "type": "paragraph",
+        "content": "If left blank, Mobile inherits what was set up for Desktop."
+      },
+      {
+        "type": "select",
+        "id": "media_type_mobile",
+        "label": "Media type",
+        "options": [
+          {"value": "image", "label": "Image"},
+          {"value": "video", "label": "Video"}
+        ],
+        "default": "image"
+      },
+      {
+        "visible_if": "{{ section.settings.media_type_mobile == 'image' }}",
+        "type": "image_picker",
+        "id": "image_mobile",
+        "label": "Image"
+      },
+      {
+        "visible_if": "{{ section.settings.media_type_mobile == 'video' }}",
+        "type": "video",
+        "id": "video_mp4_mobile",
+        "label": "Video (MP4)"
+      },
+      {
+        "visible_if": "{{ section.settings.media_type_mobile == 'video' }}",
+        "type": "video_url",
+        "id": "video_iframe_mobile",
+        "label": "Video (Youtube/Vimeo)",
+        "accept": ["youtube", "vimeo"]
+      },
+      {
+        "type": "header",
+        "content": "Media Settings"
+      },
+      {
+        "type": "checkbox",
+        "id": "video_autoplay",
+        "label": "Video autoplay",
+        "default": true
+      }
+    ]
+  }
+{% endschema %}

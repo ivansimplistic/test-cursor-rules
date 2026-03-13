@@ -1,0 +1,200 @@
+<div id="side-cart" class="ease-animation scheme color-{{settings.modals_main_color_scheme}} slide-in-modal{% if section.settings.inner_scroll_items %} inner-scroll{% endif %}" role="dialog" aria-modal="true">
+  {% render 'remove_invalid_items', items: cart.items %}
+
+  <div class="content scheme flex direction-column">
+    <div class="head scheme color-{{settings.modals_heading_color_scheme}} {% if settings.modals_heading_border %}scheme-border-bottom{% endif %}">
+      <div class="title heading-font">{{ 'side_cart.title' | t }}</div>
+      <button class="close" aria-label="{{ 'side_cart.close_caption' | t }}">
+        {% render 'icons', icon: 'close' %}
+      </button>
+    </div>
+    <div class="wrap flex-1">
+      <div data-dynamic-content="sidecart">
+        {%- if cart.items == empty -%}
+          <div class="empty text-center">
+            <div class="title">
+              {% render 'icons', icon: 'product-tag' %}<br/>
+              {{ 'side_cart.cart_empty_message' | t }}
+            </div>
+            <a href="{{ routes.all_products_collection_url }}" class="btn">{{ 'cart.start_shopping_link' | t }}</a>
+          </div>
+        {%- else -%}
+          {%- render 'free_shipping_progress', cart: cart -%}
+          <div class="cart-items">
+            {% assign totalSaving = 0 %}
+            {%- for item in cart.items -%}
+              {%- unless item.properties['_bundle_item'] contains 'related_' -%}
+                {% # theme-check-disable DeprecatedTag %}
+                {%- include 'cart_item', item: item -%}
+                {% # theme-check-enable DeprecatedTag %}
+              {%- endunless -%}
+            {%- endfor -%}
+          </div>
+        {%- endif -%}
+
+        {%- render 'cart_featured_products', section: section, itemsDesktop: 2, itemsTablet: 2, itemsMobile: 2 -%}
+
+      </div>
+
+    
+    </div>
+    <div class="foot scheme color-{{settings.modals_extras_color_scheme}} {% if settings.modals_extras_border %}scheme-border-top{% endif %}" {% if cart.items == empty %}style="display: none;"{% endif %}>
+      <div data-dynamic-content="sidecart-foot">
+        <div class="subtotals {% if totalSaving > 0 %}flex flex-wrap align-items-center justify-content-between{% else %}justify-content-center{% endif %}">
+          <div class="subtotal">
+            <span>{{ 'cart.subtotal_label' | t }} </span><strong>{{ cart.total_price | money }}</strong>
+          </div>
+          {%- if totalSaving > 0 -%}
+            <div class="savings highlight">
+              {{ 'cart.savings_label' | t }} <strong>{{ totalSaving | money }}</strong>
+            </div>
+          {%- endif -%}
+          {%- if section.settings.payment_terms -%}
+            {%- form 'cart', cart -%}
+              <div class="payment-terms">
+                {{ form | payment_terms }}
+              </div>
+            {%- endform -%}
+          {%- endif -%}
+        </div>
+
+
+        {%- if settings.cart_note -%}      
+          <div class="cart-note-wrap cart-extra-module">
+            <div>
+              <input tabindex="-1" type="checkbox" id="checkbox-cart-note" class="checkbox-custom" {%- if cart.note != nil and cart.note != "" -%} checked="checked" {%- endif -%} />
+              <label tabindex="0" for="checkbox-cart-note" class="checkbox-cart-note-label checkbox-custom-label">{{settings.cart_note_label}}</label>
+            </div>
+            <div id="cart-note" class="cart-note hide">
+              <cart-property-field>
+                <div class="field textarea">
+                  <textarea placeholder="{{ 'general.forms.message_placeholder' | t }}" id="cart-note-textarea" name="note" maxlength="100" aria-label="{{settings.cart_note_label}}">{{ cart.note }}</textarea>
+                  <label for="cart-note-textarea">{{ 'cart.note_label' | t }}</label>
+                </div>
+              </cart-property-field>
+            </div>
+          </div>
+        {%- endif -%}
+
+        {%- if settings.cart_disclaimer_text != "" -%}
+          <div class="cart-disclaimer cart-extra-module">{{ settings.cart_disclaimer_text }}</div>
+        {%- endif -%}
+
+        {%- if settings.cart_custom_title1 != blank or settings.cart_custom_title2 != blank -%}
+          {%- if settings.cart_custom_style == 'accordion' -%}
+            {%- for i in (1..2) -%}
+              {% assign customTitle = 'cart_custom_title' | append: i %}
+              {% assign customText = 'cart_custom_text' | append: i %}
+              {%- if settings[customTitle] != "" -%}
+                <div class="cart-custom cart-extra-module">
+                  <button type="button" aria-expanded="false" class="cart-accordion-button one-whole flex align-items-center justify-content-between">
+                    <span>{{ settings[customTitle] }}</span>
+                    {% render 'icons', icon: 'chevron-down' %}
+                  </button>
+                  <div class="expandable">
+                    <div class="cart-accordion-text p4">{{ settings[customText] }}</div>
+                  </div>
+                </div>
+              {%- endif -%}
+            {%- endfor -%}
+          {%- else -%}
+            <div class="cart-extra-module flex">
+              {%- for i in (1..2) -%}
+                {% assign customTitle = 'cart_custom_title' | append: i %}
+                {% assign customText = 'cart_custom_text' | append: i %}
+                {%- if settings[customTitle] != "" -%}
+                  <div class="cart-custom flex-1 text-center">
+                    <button type="button" class="link cart-popup-button">
+                      <span>{{ settings[customTitle] }}</span>
+                    </button>
+                    <div class="hide">
+                      <div class="cart-popup-text scheme color-scheme-1"><h2 class="h3">{{ settings[customTitle] }}</h2>{{ settings[customText] }}</div>
+                    </div>
+                  </div>
+                {%- endif -%}
+              {%- endfor -%}
+            </div>
+          {%- endif -%}
+        {%- endif -%}
+        {%- if settings.cart_popuplink_title1 != blank or settings.cart_popuplink_title2 != blank -%}
+          <div class="cart-extra-module flex">
+            {%- for i in (1..2) -%}
+              {% assign customTitle = 'cart_popuplink_title' | append: i %}
+              {% assign customLink = 'cart_popuplink_link' | append: i %}
+              {% assign customIcon = 'cart_popuplink_icon' | append: i %}
+              {%- if settings[customTitle] != blank -%}
+                <div class="cart-custom flex-1 text-center">
+                  <button type="button" data-url="{{ settings[customLink] }}" class="cart-popuplink-button">
+                    {{ settings[customIcon] }}
+                    <span>{{ settings[customTitle] }}</span>
+                  </button>
+                </div>
+              {%- endif -%}
+            {%- endfor -%}
+          </div>
+        {%- endif -%}
+
+      </div>
+      
+      <div class="buttons-wrapper text-center">
+
+        <button type="button" name="checkout" class="btn btn-checkout one-whole" onclick="$s.checkout(this);">
+          {{ 'cart.checkout_link' | t }}
+        </button>
+
+        {%- if additional_checkout_buttons -%}
+          <div class="additional-checkout-buttons" data-dynamic-content="sidecart-checkout-buttons">
+            {%- if cart.items.size > 0  -%}
+              {{ content_for_additional_checkout_buttons }}
+            {%- endif -%}
+          </div>
+        {%- endif -%}
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script src="{{ 'side_cart.js' | asset_url }}" defer="defer"></script>
+{% if request.design_mode %}
+<script type="module">
+  var section = document.getElementById('shopify-section-{{section.id}}');
+  section.addEventListener('shopify:section:select', (e)=>{
+    if (SideCart) {
+      SideCart.showSideCart(true);
+    }
+  });
+  section.addEventListener('shopify:section:deselect', (e)=>{
+    if (SideCart) {
+      SideCart.hideSideCart(true);
+    }
+  });
+</script>
+{% endif %}
+
+
+{% schema %}
+  {
+    "name": "Side Cart",
+    "class": "type-side-cart",
+    "settings": [
+      {
+        "type": "header",
+        "content": "Settings"
+      },
+      {
+        "type": "checkbox",
+        "id": "inner_scroll_items",
+        "label": "Inner scrollable area",
+        "default": true,
+        "info": "Turns the items panel into an scrollable area, and sticks the footer area to the bottom. Applies only on minimum display height of 750px."
+      },
+      {
+        "type": "checkbox",
+        "id": "payment_terms",
+        "label": "Payment terms",
+        "info": "Shop Pay Installments will be displayed below the subtotal line if you have the feature enabled and this box checked."
+      }
+    ]
+  }
+{% endschema %}

@@ -1,0 +1,7 @@
+<a href="{{ routes.cart_url }}" class="trigger-cart item" aria-label="{{ 'top_utils_cart.open_cart_caption' | t | escape }}">
+  <span class="icon-badge-wrap">
+    {%- render 'icons', icon: 'cart' -%}
+    <div class="cart-count badge smaller">{% if cart.item_count > 0 %}{{cart.item_count}}{% endif %}</div>
+  </span>
+  <span class="label">{{ 'top_utils_cart.cart_caption' | t }}</span>
+</a>

@@ -1,0 +1,417 @@
+if(!customElements.get('page-manager')) {
+  class PageManager extends HTMLElement {
+    constructor() {
+      super();
+      this.sectionId = this.dataset.sectionId;
+      this.firstLoadedPage = parseInt(this.dataset.currentPage);
+      this.lastLoadedPage = parseInt(this.dataset.currentPage);
+      this.totalPages = parseInt(this.dataset.totalPages);
+      this.paginationMode = this.dataset.paginationMode;
+      this.itemsContainer = this.querySelector(this.dataset.itemsContainerSelector);
+      this.onHistoryChangeHandler = this.onHistoryChange.bind(this);
+      var multiplePageManagersExist = document.querySelectorAll('page-manager').length>1;
+      this.monitorHistoryChange = this.paginationMode=='pager' && !multiplePageManagersExist;
+      this.updateUrlPageParameter = !multiplePageManagersExist;
+      this.restoreScroll = this.paginationMode=='load_more' || this.paginationMode=='infinite_scroll';
+      this.lastSearchString = location.search;
+      if (this.restoreScroll) {
+        if (history.scrollRestoration) {
+          history.scrollRestoration = 'manual';
+        }
+        var top = history.state?.pscroll;
+        if (top) {
+          var pageStartDiv = this.querySelector('[data-page="'+ this.dataset.currentPage +'"]');
+          document.documentElement.scrollTop = document.body.scrollTop = pageStartDiv.offsetTop + top/1;
+        }
+      }
+
+      if (this.monitorHistoryChange) {
+        window.addEventListener('popstate', this.onHistoryChangeHandler);
+      }
+      if(this.paginationMode == 'infinite_scroll' || this.paginationMode == 'load_more') {
+        this.onScrollHandler = this.onScroll();
+        this.onResizeHandler = this.onResize();
+        this.pagesOffset = null;
+        this.currentPersistedPage = null;
+        window.addEventListener('scroll', this.onScrollHandler);
+        window.addEventListener('resize', this.onResizeHandler);
+      }
+
+      if (!$s.connectionDataSavingRating()) {
+        const pageNumber = parseInt(this.dataset.currentPage||1);
+        if (pageNumber < parseInt(this.dataset.totalPages||1) ) {
+          $s.preloadPage(this.getFormattedPageUrl(pageNumber + 1), true);
+        }
+        if (pageNumber > 1) {
+          $s.preloadPage(this.getFormattedPageUrl(pageNumber - 1), true);
+        }
+      }
+
+    }
+
+    getPageParam() {
+      return this.dataset.pageParam || 'page';
+    }
+
+    getFormattedPageUrl(pageNumberOrUrl) {
+      const url =  new URL(isNaN(pageNumberOrUrl) ? pageNumberOrUrl : location.href);
+      if (!isNaN(pageNumberOrUrl)) {
+        url.searchParams.set(this.getPageParam(), pageNumberOrUrl);
+      }
+      url.searchParams.set('sections', this.sectionId);
+      return url.toString();
+    }
+
+    disconnectedCallback() {
+      if (this.monitorHistoryChange) {
+        window.removeEventListener('popstate', this.onHistoryChangeHandler);
+      }
+      if(this.paginationMode == 'infinite_scroll' || this.paginationMode == 'load_more') {
+        window.removeEventListener('scroll', this.onScrollHandler);
+        window.removeEventListener('resize', this.onResizeHandler);
+      }
+    }
+
+    onHistoryChange(e) {
+      if (this.lastSearchString == window.location.search)
+        return;
+      $s.showLoadingOverlay();
+      this.loadPage(window.location.href, ()=>{
+        $s.hideLoadingOverlay();
+      }, false);
+    }
+
+    onScroll() {
+      return $s.throttle(this.updateCurrentUrl.bind(this), 500);
+    }
+
+    onResize() {
+      return $s.throttle(()=>{
+          this.pagesOffset = null;
+          this.updateCurrentUrl();
+        }, 500);
+    }
+
+    loadItems(pageNumber, callbackAfterUpdate, callbackBeforeUpdate) {
+      const url = this.getFormattedPageUrl(pageNumber);
+      $s.preloadPage(url, true).then((data)=>{
+        var html = data[this.sectionId];
+        var parser = new DOMParser();
+        var doc = parser.parseFromString(html, "text/html");
+        var items = doc.querySelectorAll(this.dataset.itemSelector);
+        if (callbackBeforeUpdate)
+          callbackBeforeUpdate(items);
+
+        if (items.length > 0) {
+          var newPage = items[0].getAttribute('data-page')/1;
+          var offsetContainer = this.itemsContainer;
+          var currentItems = offsetContainer.querySelectorAll(this.dataset.itemSelector+'[data-page]');
+          var offsetInsertMethod = 'beforeend';
+          for (var i=0; i<currentItems.length; i++) {
+            if (currentItems[i].getAttribute('data-page')/1 > newPage) {
+              offsetContainer = currentItems[i];
+              offsetInsertMethod = 'beforebegin';
+              break;
+            } else {
+              offsetContainer = currentItems[i];
+              offsetInsertMethod = 'afterend';
+            }
+          }
+
+          items.forEach(function(item) {
+            offsetContainer.insertAdjacentHTML(offsetInsertMethod, item.outerHTML);
+            if (offsetInsertMethod=='afterend') {
+              offsetContainer = offsetContainer.nextSibling;
+            }
+          });
+
+          this.lastLoadedPage = Math.max(pageNumber, this.lastLoadedPage);
+          this.firstLoadedPage = Math.min(pageNumber, this.firstLoadedPage);
+          this.pagesOffset = null;
+          this.updateCurrentUrl();
+        }
+
+        if (callbackAfterUpdate)
+          callbackAfterUpdate(items);
+
+        this.dispatchEvent(new CustomEvent('pageLoaded'));
+      })
+      if (!$s.connectionDataSavingRating()) {
+        if (pageNumber>1) {
+          $s.preloadPage(this.getFormattedPageUrl(pageNumber-1), true);
+        }
+        $s.preloadPage(this.getFormattedPageUrl(pageNumber+1), true);
+      }
+    }
+
+    loadPage(url, callback, updateHistory=true, callbackBeforeUpdate, updateHandler) {
+      if(url.indexOf(window.location.origin)<0) {
+        url = window.location.origin + url;
+      } 
+      url = new URL(url);
+      this.lastSearchString = url.search;
+      if(updateHistory && this.updateUrlPageParameter) {
+        if (this.monitorHistoryChange) {
+          history.pushState(url.toString(), '', url.toString());
+        } else {
+          history.replaceState(url.toString(), '', url.toString());
+        }
+      }
+
+      $s.preloadPage(this.getFormattedPageUrl(url), true).then((data)=>{
+        var html = data[this.sectionId];
+        var parser = new DOMParser();
+        var doc = parser.parseFromString(html, "text/html");
+
+        if (callbackBeforeUpdate) callbackBeforeUpdate(doc);
+
+        if (updateHandler) {
+          updateHandler(this, doc.querySelector('page-manager'));
+        } else {
+          this.parentNode.replaceChild(doc.querySelector('page-manager'), this);
+        }
+
+        if(callback) callback();
+        this.dispatchEvent(new CustomEvent('pageLoaded'));
+      });
+
+    }
+
+    updateCurrentUrl() {
+      if (!this.updateUrlPageParameter) {
+        return;
+      }
+      if(this.paginationMode == 'infinite_scroll' || this.paginationMode == 'load_more') {
+        if (!this.pagesOffset) {
+          this.pagesOffset = [];
+          //calculate offsets
+          var items = this.querySelectorAll(this.dataset.itemSelector+'[data-page]');
+          items.forEach((item)=>{
+            var page = item.getAttribute('data-page');
+            if (!this.pagesOffset[page]) {
+              this.pagesOffset[page] = {"number": page, "offset": item.offsetTop};
+            }
+          });
+        }
+
+        const offsetTop = document.documentElement.scrollTop || document.body.scrollTop;
+        var pages = Object.keys(this.pagesOffset).sort(function(a,b) {return a/1>b/1 ? 1 : -1});
+        var currentPage = 1;
+        const vHeight = (window.innerHeight || document.documentElement.clientHeight);
+        const gapTop = vHeight / 2;
+
+        for (var i=0; i<pages.length; i++) {
+          var page = this.pagesOffset[pages[i]];
+          if (page.offset - gapTop < offsetTop) {
+            currentPage = page.number;
+          } else {
+            break;
+          }
+        }
+
+        if (this.currentPersistedPage != currentPage || this.restoreScroll) {
+          this.currentPersistedPage = currentPage;
+          var url = new URL(location.href);
+          url.searchParams.set(this.getPageParam(), currentPage);
+          const state = {};
+          if (this.restoreScroll) {
+            var pageStartDiv = this.querySelector('[data-page="'+ this.currentPersistedPage +'"]');
+            if (pageStartDiv) {
+              var pageStartTop = pageStartDiv.offsetTop;
+              state.pscroll = (offsetTop - pageStartTop);
+            }
+          }
+          history.replaceState(state,'', url.toString());
+        }
+        
+      }
+    }
+  }
+  customElements.define('page-manager', PageManager);
+}
+
+if(!customElements.get('pagination-pager')) {
+  class PaginationPager extends HTMLElement {
+    constructor() {
+      super();
+      this.pageManager = this.closest('page-manager');
+      this.ajax = true;
+
+      if(this.ajax) {
+        this.querySelectorAll('a[href]:not(.disabled)').forEach((element)=>{
+          element.addEventListener('click', (e)=>{
+            e.preventDefault();
+            $s.showLoadingOverlay();
+            this.pageManager.loadPage(element.href, ()=>{
+              var newTop = document.querySelector(this.pageManager.dataset.itemsContainerSelector).offsetTop - document.getElementById('header').offsetHeight - 80
+              if (newTop<60) {
+                newTop = 0;
+              }
+              $s.hideLoadingOverlay();
+              window.scrollTo(0, newTop);
+            });
+          });
+        });
+      }
+    }
+  }
+  customElements.define('pagination-pager', PaginationPager);
+}
+
+if(!customElements.get('pagination-load-more')) {
+  class PaginationLoadMore extends HTMLElement {
+    constructor() {
+      super();
+      this.pageManager = this.closest('page-manager');
+      this.button = this.querySelector('button');
+      this.loading = this.querySelector('.pagination-loading');
+
+      this.button.addEventListener('click', ()=>{
+        this.loadMore();
+      });
+      this.ui();
+    }
+
+    ui() {
+      if(this.pageManager.lastLoadedPage < this.pageManager.totalPages) {
+        this.button.removeAttribute('disabled');
+        this.button.classList.remove('hide');
+      } else {
+        this.button.style.display = 'none';
+      }
+    }
+
+    loadMore() {
+      if (this.loading) {
+        this.loading.classList.remove('hide');
+      }
+      this.button.setAttribute('disabled', true);
+
+      this.pageManager.loadItems(this.pageManager.lastLoadedPage + 1, (items)=>{
+        if (this.loading) {
+          this.loading.classList.add('hide');
+        }
+        this.ui();
+      });
+    }
+  }
+  customElements.define('pagination-load-more', PaginationLoadMore);
+}
+
+if(!customElements.get('pagination-infinite-scroll')) {
+  class PaginationInfiniteScroll extends HTMLElement {
+    constructor() {
+      super();
+      this.type = this.dataset.type;
+      this.pageManager = this.closest('page-manager');
+      this.scrollDownHandler = this.onScrollDown.bind(this);
+      this.scrollUpHandler = this.onScrollUp.bind(this);
+      this.loading = this.querySelector('.pagination-loading');
+
+      if(this.type=='down') {
+        window.addEventListener('scroll', this.scrollDownHandler);
+        this.scrollDownHandler();
+      }
+      if(this.type=='up') {
+        window.addEventListener('scroll', this.scrollUpHandler);
+        this.scrollUpHandler();
+      }
+    }
+
+    onScrollDown() {
+      if ($s.isInViewport(this)) {
+        window.removeEventListener('scroll', this.scrollDownHandler);
+        if (this.pageManager.lastLoadedPage < this.pageManager.totalPages) {
+          if (this.loading)  {
+            this.loading.classList.remove('hide');
+          }
+          this.pageManager.loadItems(this.pageManager.lastLoadedPage + 1, (items)=>{
+            if (this.loading)  {
+              this.loading.classList.add('hide');
+            }
+            window.addEventListener('scroll', this.scrollDownHandler);
+          });
+        }
+      }
+    }
+
+    onScrollUp() {
+      var currentScrollTop;
+      var prevPageHeight;
+
+      if ($s.isInViewport(this)) {
+        window.removeEventListener('scroll', this.scrollUpHandler);
+        if (this.pageManager.firstLoadedPage > 1) {
+          if (this.loading)  {
+            this.loading.classList.remove('hide');
+          }
+          this.pageManager.loadItems(this.pageManager.firstLoadedPage- 1, (items)=>{
+            //after ui update;
+            if (this.loading)  {
+              this.loading.classList.add('hide');
+            }
+            if (this.pageManager.firstLoadedPage==1) {
+              this.parentNode.removeChild(this);
+            }
+            var diff = this.pageManager.offsetHeight - prevPageHeight;
+            document.documentElement.scrollTop = document.body.scrollTop = currentScrollTop + diff;
+            window.addEventListener('scroll', this.scrollUpHandler);
+          }, (items)=>{
+            //before ui update;
+            prevPageHeight = this.pageManager.offsetHeight;
+            currentScrollTop = document.documentElement.scrollTop || document.body.scrollTop
+          });
+        }
+      }
+    }
+  }
+  customElements.define('pagination-infinite-scroll', PaginationInfiniteScroll);
+
+  class PageResultsEnd extends HTMLElement {
+    constructor() {
+      super();
+      window.addEventListener('mediaChange', this.hideFeaturedItemsOutOfBounds.bind(this));  
+      this.hideFeaturedItemsOutOfBounds();
+      this.closest('page-manager').addEventListener('pageLoaded', this.hideFeaturedItemsOutOfBounds.bind(this));
+    }
+    hideFeaturedItemsOutOfBounds() {
+      var lastResult = this.previousElementSibling;
+      var lastResultBounds = lastResult ? lastResult.getBoundingClientRect() : {bottom: -100, height:0, left: -100, right: -100, top: -100, width:0, x: -100, y: -100};
+      var featuredItems = this.closest('page-manager').querySelectorAll('.collage-item');
+      featuredItems.forEach(item=> {
+        var itemBounds = item.getBoundingClientRect();
+        var visible = true && lastResultBounds.height > 0;
+        if (itemBounds.bottom == lastResultBounds.bottom) {
+          var lastResultStyle = window.getComputedStyle(lastResult);
+          var itemStyle = window.getComputedStyle(item);
+          if (!isNaN(itemStyle.gridRowStart) && !isNaN(itemStyle.gridRowEnd)) {
+            //for display Grid
+            if (itemBounds.left -1 > lastResultBounds.right) {
+              visible = false; //when they end at the same row but there is a space between them
+            } else {
+              var itemRowCount = itemStyle.gridRowEnd - itemStyle.gridRowStart;
+              if (itemRowCount>1) {
+                var estimatedRows = Math.round(itemBounds.height / lastResultBounds.height);
+                if (itemRowCount!=estimatedRows) {
+                  visible = false;  //when they end at the same row but the featured item should cover more rows (Grid Mode)
+                }
+              }
+            }
+          } else {
+            //for display Flex
+            if (lastResultStyle.order && itemStyle.order) {
+              if (lastResultStyle.order/1 + 1 < itemStyle.order/1) {
+                visible = false;
+              }
+            }
+          }
+        } else if (itemBounds.bottom > lastResultBounds.bottom || itemBounds.top >=lastResultBounds.bottom) {
+          visible = false;  //when the featured item is in the next row
+        }
+        
+        item.style.display = visible ? '' : 'none';
+      });
+    }
+  }
+  customElements.define('page-results-end', PageResultsEnd);
+}

@@ -1,0 +1,660 @@
+{%- render 'page_hero_content', section: section -%}
+
+{% schema %}
+  {
+    "name": "Collections Listing Hero",
+    "class": "type-collections-listing-hero",
+    "tag": "section",
+    "settings": [
+      {
+        "type": "header",
+        "content": "Colors"
+      },
+      {
+        "type": "color_scheme",
+        "id": "section_color_scheme",
+        "label": "Section color scheme",
+        "default": "scheme-1",
+        "info": "Only visible when the section is not full width, or the section top/bottom paddings are enabled."
+      },
+      {
+        "type": "color_scheme",
+        "id": "content_color_scheme",
+        "label": "Content color scheme",
+        "default": "scheme-2"
+      },
+      {
+        "type": "header",
+        "content": "Text Settings"
+      },
+      {
+        "type": "range",
+        "id": "text_width",
+        "min": 0,
+        "max": 100,
+        "step": 1,
+        "unit": "em",
+        "label": "Width (Desktop)",
+        "default": 50
+      },
+      {
+        "type": "select",
+        "id": "text_position",
+        "label": "Position (Desktop)",
+        "options": [
+          {"value": "start", "label": "Left"},
+          {"value": "center", "label": "Center"},
+          {"value": "end", "label": "Right"}
+        ],
+        "default": "start",
+        "info": "Within the Text column"
+      },
+      {
+        "type": "select",
+        "id": "text_align",
+        "label": "Alignment (Desktop)",
+        "options": [
+          {"value": "left", "label": "Left"},
+          {"value": "center", "label": "Center"},
+          {"value": "right", "label": "Right"}
+        ],
+        "default": "left"
+      },
+      {
+        "type": "range",
+        "id": "text_width_mobile",
+        "min": 0,
+        "max": 100,
+        "step": 1,
+        "unit": "em",
+        "label": "Width (Mobile)",
+        "default": 30
+      },
+      {
+        "type": "select",
+        "id": "text_position_mobile",
+        "label": "Position (Mobile)",
+        "options": [
+          {"value": "start", "label": "Left"},
+          {"value": "center", "label": "Center"},
+          {"value": "end", "label": "Right"}
+        ],
+        "default": "center",
+        "info": "Within the Text column"
+      },
+      {
+        "type": "select",
+        "id": "text_align_mobile",
+        "label": "Alignment (Mobile)",
+        "options": [
+          {"value": "left", "label": "Left"},
+          {"value": "center", "label": "Center"},
+          {"value": "right", "label": "Right"}
+        ],
+        "default": "center"
+      },
+      {
+        "type": "range",
+        "id": "text_border_radius",
+        "min": 0,
+        "max": 10,
+        "step": 0.2,
+        "unit": "em",
+        "label": "Border radius",
+        "default": 0
+      },
+      {
+        "type": "header",
+        "content": "Media Settings"
+      },
+      {
+        "type": "checkbox",
+        "id": "show_image",
+        "label": "Show image",
+        "default": true
+      },
+      {
+        "visible_if": "{{ section.settings.show_image == true }}",
+        "type": "image_picker",
+        "id": "image",
+        "label": "Image (Desktop)",
+        "info": "Leave blank to use the collection image."
+      },
+      {
+        "visible_if": "{{ section.settings.show_image == true }}",
+        "type": "image_picker",
+        "id": "image_mobile",
+        "label": "Image (Mobile)"
+      },
+      {
+        "visible_if": "{{ section.settings.show_image == true }}",
+        "type": "select",
+        "id": "image_position",
+        "label": "Media position (Desktop)",
+        "options": [
+          {"value": "normal", "label": "Left"},
+          {"value": "row-reverse", "label": "Right"}
+        ],
+        "default": "row-reverse"
+      },
+      {
+        "visible_if": "{{ section.settings.show_image == true }}",
+        "type": "select",
+        "id": "image_position_mobile",
+        "label": "Media position (Mobile)",
+        "options": [
+          {"value": "normal", "label": "Top"},
+          {"value": "column-reverse", "label": "Bottom"}
+        ],
+        "default": "normal"
+      },
+      {
+        "visible_if": "{{ section.settings.show_image == true }}",
+        "type": "range",
+        "id": "image_width",
+        "min": 0,
+        "max": 100,
+        "step": 1,
+        "unit": "%",
+        "label": "Media width",
+        "default": 50
+      },
+      {
+        "visible_if": "{{ section.settings.show_image == true }}",
+        "type": "select",
+        "id": "image_height",
+        "label": "Media height (Desktop)",
+        "options": [
+          {"value": "auto", "label": "Auto (media natural height)"},
+          {"value": "cover", "label": "Cover the height of the text column"},
+          {"value": "small","label": "Small"},
+          {"value": "medium","label": "Medium"},
+          {"value": "large","label": "Large"}
+        ],
+        "default": "medium"
+      },
+      {
+        "visible_if": "{{ section.settings.show_image == true }}",
+        "type": "select",
+        "id": "image_height_mobile",
+        "label": "Media height (Mobile)",
+        "options": [
+          {"value": "auto", "label": "Auto (media natural height)"},
+          {"value": "small","label": "Small"},
+          {"value": "medium","label": "Medium"},
+          {"value": "large","label": "Large"}
+        ],
+        "default": "medium"
+      },
+      {
+        "visible_if": "{{ section.settings.show_image == true }}",
+        "type": "range",
+        "id": "image_border_radius",
+        "min": 0,
+        "max": 10,
+        "step": 0.2,
+        "unit": "em",
+        "label": "Border radius",
+        "default": 0
+      },
+      {
+        "visible_if": "{{ section.settings.show_image == true }}",
+        "type": "checkbox",
+        "id": "image_padding",
+        "label": "Padding"
+      },
+      {
+        "visible_if": "{{ section.settings.show_image == true }}",
+        "type": "paragraph",
+        "content": "******************************************* Background image *******************************************"
+      },
+      {
+        "visible_if": "{{ section.settings.show_image == true }}",
+        "type": "checkbox",
+        "id": "background_image_desktop",
+        "label": "Use image as background (Desktop)"
+      },
+      {
+        "visible_if": "{{ section.settings.show_image == true }}",
+        "type": "checkbox",
+        "id": "background_image_mobile",
+        "label": "Use image as background (Mobile)"
+      },
+      {
+        "visible_if": "{{ section.settings.background_image_desktop == true or section.settings.background_image_mobile == true }}",
+        "type": "color",
+        "id": "text_color",
+        "label": "Text color",
+        "default": "#fff"
+      },
+      {
+        "visible_if": "{{ section.settings.background_image_desktop == true or section.settings.background_image_mobile == true }}",
+        "type": "paragraph",
+        "content": "Text protection settings:"
+      },
+      {
+        "visible_if": "{{ section.settings.background_image_desktop == true or section.settings.background_image_mobile == true }}",
+        "type": "select",
+        "id": "tint_type",
+        "label": "Type",
+        "options": [
+          {"value": "full", "label": "Full"},
+          {"value": "box", "label": "Box"},
+          {"value": "shadow", "label": "Shadow"}
+        ],
+        "default": "box"
+      },
+      {
+        "visible_if": "{{ section.settings.background_image_desktop == true or section.settings.background_image_mobile == true }}",
+        "type": "color",
+        "id": "tint_color",
+        "label": "Color",
+        "default": "#000"
+      },
+      {
+        "visible_if": "{{ section.settings.background_image_desktop == true or section.settings.background_image_mobile == true }}",
+        "type": "range",
+        "id": "tint_opacity",
+        "min": 0,
+        "max": 100,
+        "step": 1,
+        "unit": "%",
+        "label": "Opacity",
+        "default": 20
+      },
+      {
+        "visible_if": "{{ section.settings.tint_type != 'shadow' and section.settings.background_image_desktop == true or section.settings.background_image_mobile == true }}",
+        "type": "range",
+        "id": "tint_border_radius",
+        "min": 0,
+        "max": 10,
+        "step": 0.2,
+        "unit": "em",
+        "label": "Text box border radius",
+        "default": 0
+      },
+      {
+        "visible_if": "{{ section.settings.background_image_desktop == true or section.settings.background_image_mobile == true }}",
+        "type": "range",
+        "id": "tint_blur",
+        "min": 0,
+        "max": 50,
+        "step": 1,
+        "unit": "px",
+        "label": "Blur effect size",
+        "default": 24
+      },
+      {
+        "type": "header",
+        "content": "Section Settings"
+      },
+      {
+        "type": "checkbox",
+        "id": "full_width",
+        "label": "Full width",
+        "default": true
+      },
+      {
+        "type": "select",
+        "id": "content_vertical_alignment",
+        "label": "Content vertical alignment (Desktop)",
+        "options": [
+          {"value": "start", "label": "Top"},
+          {"value": "center", "label": "Center"},
+          {"value": "end", "label": "Bottom"}
+        ],
+        "default": "center"
+      },
+      {
+        "type": "header",
+        "content": "Padding Desktop"
+      },
+      {
+        "type": "range",
+        "id": "text_padding",
+        "min": 0,
+        "max": 100,
+        "step": 10,
+        "unit": "%",
+        "label": "Inner padding (Desktop)",
+        "default": 100
+      },
+      {
+        "type": "range",
+        "id": "section_padding_top",
+        "min": 0,
+        "max": 100,
+        "step": 10,
+        "unit": "%",
+        "label": "Outer padding top (Desktop)",
+        "default": 0
+      },
+      {
+        "type": "range",
+        "id": "section_padding_bottom",
+        "min": 0,
+        "max": 100,
+        "step": 10,
+        "unit": "%",
+        "label": "Outer padding bottom (Desktop)",
+        "default": 0
+      },
+      {
+        "type": "header",
+        "content": "Padding Mobile"
+      },
+      {
+        "type": "range",
+        "id": "text_padding_mobile",
+        "min": 0,
+        "max": 100,
+        "step": 10,
+        "unit": "%",
+        "label": "Inner padding (Mobile)",
+        "default": 100
+      },
+      {
+        "type": "range",
+        "id": "section_padding_top_mobile",
+        "min": 0,
+        "max": 100,
+        "step": 10,
+        "unit": "%",
+        "label": "Outer padding top (Mobile)",
+        "default": 0
+      },
+      {
+        "type": "range",
+        "id": "section_padding_bottom_mobile",
+        "min": 0,
+        "max": 100,
+        "step": 10,
+        "unit": "%",
+        "label": "Outer padding bottom (Mobile)",
+        "default": 0
+      }
+    ],
+    "blocks": [
+      {
+        "type": "breadcrumb",
+        "name": "Breadcrumbs",
+        "limit": 1,
+        "settings": [
+          {
+            "type": "header",
+            "content": "Placement"
+          },
+          {
+            "type": "select",
+            "id": "placement",
+            "label": "Placement",
+            "options": [
+              {"value": "outside", "label": "Section on top"},
+              {"value": "inside", "label": "Flow as a Block"}
+            ],
+            "default": "outside",
+            "info": "Important: when 'Section on top' the breadcrumb block must be the first one of the section, otherwise it won't appear."
+          },
+          {
+            "type": "header",
+            "content": "Desktop settings"
+          },
+          {
+            "type": "color_scheme",
+            "id": "color_scheme",
+            "label": "Color scheme",
+            "default": "scheme-2"
+          },
+          {
+            "type": "select",
+            "id": "text_align",
+            "label": "Text align",
+            "options": [
+              {"value": "start", "label": "left"},
+              {"value": "center", "label": "center"},
+              {"value": "end", "label": "right"}
+            ],
+            "default": "start"
+          },
+          {
+            "type": "checkbox",
+            "id": "over_first_section",
+            "label": "Overlap the first section",
+            "info": "When placement is 'Section on top'",
+            "default": true
+          },
+          {
+            "type": "range",
+            "id": "padding_top",
+            "min": 0,
+            "max": 5,
+            "step": 0.5,
+            "unit": "rem",
+            "label": "Padding top",
+            "default": 1.5
+          },
+          {
+            "type": "range",
+            "id": "padding_bottom",
+            "min": 0,
+            "max": 5,
+            "step": 0.5,
+            "unit": "rem",
+            "label": "Padding bottom",
+            "default": 1.5
+          },
+          {
+            "type": "checkbox",
+            "id": "border_top",
+            "label": "Top border",
+            "default": false
+          },
+          {
+            "type": "checkbox",
+            "id": "border_bottom",
+            "label": "Bottom border",
+            "default": false
+          },
+          {
+            "type": "header",
+            "content": "Mobile settings"
+          },
+          {
+            "type": "color_scheme",
+            "id": "color_scheme_mobile",
+            "label": "Color scheme",
+            "default": "scheme-2"
+          },
+          {
+            "type": "select",
+            "id": "text_align_mobile",
+            "label": "Text align",
+            "options": [
+              {"value": "start", "label": "left"},
+              {"value": "center", "label": "center"},
+              {"value": "end", "label": "right"}
+            ],
+            "default": "start"
+          },
+          {
+            "type": "checkbox",
+            "id": "hide_mobile",
+            "label": "Hide on Mobile Phones",
+            "default": false
+          },
+          {
+            "type": "checkbox",
+            "id": "over_first_section_mobile",
+            "label": "Overlap the first section",
+            "info": "When placement is 'Section on top'"
+          },
+          {
+            "type": "range",
+            "id": "padding_top_mobile",
+            "min": 0,
+            "max": 5,
+            "step": 0.5,
+            "unit": "rem",
+            "label": "Padding top",
+            "default": 1.5
+          },
+          {
+            "type": "range",
+            "id": "padding_bottom_mobile",
+            "min": 0,
+            "max": 5,
+            "step": 0.5,
+            "unit": "rem",
+            "label": "Padding bottom",
+            "default": 1.5
+          },
+          {
+            "type": "checkbox",
+            "id": "border_top_mobile",
+            "label": "Top border",
+            "default": false
+          },
+          {
+            "type": "checkbox",
+            "id": "border_bottom_mobile",
+            "label": "Bottom border",
+            "default": false
+          }
+        ]
+      },
+      {
+        "type": "title",
+        "name": "Title",
+        "settings": [
+          {
+            "type": "text",
+            "id": "title",
+            "label": "Title",
+            "default": "Collections"
+          },
+          {
+            "type": "range",
+            "id": "title_size",
+            "min": -1,
+            "max": 6,
+            "step": 1,
+            "unit": "h",
+            "label": "Title size",
+            "default": 1,
+            "info": "Equivalent to the heading tags: 6 = <h6> (smallest), 1 = <h1> (largest), 0 and -1 are even larger."
+          }
+        ]
+      },
+      {
+        "type": "quantity",
+        "name": "Quantity of collections",
+        "limit": 1,
+        "settings": [
+          {
+            "type": "select",
+            "id": "text_style",
+            "label": "Text style",
+            "options": [
+              {"value": "normal","label": "Body"},
+              {"value": "subheading","label": "Subheading"},
+              {"value": "small-label","label": "Small label"}
+            ],
+            "default": "subheading"
+          },
+          {
+            "type": "range",
+            "id": "text_size",
+            "min": 1,
+            "max": 5,
+            "step": 1,
+            "unit": "p",
+            "label": "Text size",
+            "default": 3
+          }
+        ]
+      },
+      {
+        "type": "richtext",
+        "name": "Richtext",
+        "settings": [
+          {
+            "type": "richtext",
+            "id": "text",
+            "label": "Text",
+            "default": "<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed ultrices, justo eget tincidunt interdum, quam nisi interdum tellus, sed consequat urna mauris eget sapien. Integer vitae felis ac ligula hendrerit finibus quis sed augue.</p>"
+          },
+          {
+            "type": "select",
+            "id": "text_style",
+            "label": "Text style",
+            "options": [
+              {"value": "normal","label": "Body"},
+              {"value": "subheading","label": "Subheading"},
+              {"value": "small-label","label": "Small label"}
+            ],
+            "default": "normal"
+          },
+          {
+            "type": "range",
+            "id": "text_size",
+            "min": 1,
+            "max": 5,
+            "step": 1,
+            "unit": "p",
+            "label": "Text size",
+            "default": 3
+          }
+        ]
+      },
+      {
+        "type": "separator",
+        "name": "Separator",
+        "settings": [
+          {
+            "type": "checkbox",
+            "id": "border",
+            "label": "Border (Desktop)",
+            "default": true
+          },
+          {
+            "type": "range",
+            "id": "padding",
+            "min": 0,
+            "max": 20,
+            "step": 0.5,
+            "unit": "rem",
+            "label": "Padding (Desktop)",
+            "default": 2.5
+          },
+          {
+            "type": "checkbox",
+            "id": "border_mobile",
+            "label": "Border (Mobile)",
+            "default": true
+          },
+          {
+            "type": "range",
+            "id": "padding_mobile",
+            "min": 0,
+            "max": 20,
+            "step": 0.5,
+            "unit": "rem",
+            "label": "Padding (Mobile)",
+            "default": 2.5
+          }
+        ]
+      },
+      {
+        "type": "liquid",
+        "name": "Liquid/html",
+        "settings": [
+          {
+            "type": "liquid",
+            "id": "liquid",
+            "label": "Liquid code"
+          }
+        ]
+      }
+    ]
+  }
+{% endschema %}

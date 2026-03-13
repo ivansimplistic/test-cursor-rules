@@ -1,0 +1,114 @@
+#cart {padding: var(--global-sections-padding) 0; --cart-items-gap: 1.5em;}
+#cart h1 {margin-bottom: 1em;}
+#cart h1 .cart-count {font-size: 1.5rem; width: 2em; height: 2em; margin-left: 1.5rem;}
+#cart .empty {margin-bottom: 4em;}
+#cart .empty .title {margin-bottom: 1.5em;}
+
+#cart .free-shipping-progress {padding: 1em 2em;}
+
+#cart .summary-column-content {border-radius: var(--extras-border-radius); overflow: hidden;}
+#cart .summary {padding: 2em;}
+
+#cart .summary .buttons-wrapper {margin-top: 0.5em;}
+#cart .summary .subtotals {padding-bottom: 1em;}
+#cart .summary .subtotals .savings {font-size: 0.9em;}
+#cart .summary .subtotals .line:not(:last-child) {padding-bottom: 0.5em; margin-bottom: 0.5em; border-bottom: 1px solid var(--scheme-borders-color);}
+#cart .summary shopify-payment-terms {display: block; font-size: 0.7em; margin-top: 0.5em;}
+
+#cart .summary .additional-checkout-buttons {position: relative; z-index: 1;}
+#cart .summary .additional-checkout-buttons span {display: block; font-size: 0.7em; text-transform: uppercase; font-weight: 700; color: #999; margin-bottom: 1em;}
+#cart .summary .additional-checkout-buttons li {flex-grow: 1 !important;}
+#cart .summary .buttons-wrapper .btn {width: 100%; margin-bottom: 1em; padding-left: 0; padding-right: 0;}
+#cart .summary .buttons-wrapper .btn:last-child {margin-bottom: 0;}
+
+#cart .items-column {flex-grow: 1;}
+#cart .item {position: relative; margin-top: var(--cart-items-gap); padding-top: var(--cart-items-gap);}
+#cart .item:first-child {margin-top: 0em; padding-top: 0; border-top: none;}
+#cart .cart-items {padding-bottom: var(--cart-items-gap);}
+#cart .item.hidden {display: none !important;}
+#cart .item.hidden + .item.scheme-border-top {border-top-width: 0px; margin-top: 0; padding-top: 0;}
+#cart .item:not(.hidden)  ~  .item.scheme-border-top {border-top-width: 1px; margin-top: var(--cart-items-gap); padding-top: var(--cart-items-gap);}
+#cart .item img {width: 100%; border-radius: {{settings.cart_items_border_radius}}em;}
+#cart .item .title {display: block; padding-right: 1em;}
+#cart .item .title-price + .variants, 
+#cart .item .title-price + .property {margin-top: 0.2em;}
+#cart .item .variant,
+#cart .item .property {font-size: 0.9em; opacity: 0.6; line-height: {{settings.body_font_line_height}};}
+#cart .item .qtty-price {margin-top: 0.7em;}
+#cart .item quantity-input {font-size: 0.7em;}
+#cart .item .price {position: relative; margin-left: 1em; line-height: 1}
+#cart .item .price > * {padding-left: 0.5em;}
+#cart .item .price .compare {text-decoration: line-through; opacity: 0.6;}
+#cart .item .price .message {display: block; font-size: 0.7em; padding: 0.4em 0.7em; border-radius: 1em; text-align: center; margin-top: 0.5em;}
+#cart .item .remove {cursor: pointer; display: block; line-height: 1; padding: 0.8em; margin: -0.8em; position: relative; top: 0.4em;}
+#cart .item[data-locked]:not([data-remove]) .remove {display: none;}
+#cart .item[data-locked] .quantity-button {display: none; }
+#cart .cart-items .item[data-bundle-item^="related"] {margin-top: 0; padding: 1em; background: var(--scheme-overlay-color);}
+#cart .cart-items .item[data-bundle-item="main"] + .item[data-bundle-item^="related"] {border: none;}
+#cart .bundled-items-title {margin: 1em 0 0.5em;}
+#cart cart-item-edit select {margin-top: 0.75em;}
+
+@media (min-width: {{settings.breakpoint_tablet | plus: 0.001}}em){
+  #cart .summary-column {position: sticky; top: calc(var(--header-offset) + 2em);}
+}
+
+{%- assign includeSnippet = false -%}
+
+{%- if settings.cart_featured_collection != blank -%}
+  {%- assign includeSnippet = true -%}
+{%- endif -%}
+
+
+{% if includeSnippet %}
+#cart .products-slider {margin: 0; overflow: hidden; border-radius: var(--extras-border-radius);}
+#cart .products-slider > * {position: relative; z-index: 1;}
+#cart .products-slider .featured-head {padding: 1em;}
+#cart .products-slider .featured-head .info {padding-right: 1.5em;}
+#cart .products-slider h2 {font-size: 1.2em; margin-bottom: 0;}
+#cart .products-slider .keen-arrows {font-size: 0.733333em;}
+#cart .products-slider .keen {padding: 0 1em;}
+#cart .products-slider .keen-slider {padding-bottom: 0.5em;} 
+#cart .products-slider .keen-nav-bar {margin: 1em -1em 0; width: calc(100% + 2em);}
+#cart .products-slider .product-card {padding: 0; border: none; box-shadow: none; font-size: 90%;}
+#cart .products-slider .product-card:after {display: none;}
+#cart .summary-column .products-slider {border-left: 0; border-right: 0; border-bottom: 0; margin-top: 1em;}
+
+@media (min-width: {{settings.breakpoint_tablet | plus: 0.001}}em){
+  #cart .items-column .products-slider {margin: 2em 0 0;}
+  #cart .items-column:not(.items-empty) .products-slider {max-width: 92%;}
+  #cart .items-column .products-slider .featured-head {padding: 2em;}
+  #cart .items-column .products-slider .keen {padding: 0 2em;}
+  #cart .items-column .products-slider h2 {font-size: 1.8em;}
+  #cart .products-slider .keen-arrows {font-size: 1em;}
+  #cart .items-column .keen-nav-bar {margin-top: 2em;}
+  #cart .items-column .products-slider .keen-slider {padding-bottom: 2.5em;} 
+  #cart .items-column .products-slider .keen-nav-bar {margin: 0 -2em 0; width: calc(100% + 4em);} 
+  #cart .summary-column .products-slider .product-card .info-inner {display: block;}
+  #cart .summary-column .products-slider .product-card .title {margin: 0 0 0.5em;}
+  #cart .summary-column > * {max-width: 30em; margin-left: auto;}
+  #cart .summary-column recommended-products {display: block;}
+}
+@media (max-width: {{settings.breakpoint_tablet}}){
+  #cart .items-column .products-slider {margin-bottom: 2em;}
+}
+{%- endif -%}
+
+.return-policy-message .title {font-size: 1.2em; text-transform: {{settings.heading_font_transform}}; color: {{ settings.color_heading}}; padding-bottom: 1em; margin-bottom: 1.5em; border-bottom: 1px solid #eee; }
+
+@media (min-width:{{settings.breakpoint_tablet | plus: 0.001}}em){
+  #cart  {cart-items-gap: 2em;}
+  #cart .cart-items {max-width: 92%;} 
+  #cart .item .title {font-size: 1.2em;}
+  #cart .item .variant,
+  #cart .item .property {font-size: 1em;}
+  #cart .item quantity-input {font-size: 0.9em;}  
+  #cart .item .qtty-price {margin-top: 1em;}
+  #cart .item .title-price + .variants, 
+  #cart .item .title-price + .property {margin-top: 0.5em;}
+  #cart .item .price {font-size: 1.2em;}
+}
+
+@media (max-width:{{settings.breakpoint_tablet}}){
+  #cart {padding: 2em 0;}
+  #cart .cart-items {margin-bottom: 1em;}
+}

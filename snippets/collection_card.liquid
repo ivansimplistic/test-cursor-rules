@@ -1,0 +1,27 @@
+{%- liquid
+  assign border = border | default: settings.collection_card_border
+  assign contentColorScheme = section.settings.content_color_scheme | append: '' | default: 'scheme-1'
+  assign cardsColorScheme = section.settings.cards_color_scheme | append: '' | default: 'scheme-1'
+  assign customImage = block.settings.custom_image
+-%}
+<div class="collection-card common-card no-highlight-hover info-{{settings.collection_card_text_layout}} text-{{settings.collection_card_text_align}} {% if settings.collection_card_border %}scheme-border-box{% endif %} {% if settings.collection_card_image_full_width %}image-full-width{% endif %} {% if cardsColorScheme != blank %}scheme color-{{cardsColorScheme}}{% endif %} same-scheme-{%- if cardsColorScheme == contentColorScheme -%}true{%- else -%}false{%- endif -%}">
+  <a href="{{collection.url}}" class="no-highlight-hover">
+    {%- if customImage != blank -%}
+      {%- assign image = customImage -%}
+    {%- else -%}
+      {%- assign image = collection.image | default: collection.products.first.images.first -%}
+    {%- endif -%}
+    <div class="image-container">
+      <div class="img ease-animation-slow {% if image %}lazyload{% endif %}" {% if image %}data-bgset="{% render 'lazy_src', image: image  %}"{% endif %}></div>
+      {%- if collection.metafields.custom.rollover_image != blank -%}
+        <div class="img hover-img ease-animation-slow lazyload" data-bgset="{{collection.metafields.custom.rollover_image | image_url: width: '800', height: '800'}}"></div>
+      {%- endif -%}
+    </div>
+    <div class="info">
+      <div class="title {{settings.collection_card_title_font_family}} flex justify-content-{{settings.collection_card_text_align | replace: 'left', 'start' | replace: 'right', 'end'}}">{{collection.title}} {%- if settings.collection_show_arrow -%}{%- render 'icons', icon: settings.links_arrow -%}{%- endif -%}</div>
+      {%- if settings.collection_show_quantity -%}
+        <div class="qty small-label">{{ collection.all_products_count }} {{ collection.all_products_count | pluralize: 'product', 'products' }}</div>
+      {%- endif -%}
+    </div>
+  </a>
+</div>

@@ -1,0 +1,29 @@
+<script>
+  window.YTReady = new Promise((r)=>{window.onYouTubePlayerAPIReady = function() {r();}});
+  document.documentElement.className = document.documentElement.className.replace('no-js', 'js');
+  window.lngg = {};
+  lngg.cart__saving_field_label = {{ 'cart.saving_field_label' | t | json }};
+  window.breakpoints = {
+    small: '{{ settings.breakpoint_mobile }}',
+    medium: '{{ settings.breakpoint_tablet }}'
+  };
+  window.routes = {
+    checkout_url: '{{ routes.root_url }}{% if routes.root_url != '/' %}/{% endif %}checkout',
+    root_url: '{{ routes.root_url }}{% if routes.root_url != '/' %}/{% endif %}',
+    products_url: '{{ routes.root_url }}{% if routes.root_url != '/' %}/{% endif %}products',
+    cart_url: '{{ routes.cart_url }}',
+    cart_add_url: '{{ routes.cart_add_url }}',
+    cart_change_url: '{{ routes.cart_change_url }}',
+    cart_update_url: '{{ routes.cart_update_url }}',
+    predictive_search_url: '{{ routes.predictive_search_url }}',
+    search_url: '{{ routes.search_url }}'
+  };
+  window.money_format = "{{cart.currency.symbol}}{% raw %}{{amount}}{% endraw %}";
+  window.customer = {% if customer %}{}{% else %}null{% endif %};
+  {% comment %}
+  REF: Feature 'Basic FADE IN' on lazyloaded images
+       Add class 'load' 2 seconds after page loaded event
+       Disabled because no effect gets better page score.
+  window.addEventListener('load', (e)=>{setTimeout(()=>{document.body.parentElement.classList.add(e.type)},2000)})
+  {% endcomment %}
+</script>

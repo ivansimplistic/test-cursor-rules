@@ -1,0 +1,780 @@
+<style>
+  .enhanced-description-section util-accordion,
+  .enhanced-description-section util-tabs {display: block; width: 100%; margin: 0 !important;}
+  .enhanced-description-section util-accordion h2,
+  .enhanced-description-section util-tabs h2 {margin: 0em; font-family: inherit; text-transform: inherit; font-weight: inherit; color: inherit; line-height: inherit;}
+  .enhanced-description-section util-tabs .util-tab.v2 {justify-content: center; text-align: center; margin-top: 0; margin-bottom: 0; padding-left: 2rem; padding-right: 2rem;}
+  .enhanced-description-section util-accordion .accordion-icon {font-size: 1.2em; width: 1em; height: 1em; top: 0.5em;}
+  .enhanced-description-section util-tabs h2 {font-size: inherit; text-transform: inherit;}
+  .enhanced-description-section util-tabs [role="tabpanel"] {width: 100%; height: auto !important;}
+  .enhanced-description-section util-tabs .tab-content {overflow: auto; height: 100%; margin-top: 5rem;}
+  .enhanced-description-section util-tabs .accordion:first-child {padding-top: 0; border-top: 0;}
+  .enhanced-description-section util-tabs .accordion:last-child {border-bottom: 0;}
+  .enhanced-description-section util-tabs util-accordion .accordion-icon {font-size: 1em; width: 1em; height: 1em; top: 0.3em;}
+  .enhanced-description-section .question {margin-bottom: 1rem;}
+  .enhanced-description-section .question:not(:first-child) {margin-top: 3rem;}
+  @media (max-width: {{settings.breakpoint_mobile}}){
+    .enhanced-description-section util-tabs .tab-content {margin-top: 3rem;}
+  }
+</style>
+{%- capture contentHtml -%}
+  {%- assign descriptionParts = product.description | replace: '<h2', '<parts-sep><h2' | split: '<parts-sep>' -%}
+  <div class="enhanced-description-section">
+
+    {%- if section.settings.description_layout == 'accordions' or section.settings.description_layout_mobile == 'accordions' -%}
+
+      {%- capture accordionsHtml -%}
+        {{ 'util_accordion.css' | asset_url | stylesheet_tag }}
+        <script src="{{ 'util_accordion.js' | asset_url }}" defer="defer"></script>
+        {%- assign expandFirst = section.settings.accordions_first_expanded -%}
+        <util-accordion data-expand-multiple="{% if section.settings.accordions_expand_multiple %}true{% endif %}">
+
+        {%- for block in section.blocks -%}
+          {%- assign itemId = section.id | append: '_' | append: forloop.index -%}
+
+          {%- if block.type == 'default_content' -%}
+            {%- if descriptionParts.size > 1 -%}       
+              {%- for part in descriptionParts offset: 1 -%}
+                {%- assign itemParts = part | replace: '</h2>', '</h2><parts-sep>' | split: '<parts-sep>' -%}
+                <div class="accordion scheme-border-bottom {% if expandFirst %}open{% endif %}">
+                  <button type="button" aria-expanded="{% if expandFirst %}true{% else %}false{% endif %}" class="accordion-trigger" aria-controls="panel-{{itemId}}" id="button-{{itemId}}">
+                    <span class="accordion-title">
+                      {{itemParts[0] | replace: '<h2>', '<h2 class="h4">'}}
+                    </span>
+                    <span class="accordion-icon {{settings.accordions_icon}}"><i></i></span>
+                  </button>
+                  <div id="panel-{{itemId}}" role="region" aria-labelledby="button-{{itemId}}" class="accordion-panel expandable {% if expandFirst %}expandable-default-open{% endif %}">
+                    {{itemParts[1]}}
+                  </div>
+                </div>
+                {%- if expandFirst -%}
+                  {%- assign expandFirst = false -%}
+                {%- endif -%}
+              {%- endfor -%}
+            {%- endif -%}
+
+          {%- elsif block.type == 'custom_content' -%}
+            <div class="accordion scheme-border-bottom {% if expandFirst %}open{% endif %}">
+              <button type="button" aria-expanded="{% if expandFirst %}true{% else %}false{% endif %}" class="accordion-trigger" aria-controls="panel-{{itemId}}" id="button-{{itemId}}">
+                <span class="accordion-title">
+                  <h2 class="h4">{{block.settings.title}}</h2>
+                </span>
+                <span class="accordion-icon {{settings.accordions_icon}}"><i></i></span>
+              </button>
+              <div id="panel-{{itemId}}" role="region" aria-labelledby="button-{{itemId}}" class="accordion-panel expandable {% if expandFirst %}expandable-default-open{% endif %}">
+                {{block.settings.content}}
+              </div>
+            </div>
+            {%- if expandFirst -%}
+              {%- assign expandFirst = false -%}
+            {%- endif -%}
+
+          {%- elsif block.type == 'faq' -%}
+            <div class="accordion scheme-border-bottom {% if expandFirst %}open{% endif %}">
+              <button type="button" aria-expanded="{% if expandFirst %}true{% else %}false{% endif %}" class="accordion-trigger" aria-controls="panel-{{itemId}}" id="button-{{itemId}}">
+                <span class="accordion-title">
+                  <h2 class="h4">{{block.settings.title}}</h2>
+                </span>
+                <span class="accordion-icon {{settings.accordions_icon}}"><i></i></span>
+              </button>
+              <div id="panel-{{itemId}}" role="region" aria-labelledby="button-{{itemId}}" class="accordion-panel expandable {% if expandFirst %}expandable-default-open{% endif %}">
+                {%- for i in (1..15) -%}
+                  {%- assign question = 'title' | append: i -%}
+                  {%- assign answer = 'content' | append: i -%}
+                  {%- if block.settings[question] != blank -%}
+                    <h3 class="h5 question">
+                      {{block.settings[question]}}
+                    </h3>
+                    <div class="answer">
+                      {{block.settings[answer]}}
+                    </div>
+                  {%- endif -%}
+                {%- endfor -%}
+              </div>
+            </div>
+            {%- if expandFirst -%}
+              {%- assign expandFirst = false -%}
+            {%- endif -%}
+
+          {%- endif -%}
+        {%- endfor -%}
+          
+        </util-accordion>
+      {%- endcapture -%}
+
+      <div class="{% if section.settings.description_layout == 'tabs' %}large--hide{% endif %} {% if section.settings.description_layout_mobile == 'tabs' %}medium-down--hide{% endif %}">
+        {{accordionsHtml}}
+      </div>
+
+    {%- endif -%}
+
+    {%- if section.settings.description_layout == 'tabs' or section.settings.description_layout_mobile == 'tabs'  -%}
+
+      {%- capture tabButtons -%}
+        {%- for block in section.blocks -%}
+          {%- assign itemId = section.id | append: '_' | append: forloop.index -%}
+          {%- if block.type == 'default_content' -%}
+            {%- if descriptionParts.size > 1 -%}
+              {%- assign partIndex = 0 -%}
+              {%- for part in descriptionParts offset: 1 -%}
+                {%- assign partIndex = partIndex | plus: 1 -%}
+                {%- assign itemParts = part | replace: '</h2>', '</h2><parts-sep>' | split: '<parts-sep>' -%}
+                <button class="util-tab {{section.settings.tab_style}}" type="button" role="tab" aria-selected="true" id="btn-block-{{itemId}}-{{partIndex}}" aria-controls="content-block-{{itemId}}-{{partIndex}}">{{itemParts[0]}}</button>
+              {%- endfor -%}
+            {%- endif -%}
+          {%- else -%}
+            <button class="util-tab {{section.settings.tab_style}}" type="button" role="tab" aria-selected="true" id="btn-block-{{itemId}}" aria-controls="content-block-{{itemId}}">{{block.settings.title}}</button>
+          {%- endif -%}
+        {%- endfor -%}
+      {%- endcapture -%}
+
+      {%- capture tabPanels -%}
+        {%- for block in section.blocks -%}
+          {%- assign itemId = section.id | append: '_' | append: forloop.index -%}
+
+          {%- if block.type == 'default_content' -%}
+            {%- if descriptionParts.size > 1 -%}          
+              {%- assign partIndex = 0 -%}
+              {%- for part in descriptionParts offset: 1 -%}
+                {%- assign partIndex = partIndex | plus: 1 -%}
+                {%- assign itemParts = part | replace: '</h2>', '</h2><parts-sep>' | split: '<parts-sep>' -%}
+                <div tabindex="0" role="tabpanel" id="content-block-{{itemId}}-{{partIndex}}" aria-labelledby="btn-block-{{itemId}}-{{partIndex}}"{% if forloop.index > 1 %} hidden="hidden"{% endif %} >
+                  <div class="tab-content">
+                    {{itemParts[1]}}
+                  </div>
+                </div>
+              {%- endfor -%}
+            {%- endif -%}
+
+          {%- elsif block.type == 'custom_content' -%}
+            <div tabindex="0" role="tabpanel" id="content-block-{{itemId}}" aria-labelledby="btn-block-{{itemId}}"{% if forloop.index > 1 %} hidden="hidden"{% endif %} >
+              <div class="tab-content">
+                {{block.settings.content}}
+                {{block.settings.liquid}}
+              </div>
+            </div>
+
+          {%- elsif block.type == 'faq' -%}
+            <div tabindex="0" role="tabpanel" id="content-block-{{itemId}}" aria-labelledby="btn-block-{{itemId}}"{% if forloop.index > 1 %} hidden="hidden"{% endif %} >
+              <div class="tab-content">
+                <util-accordion data-expand-multiple="{% if block.settings.expand_multiple %}true{% else %}{% endif %}">
+                  {%- assign faqExpandFirst = block.settings.expand_first -%}
+                  {%- for i in (1..15) -%}
+                    {%- assign question = 'title' | append: i -%}
+                    {%- assign answer = 'content' | append: i -%}
+                    {%- if block.settings[question] != blank -%}
+                      <div class="accordion scheme-border-bottom {% if faqExpandFirst %}open{% endif %}">
+                        <button type="button" aria-expanded="{% if faqExpandFirst %}true{% else %}false{% endif %}" class="accordion-trigger" aria-controls="panel-{{block.id}}-{{i}}" id="button-{{block.id}}-{{i}}">
+                          <span class="accordion-title">
+                            <h3 class="h5">{{block.settings[question]}}</h3>
+                          </span>
+                          <span class="accordion-icon {{settings.accordions_icon}}"><i></i></span>
+                        </button>
+                        <div id="panel-{{block.id}}-{{i}}" role="region" aria-labelledby="button-{{block.id}}-{{i}}" class="accordion-panel expandable {% if faqExpandFirst %}expandable-default-open{% endif %}">
+                          {{block.settings[answer]}}
+                        </div>
+                      </div>
+                      {%- if faqExpandFirst -%}
+                        {%- assign faqExpandFirst = false -%}
+                      {%- endif -%}
+                    {%- endif -%}
+                  {%- endfor -%}
+                </util-accordion>
+              </div>
+            </div>
+
+          {%- endif -%}
+        {%- endfor -%}
+      {%- endcapture -%}
+    
+      {%- capture tabsHtml -%}
+        <util-tabs data-match-height="true">
+          <div class="tabs-outer {% if section.settings.tab_style == 'v2' %}full-width{% endif %} one-line-desktop one-line-mobile">
+            <div class="tabs-inner flex">
+              <div class="tabs-wrap flex flex-wrap">
+                {% if section.settings.tab_style == 'v2' %}<div class="util-tab v2 flex-1 medium-down--hide"></div>{% endif %}
+                {{tabButtons}}
+                {% if section.settings.tab_style == 'v2' %}<div class="util-tab v2 flex-1 medium-down--hide"></div>{% endif %}
+              </div>
+            </div>
+          </div>
+          {{tabPanels}}
+        </util-tabs>
+        <script src="{{ 'util_tabs.js' | asset_url }}" defer="defer"></script>
+      {%- endcapture -%}
+      
+      <div class="{% if section.settings.description_layout == 'accordions' %}large--hide{% endif %} {% if section.settings.description_layout_mobile == 'accordions' %}medium-down--hide{% endif %}">
+        {{tabsHtml}}
+      </div>
+
+    {%- endif -%}
+
+  </div>
+{%- endcapture -%}
+
+{%- render 'section_custom_structure', section: section, contentHtml: contentHtml -%}
+
+
+{% schema %}
+  {
+    "name": "Enhanced Description",
+    "class": "type-enhanced-description",
+    "tag": "section",
+    "limit": 1,
+    "settings": [
+      {
+        "type": "paragraph",
+        "content": "The content is pulled from the product description, created from each Heading 2 title and its content below."
+      },
+      {
+        "type": "select",
+        "id": "description_layout",
+        "label": "Description Layout (Desktop)",
+        "options": [
+          {
+            "value": "accordions",
+            "label": "Accordions"
+          },
+          {
+            "value": "tabs",
+            "label": "Tabs"
+          }
+        ],
+        "default": "tabs"
+      },
+      {
+        "type": "select",
+        "id": "description_layout_mobile",
+        "label": "Description Layout (Mobile)",
+        "options": [
+          {
+            "value": "accordions",
+            "label": "Accordions"
+          },
+          {
+            "value": "tabs",
+            "label": "Tabs"
+          }
+        ],
+        "default": "accordions"
+      },
+      {
+        "visible_if": "{{ section.settings.description_layout == 'tabs' or section.settings.description_layout_mobile == 'tabs' }}",
+        "type": "paragraph",
+        "content": "Tabs settings:"
+      },
+      {
+        "visible_if": "{{ section.settings.description_layout == 'tabs' or section.settings.description_layout_mobile == 'tabs' }}",
+        "type": "select",
+        "id": "tab_style",
+        "label": "Tabs style",
+        "options": [
+          {"value": "v1","label": "Pills"},
+          {"value": "v2","label": "Line"}
+        ],
+        "default": "v2"
+      },
+      {
+        "visible_if": "{{ section.settings.description_layout == 'accordions' or section.settings.description_layout_mobile == 'accordions' }}",
+        "type": "paragraph",
+        "content": "Accordion settings:"
+      },
+      {
+        "visible_if": "{{ section.settings.description_layout == 'accordions' or section.settings.description_layout_mobile == 'accordions' }}",
+        "type": "checkbox",
+        "id": "accordions_expand_multiple",
+        "label": "Expand multiple blocks",
+        "default": true
+      },
+      {
+        "visible_if": "{{ section.settings.description_layout == 'accordions' or section.settings.description_layout_mobile == 'accordions' }}",
+        "type": "checkbox",
+        "id": "accordions_first_expanded",
+        "label": "First block expanded",
+        "default": true
+      },
+      {
+        "type": "header",
+        "content": "Head"
+      },
+      {
+        "type": "text",
+        "id": "eyebrow",
+        "label": "Eyebrow"
+      },
+      {
+        "visible_if": "{{ section.settings.eyebrow != blank }}",
+        "type": "range",
+        "id": "eyebrow_size",
+        "min": 1,
+        "max": 5,
+        "step": 1,
+        "unit": "p",
+        "label": "Eyebrow size",
+        "default": 3
+      },
+      {
+        "type": "text",
+        "id": "title",
+        "label": "Title"
+      },
+      {
+        "visible_if": "{{ section.settings.title != blank }}",
+        "type": "checkbox",
+        "id": "is_h1",
+        "label": "This is the first title of the page (H1)"
+      },
+      {
+        "visible_if": "{{ section.settings.title != blank }}",
+        "type": "range",
+        "id": "title_size",
+        "min": -1,
+        "max": 6,
+        "step": 1,
+        "unit": "h",
+        "label": "Title size",
+        "default": 2,
+        "info": "Equivalent to the heading tags."
+      },
+      {
+        "type": "richtext",
+        "id": "text",
+        "label": "Text"
+      },
+      {
+        "visible_if": "{{ section.settings.text != blank }}",
+        "type": "range",
+        "id": "text_size",
+        "min": 1,
+        "max": 5,
+        "step": 1,
+        "unit": "p",
+        "label": "Text size",
+        "default": 3
+      },
+      {
+        "visible_if": "{{ section.settings.text != blank }}",
+        "type": "range",
+        "id": "text_width",
+        "min": 0,
+        "max": 100,
+        "step": 1,
+        "unit": "em",
+        "label": "Text Width",
+        "default": 40
+      },
+      {
+        "type": "text",
+        "id": "button",
+        "label": "Button"
+      },
+      {
+        "visible_if": "{{ section.settings.button != blank }}",
+        "type": "url",
+        "id": "link",
+        "label": "Button link"
+      },
+      {
+        "visible_if": "{{ section.settings.button != blank }}",
+        "type": "select",
+        "id": "button_style",
+        "label": "Button style",
+        "options": [
+            {"value": "link", "label": "Link"},
+            {"value": "btn", "label": "Button"},
+            {"value": "btn v2", "label": "Button V2"}
+        ],
+        "default": "btn"
+      },
+      {
+        "visible_if": "{{ section.settings.button != blank }}",
+        "type": "select",
+        "id": "button_position",
+        "label": "Button position",
+        "options": [
+          {"value": "top","label": "Top"},
+          {"value": "bottom","label": "Bottom"},
+          {"value": "right","label": "Right"}
+        ],
+        "default": "top"
+      },
+      {
+        "type": "header",
+        "content": "Section settings"
+      },
+      {
+        "type": "checkbox",
+        "id": "content_full_width",
+        "label": "Content full width",
+        "default": false
+      },
+      {
+        "type": "checkbox",
+        "id": "full_width",
+        "label": "Section Full width",
+        "default": true
+      },
+      {
+        "type": "select",
+        "id": "head_position",
+        "label": "Header position (Desktop)",
+        "options": [
+          {"value": "top","label": "Top"},
+          {"value": "left","label": "Left"}
+        ],
+        "default": "top"
+      },
+      {
+        "visible_if": "{{ section.settings.head_position == 'left' }}",
+        "type": "range",
+        "id": "head_width",
+        "min": 10,
+        "max": 50,
+        "step": 1,
+        "unit": "%",
+        "label": "Header width (Desktop)",
+        "default": 20,
+        "info": "When the head is on the left."
+      },
+      {
+        "type": "select",
+        "id": "text_align",
+        "label": "Text Align",
+        "options": [
+          {"value": "left","label": "Left"},
+          {"value": "center","label": "Center"},
+          {"value": "right","label": "Right"}
+        ],
+        "default": "left"
+      },
+      {
+        "type": "color_scheme",
+        "id": "section_color_scheme",
+        "label": "Section Color scheme",
+        "default": "scheme-1"
+      },
+      {
+        "type": "color_scheme",
+        "id": "content_color_scheme",
+        "label": "Content Color scheme",
+        "default": "scheme-1"
+      },
+      {
+        "type": "range",
+        "id": "border_radius",
+        "min": 0,
+        "max": 10,
+        "step": 0.2,
+        "unit": "em",
+        "label": "Border radius",
+        "default": 0
+      },
+      {
+        "type": "header",
+        "content": "Padding Desktop"
+      },
+      {
+        "type": "range",
+        "id": "text_padding",
+        "min": 0,
+        "max": 100,
+        "step": 10,
+        "unit": "%",
+        "label": "Inner padding (Desktop)",
+        "default": 100
+      },
+      {
+        "type": "range",
+        "id": "section_padding_top",
+        "min": 0,
+        "max": 100,
+        "step": 10,
+        "unit": "%",
+        "label": "Outer padding top (Desktop)",
+        "default": 0
+      },
+      {
+        "type": "range",
+        "id": "section_padding_bottom",
+        "min": 0,
+        "max": 100,
+        "step": 10,
+        "unit": "%",
+        "label": "Outer padding bottom (Desktop)",
+        "default": 0
+      },
+      {
+        "type": "header",
+        "content": "Padding Mobile"
+      },
+      {
+        "type": "range",
+        "id": "text_padding_mobile",
+        "min": 0,
+        "max": 100,
+        "step": 10,
+        "unit": "%",
+        "label": "Inner padding (Mobile)",
+        "default": 100
+      },
+      {
+        "type": "range",
+        "id": "section_padding_top_mobile",
+        "min": 0,
+        "max": 100,
+        "step": 10,
+        "unit": "%",
+        "label": "Outer padding top (Mobile)",
+        "default": 0
+      },
+      {
+        "type": "range",
+        "id": "section_padding_bottom_mobile",
+        "min": 0,
+        "max": 100,
+        "step": 10,
+        "unit": "%",
+        "label": "Outer padding bottom (Mobile)",
+        "default": 0
+      }
+    ],
+    "blocks": [
+      {
+        "type": "default_content",
+        "name": "Default content",
+        "settings": [
+          {
+            "type": "paragraph",
+            "content": "This Block refers to the tabs created by the Heading 2 titles of the Product Description."
+          },
+          {
+            "type": "paragraph",
+            "content": "Place this Block in the desired order."
+          }
+        ]
+      },
+      {
+        "type": "custom_content",
+        "name": "Custom content",
+        "settings": [
+          {
+            "type": "text",
+            "id": "title",
+            "label": "Tab title",
+            "default": "Custom"
+          },
+          {
+            "type": "richtext",
+            "id": "content",
+            "label": "Content",
+            "default": "<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus ut tellus nec mi tincidunt imperdiet eget vitae sapien. Integer massa velit, commodo at magna eget, semper vehicula quam. Morbi laoreet tellus at neque blandit, eu congue sem congue. Mauris dapibus est ut ipsum malesuada tincidunt. Curabitur tempus commodo suscipit. Sed eu blandit urna, at porttitor ligula. In maximus lobortis tellus.</p>"
+          },
+          {
+            "type": "liquid",
+            "id": "liquid",
+            "label": "Liquid"
+          }
+        ]
+      },
+      {
+        "type": "faq",
+        "name": "FAQ",
+        "settings": [
+          {
+            "type": "checkbox",
+            "id": "expand_multiple",
+            "label": "Allow multiple panels expanded at once",
+            "default": false
+          },
+          {
+            "type": "checkbox",
+            "id": "expand_first",
+            "label": "Expand first item by default",
+            "default": false
+          },
+          {
+            "type": "text",
+            "id": "title",
+            "label": "Tab title",
+            "default": "FAQ's"
+          },
+          {
+            "type": "header",
+            "content": "FAQs"
+          },
+          {
+            "type": "text",
+            "id": "title1",
+            "label": "Title #1",
+            "default": "Lorem ipsum dolor sit amet?"
+          },
+          {
+            "visible_if": "{{ block.settings.title1 != blank }}",
+            "type": "richtext",
+            "id": "content1",
+            "label": "Content #1",
+            "default": "<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus ut tellus nec mi tincidunt imperdiet eget vitae sapien. Integer massa velit, commodo at magna eget, semper vehicula quam. Morbi laoreet tellus at neque blandit, eu congue sem congue. Mauris dapibus est ut ipsum malesuada tincidunt. Curabitur tempus commodo suscipit. Sed eu blandit urna, at porttitor ligula. In maximus lobortis tellus.</p>"
+          },
+          {
+            "type": "text",
+            "id": "title2",
+            "label": "Title #2",
+            "default": "Lorem ipsum dolor sit amet?"
+          },
+          {
+            "visible_if": "{{ block.settings.title2 != blank }}",
+            "type": "richtext",
+            "id": "content2",
+            "label": "Content #2",
+            "default": "<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus ut tellus nec mi tincidunt imperdiet eget vitae sapien. Integer massa velit, commodo at magna eget, semper vehicula quam. Morbi laoreet tellus at neque blandit, eu congue sem congue. Mauris dapibus est ut ipsum malesuada tincidunt. Curabitur tempus commodo suscipit. Sed eu blandit urna, at porttitor ligula. In maximus lobortis tellus.</p>"
+          },
+          {
+            "type": "text",
+            "id": "title3",
+            "label": "Title #3",
+            "default": "Lorem ipsum dolor sit amet?"
+          },
+          {
+            "visible_if": "{{ block.settings.title3 != blank }}",
+            "type": "richtext",
+            "id": "content3",
+            "label": "Content #3",
+            "default": "<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus ut tellus nec mi tincidunt imperdiet eget vitae sapien. Integer massa velit, commodo at magna eget, semper vehicula quam. Morbi laoreet tellus at neque blandit, eu congue sem congue. Mauris dapibus est ut ipsum malesuada tincidunt. Curabitur tempus commodo suscipit. Sed eu blandit urna, at porttitor ligula. In maximus lobortis tellus.</p>"
+          },
+          {
+            "type": "text",
+            "id": "title4",
+            "label": "Title #4"
+          },
+          {
+            "visible_if": "{{ block.settings.title4 != blank }}",
+            "type": "richtext",
+            "id": "content4",
+            "label": "Content #4"
+          },
+          {
+            "type": "text",
+            "id": "title5",
+            "label": "Title #5"
+          },
+          {
+            "visible_if": "{{ block.settings.title5 != blank }}",
+            "type": "richtext",
+            "id": "content5",
+            "label": "Content #5"
+          },
+          {
+            "type": "text",
+            "id": "title6",
+            "label": "Title #6"
+          },
+          {
+            "visible_if": "{{ block.settings.title6 != blank }}",
+            "type": "richtext",
+            "id": "content6",
+            "label": "Content #6"
+          },
+          {
+            "type": "text",
+            "id": "title7",
+            "label": "Title #7"
+          },
+          {
+            "visible_if": "{{ block.settings.title7 != blank }}",
+            "type": "richtext",
+            "id": "content7",
+            "label": "Content #7"
+          },
+          {
+            "type": "text",
+            "id": "title8",
+            "label": "Title #8"
+          },
+          {
+            "visible_if": "{{ block.settings.title8 != blank }}",
+            "type": "richtext",
+            "id": "content8",
+            "label": "Content #8"
+          },
+          {
+            "type": "text",
+            "id": "title9",
+            "label": "Title #9"
+          },
+          {
+            "visible_if": "{{ block.settings.title9 != blank }}",
+            "type": "richtext",
+            "id": "content9",
+            "label": "Content #9"
+          },
+          {
+            "type": "text",
+            "id": "title10",
+            "label": "Title #10"
+          },
+          {
+            "visible_if": "{{ block.settings.title10 != blank }}",
+            "type": "richtext",
+            "id": "content10",
+            "label": "Content #10"
+          },
+          {
+            "type": "text",
+            "id": "title11",
+            "label": "Title #11"
+          },
+          {
+            "visible_if": "{{ block.settings.title11 != blank }}",
+            "type": "richtext",
+            "id": "content11",
+            "label": "Content #11"
+          },
+          {
+            "type": "text",
+            "id": "title12",
+            "label": "Title #12"
+          },
+          {
+            "visible_if": "{{ block.settings.title12 != blank }}",
+            "type": "richtext",
+            "id": "content12",
+            "label": "Content #12"
+          },
+          {
+            "type": "text",
+            "id": "title13",
+            "label": "Title #13"
+          },
+          {
+            "visible_if": "{{ block.settings.title13 != blank }}",
+            "type": "richtext",
+            "id": "content13",
+            "label": "Content #13"
+          },
+          {
+            "type": "text",
+            "id": "title14",
+            "label": "Title #14"
+          },
+          {
+            "visible_if": "{{ block.settings.title14 != blank }}",
+            "type": "richtext",
+            "id": "content14",
+            "label": "Content #14"
+          },
+          {
+            "type": "text",
+            "id": "title15",
+            "label": "Title #15"
+          },
+          {
+            "visible_if": "{{ block.settings.title15 != blank }}",
+            "type": "richtext",
+            "id": "content15",
+            "label": "Content #15"
+          }
+        ]
+      }
+    ]
+  }
+{% endschema %}

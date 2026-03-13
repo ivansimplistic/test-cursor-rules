@@ -1,0 +1,473 @@
+{
+  "general": {
+    "home_link": "Home",
+    "close_caption": "Close",
+    "or_conjunction": "or",
+    "copyright": "© {{ year }} {{ name }}",
+    "play_video": "Play video",
+    "pause_video": "Pause video",
+    "skip_to_main_content_button": "Skip to Main Content",
+    "skip_to_footer_button": "Skip to Footer",
+    "go_to_label": "Go to...",
+    "header_submenu_label": "Submenu {{ title }}",
+    "products_singular": "product",
+    "products_plural": "products",
+    "product_quantity": {
+      "quantity_of_product_caption": "Quantity of {{ product_title }}"
+    },
+    "forms": {
+      "select_option_label": "- Select -",
+      "complete_the_field_message": "Please complete the {{ field }}.",
+      "complete_all_the_fields_message": "Please complete all the required fields.",
+      "enter_a_valid_email_message": "Please enter a valid email address.",
+      "confirmation_password_must_match_message": "The password must match with its confirmation.",
+      "message_placeholder": "Message"
+    }
+  },
+  "404": {
+    "title": "Oops!",
+    "message": "We're sorry, but the page you're looking for could not be found.",
+    "link_text": "Back to the Homepage"
+  },
+  "accordion": {
+    "filter_content_label": "Filter Content"
+  },
+  "account": {
+    "popup": {
+      "title": "Account"
+    },
+    "activate_account": {
+      "title": "Activate Account",
+      "text": "Create your password to activate your account",
+      "label_password": "Password",
+      "label_confirm_password": "Confirm Password",
+      "accept_button": "Activate Account",
+      "decline_button": "Decline Invitation"
+    },
+    "addresses": {
+      "title": "Address Book",
+      "new_address_button": "Add New Address",
+      "default_address_label": "Default Address",
+      "new_title": "Add a new address",
+      "edit_title": "Edit address",
+      "action_edit": "Edit",
+      "action_delete": "Delete",
+      "action_delete_confirm_message": "Are you sure you wish to delete this address?"
+    },
+    "login": {
+      "title": "Login",
+      "email_label": "Email address",
+      "password_label": "Password",
+      "forgot_password_message": "Forgot your password?",
+      "login_button": "Login",
+      "new_customer_title": "New Customer?",
+      "new_customer_link": "Register",
+      "recover": {
+        "title": "Reset Password",
+        "message": "Enter your email address below and check your inbox for instructions to reset your password.",
+        "submit_success_message": "Please check your inbox to proceed.",
+        "email_label": "Email address",
+        "submit_button": "Submit",
+        "cancel_button": "Cancel"
+      }
+    },
+    "account_details": {
+      "details_column_title": "User details",
+      "reset_password_label": "Reset password",
+      "address_column_title": "Main address",
+      "manage_addresses_label": "Manage addresses",
+      "latest_orders_title": "Latest orders",
+      "see_past_orders_label": "See past orders ({{ past_orders_size }})"
+    },
+    "order_history": {
+      "title": "Order history",
+      "order_column_title": "Order",
+      "date_column_title": "Date",
+      "payment_status_column_title": "Payment status",
+      "fulfillment_status_column_title": "Fulfillment status",
+      "total_column_title": "Total",
+      "tracking_column_title": "Tracking",
+      "tracking_available": "Track",
+      "tracking_unavailable": "Unavailable",
+      "no_orders_message": "You haven't placed any orders yet.",
+      "status_cancelled_label": "(cancelled)"
+    },
+    "order": {
+      "title": "Order {{ order_name }}",
+      "status_cancelled": "(cancelled)",
+      "placed_at_label": "Placed at:",
+      "cancelled_at_label": "Cancelled at:",
+      "billing_address_title": "Billing Address",
+      "payment_status_label": "Payment Status:",
+      "shipping_address_title": "Shipping Address",
+      "fulfillment_status_label": "Fulfillment Status:",
+      "order_summary_title": "Order Summary",
+      "product_column_title": "Product",
+      "price_column_title": "Price",
+      "quantity_column_title": "Quantity",
+      "total_column_title": "Total",
+      "fullfilled_date_label": "Fulfilled {{ fulfilled_at }}",
+      "subtotal_label": "Subtotal:",
+      "shipping_method_label": "Shipping ({{ shipping_title }}):",
+      "tax_label": "Tax ({{ tax_title }}):",
+      "total_label": "Total:",
+      "other_tracking_numbers_label": "(view all tracking)"
+    },
+    "register": {
+      "title": "Register",
+      "first_name_label": "First Name",
+      "last_name_label": "Last Name",
+      "email_label": "Email address",
+      "password_label": "Password",
+      "register_button": "Create Account",
+      "already_have_account_title": "Already have an account?",
+      "already_have_account_link": "Login"
+    },
+    "reset_password": {
+      "title": "Reset Password",
+      "text": "Enter a new password for",
+      "label_password": "Password",
+      "label_confirm_password": "Confirm Password",
+      "accept_button": "Reset Password"
+    },
+    "customer_address_form": {
+      "first_name_label": "First Name",
+      "last_name_label": "Last Name",
+      "company_label": "Company",
+      "address1_label": "Address 1",
+      "address2_label": "Address 2",
+      "city_label": "City",
+      "country_label": "Country",
+      "state_province_label": "State/Province",
+      "zip_code_label": "Zip Code",
+      "phone_label": "Phone",
+      "set_default_address_label": "Set as Default Address?",
+      "add_address_button": "Add address",
+      "update_address_button": "Update address",
+      "cancel_button": "Cancel"
+    },
+    "customer_portal_menu": {
+      "title": "My Account",
+      "account_details_link": "Account details",
+      "address_book_link": "Address book",
+      "order_history_link": "Order history",
+      "subscriptions_link": "My Subscriptions",
+      "logout_button": "Logout"
+    }
+  },
+  "announcement_bar": {
+    "caption": "Announcement"
+  },
+  "article_main": {
+    "back_to": "Back to {{ blog_title }}",
+    "previous_post": "Previous post",
+    "next_post": "Next post"
+  },
+  "blog_sidebar": {
+    "search_label": "Search",
+    "search_field_caption": "Enter search terms",
+    "search_submit_caption": "Submit search",
+    "categories_all_label": "All"
+  },
+  "cart": {
+    "title": "Cart",
+    "empty_message": "Your shopping cart is empty.",
+    "start_shopping_link": "Start Shopping",
+    "continue_shopping_link": "Continue shopping",
+    "checkout_link": "Checkout",
+    "subtotal_label": "Subtotal:",
+    "savings_label": "Savings:",
+    "shipping_label": "Shipping:",
+    "shipping_text": "Calculated in the next step",
+    "note_label": "Message",
+    "saving_field_label": "Saving",
+    "item": {
+      "remove_caption": "Remove Item"
+    },
+
+    "bundles": {
+      "bundled_items_title": "Bundled items:"
+    }
+  },
+  "collection_main": {
+    "empty_collection_message": "This Collection is currently empty. Please come back later.",
+    "no_results_for_filters_message": "No results for the current filters. Please expand your search options.",
+    "see_our_products_message": "Check out our products",
+    "products_count": "{{ products_quantity }} Products",
+    "products_count_single": "{{ products_quantity }} Product"
+  },
+  "custom_items_content": {
+    "view_all_caption": "View all",
+    "view_less_caption": "View less"
+  },
+  "mobile_menu": {
+    "title": "Menu",
+    "close_caption": "Close Menu",
+    "my_account_link": "My Account",
+    "login_link": "Log In",
+    "currency_label": "Currency",
+    "language_label": "Language",
+    "open_menu_caption": "Open Menu",
+    "toggle_navigation_caption": "Toggle navigation",
+    "toggle_submenu_caption": "Toggle {{ submenu_title }} submenu",
+    "open_submenu_caption": "Open {{ submenu_title }} submenu",
+    "navigation_back_label": "Back",
+    "navigation_back_caption": "Close submenu"
+  },
+  "pickup_availability": {
+    "pickup_available_at_place_label": "Pickup available at {{ location_name }}",
+    "pickup_not_available_at_label": "Pickup currently unavailable at {{ location_name }}",
+    "pickup_available_time_label": "Pickup available, {{ pick_up_time }}",
+    "view_store_info": "View store information",
+    "view_availability_other_stores": "Check availability at other stores"
+  },
+  "product_main": {
+    "model_view_message": "View in your space",
+    "add_to_cart_button": "Add to cart",
+    "sold_out_message": "Sold out",
+    "select_option_label": "Select a {{ option_name }}",
+    "sold_out_option_value": " - Sold Out",
+    "autoplay_videos_label": "Autoplay videos",
+    "view_3d_model_label": "View 3D model"
+  },
+  "search_main": {
+    "search_page_title": "Search",
+    "no_results_for_filters_message": "No results for current filters.",
+    "results_with_count": "Results: {{ count }}"
+  },
+  "shipping_calculator": {
+    "country_label": "Country",
+    "state_province_label": "State/Province",
+    "zip_postal_code_label": "Zip/Postal Code",
+    "calculate_shipping_rates_caption": "Calculate shipping rates",
+    "complete_to_see_results_message": "Complete the form to see results."
+  },
+  "side_cart": {
+    "title": "Your Cart",
+    "close_caption": "Close Side Cart",
+    "cart_empty_message": "Your cart is empty.",
+    "start_shopping_link": "Start Shopping"
+  },
+  "article_card": {
+    "author_title": "By {{ author_name }}"
+  },
+  "blog_comments": {
+    "new_comment_title": "Leave a Comment",
+    "submitted_moderated_message": "Thank you for submitting a comment! You will see it posted soon!",
+    "submitted_success_message": "Thank you, your comment was posted successfully!",
+    "author_email_label": "Email",
+    "author_name_label": "Name",
+    "message_label": "Message",
+    "submit_button": "Post comment",
+    "share_comment_label": "Share this comment:",
+    "share_on_facebook_caption": "Share this comment on Facebook",
+    "share_on_twitter_caption": "Share this comment on Twitter",
+    "share_on_pinterest_caption": "Share this comment on Pinterest"
+  },
+  "carousel": {
+    "previous_slide_caption": "Go to previous slide",
+    "next_slide_caption": "Go to next slide"
+  },
+  "collage_item": {
+    "products_title": "{{ products_quantity }} Products",
+    "posts_title": "{{ posts_quantity }} Posts"
+  },
+  "collection_filters": {
+    "title": "Filters",
+    "skip_to_collection_button": "Skip to Collection",
+    "close_caption": "Close Filters Modal",
+    "enter_search_terms_caption": "Enter search terms",
+    "remove_filter_caption": "Remove filter {{ label }}",
+    "remove_filter_price_caption": "Remove filter price",
+    "clear_all_button": "Clear All",
+    "price_from_label": "From",
+    "price_to_label": "To",
+    "product_count_filtered": "Products: {{ product_count }} of {{ total_count }}"
+  },
+  "currency_selector": {
+    "change_currency_caption": "Switch currency"
+  },
+  "language_selector": {
+    "change_language_caption": "Switch language"
+  },
+  "newsletter_form": {
+    "email_visible_label":"Email address",
+    "email_aria_label":"Email address"
+  },
+  "page_hero_blocks": {
+    "navbar_blog_categories_caption": "Blog categories",
+    "navbar_all_articles_label": "All posts"
+  },
+  "page_manager_helper": {
+    "load_more_button": "Load more"
+  },
+  "page_top": {
+    "sort_by_label": "Sort by",
+    "sort_manual_label": "Sort by",
+    "sort_price_low_to_high_label": "Price: Low to high",
+    "sort_price_high_to_low_label": "Price: High to low",
+    "sort_alphabetically_ascending_label": "A-Z",
+    "sort_alphabetically_descending_label": "Z-A",
+    "sort_oldest_to_newest_label": "Oldest to newest",
+    "sort_newest_to_oldest_label": "Newest to oldest",
+    "sort_best_selling_by_label": "Best selling",
+    "sort_relevance_label": "Sort by relevance",
+    "filters_button": "Filters",
+    "grid_layout_size_list_caption": "Change grid layout to display as a List",
+    "grid_layout_size_one_per_row_caption": "Change grid layout to display one product per row",
+    "grid_layout_size_two_per_row_caption": "Change grid layout to display two products per row",
+    "grid_layout_size_three_per_row_caption": "Change grid layout to display three product per row",
+    "grid_layout_size_four_per_row_caption": "Change grid layout to display four product per row"
+  },
+  "pagination": {
+    "next_button": "Next",
+    "previous_button": "Prev",
+    "current_page_caption": "Current page",
+    "page_caption": "Page",
+    "showing_items_label": "Showing: {{ current_items }} of {{ total_items }}"
+  },
+  "photoswipe": {
+    "close_caption": "Close (Esc)",
+    "toggle_fullscreen_caption": "Toggle fullscreen",
+    "zoom_in_out_caption": "Zoom in/out",
+    "previous_caption": "Previous (arrow left)",
+    "next_caption": "Next (arrow right)"
+  },
+  "product_card": {
+    "shop_now_button": "Shop now",
+    "reviews_rating_caption": "Rating: {{ rating }} out of 5 stars",
+    "swatches_more_label": "more"
+  },
+  "product_card_atc": {
+    "close_quick_add_caption": "Close quick add panel",
+    "add_to_cart_button": "Add",
+    "sold_out_message": "Sold out",
+    "quick_view_button": "More details",
+    "quick_shop_button": "Quick shop",
+    "starts_at_price": "From"
+  },
+  "product_card_quantity": {
+    "quantity_of_product_caption": "Quantity of {{ product_title }}",
+    "decrease_quantity_of_product_caption": "Decrease quantity of {{ product_title }}",
+    "increase_quantity_of_product_caption": "Increase quantity of {{ product_title }}"
+  },
+  "product_card_swatches": {
+    "option_selection_group_caption": "{{ option }} selection group"
+  },
+  "product_enhanced_description": {
+    "tabs_caption": "Additional product information"
+  },
+  "product": {
+    "original_price_label": "Original price",
+    "final_price_label": "Final price"
+  },
+
+  "component_product_personalization_js": {
+    "enter_text_label": "Enter text",
+    "enter_monogram_label": "Enter text"
+  },
+
+  "search_form": {
+    "enter_search_terms_caption": "Enter search terms",
+    "submit_search_caption": "Submit search",
+    "search_placeholder": "Search"
+  },
+  "social_share_article": {
+    "share_via_email_caption": "Share this post via Email",
+    "share_via_email_subject": "I want to share this with you",
+    "share_via_email_body": "Hi there, check out this article in our store {{ url }}!",
+    "share_post_caption": "Share this post",
+    "share_on_facebook_caption": "Share this post on Facebook",
+    "share_on_twitter_caption": "Share this post on Twitter",
+    "share_on_pinterest_caption": "Share this post on Pinterest"
+  },
+  "social_share_pdp": {
+    "share_product_label": "Share this product",
+    "share_via_email_caption": "Share this post via Email",
+    "share_via_email_subject": "I want to share this with you",
+    "share_via_email_body": "Hi there, check out this product in our store {{ url }}!",
+    "share_on_facebook_caption": "Share this product on Facebook",
+    "share_on_twitter_caption": "Share this product on Twitter",
+    "share_on_pinterest_caption": "Share this product on Pinterest"
+  },
+  "top_utils_cart": {
+    "open_cart_caption": "Open cart",
+    "cart_caption": "Cart"
+  },
+  "top_utils_search": {
+    "close_caption": "Close search bar",
+    "search_caption": "Search"
+  },
+  "top_utils_user": {
+    "my_account_caption": "Account",
+    "login_caption": "Login"
+  },
+  "search_js": {
+    "products_title": "Products",
+    "articles_title": "Articles",
+    "pages_title": "Pages",
+    "collections_title": "Collections",
+    "search_results_caption": "Search results",
+    "see_all_results_link": "See all results",
+    "see_all_n_results_link": "See all {{ quantity }} results",
+    "no_products_found_message": "No products found",
+    "popular_searches_title": "Popular searches",
+    "popular_search_terms_title": "Popular search terms",
+    "your_last_searches_title": "Your last searches"
+  },
+  "util_countdown_js": {
+    "days_label": "Days",
+    "hours_label": "Hours",
+    "minutes_label": "Minutes",
+    "seconds_label": "Seconds"
+  },
+
+  "bundle_builder": {
+    "add_to_cart_button": "Add to cart",
+    "subtotal_label": "Subtotal:",
+    "items_count_label": "Items:",
+    "minimum_items_label": "Min:",
+    "maximum_items_label": "Max:",
+    "step_selected_items_label": "Selected",
+    "step_select_at_least_label": "Add at least [min]",
+    "step_select_between_label": "Choose between [min] and [max]",
+  },
+
+  "cookies_banner": {
+    "settings_panel": {
+      "title": "Cookie settings",
+      "option_necessary_label": "Strictly Necessary",
+      "option_necessary_text": "Cookies necessary for our website to function properly.",
+      "option_analytics_label": "Analytics",
+      "option_analytics_text": "Cookies to understand how customers interact with the site.",
+      "option_preferences_label": "Preferences",
+      "option_preferences_text": "Cookies that remember customer preferences, such as country or language, to personalize visits to the website.",
+      "option_marketing_label": "Marketing",
+      "option_marketing_text": "Cookies to provide ads and marketing communications based on customer interests.",
+      "option_saleofdata_label": "Sale of data",
+      "option_saleofdata_text": "Opt in of data sharing / sales.",
+      "save_button": "Save"
+    }
+  },
+  "social": {
+    "follow_instagram": "Follow us on Instagram",
+    "follow_facebook": "Follow us on Facebook",
+    "follow_twitter": "Follow us on Twitter",
+    "follow_pinterest": "Follow us on Pinterest",
+    "follow_tiktok": "Follow us on TikTok",
+    "follow_snapchat": "Follow us on Snapchat",
+    "follow_linkedin": "Follow us on LinkedIn",
+    "follow_vimeo": "Follow us on Vimeo",
+    "follow_youtube": "Follow us on YouTube",
+    "opens_new_window": "Opens new window"
+  },
+  "gift_card": {
+    "illustration_alt": "Gift card illustration",
+    "start_shopping": "Start Shopping",
+    "add_to_apple_wallet": "Add to Apple Wallet"
+  },
+  "video": {
+    "youtube_player_title": "YouTube video player",
+    "vimeo_player_title": "Vimeo Video Player"
+  }
+}

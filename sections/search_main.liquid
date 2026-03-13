@@ -1,0 +1,681 @@
+{%- liquid
+  assign firstBlock = section.blocks.first
+  if firstBlock.type == 'breadcrumb' and firstBlock.settings.placement == 'outside'
+    render 'breadcrumb', section: firstBlock
+  endif
+-%}
+
+<style>
+.collection-grid {
+  --items-per-row: {{section.settings.items_per_row}};
+  --grid-align: {{section.settings.grid_align}};
+}
+@media (max-width: {{settings.breakpoint_tablet}}) {
+  .collection-grid {
+    --items-per-row: {{section.settings.items_per_row_tablet}};
+  }
+}
+@media (max-width: {{settings.breakpoint_mobile}}) {
+  .collection-grid {
+    --items-per-row: {{section.settings.items_per_row_mobile}};
+  }
+}
+</style>
+
+{{ 'collection_main.css' | asset_url | stylesheet_tag }}
+
+<style>
+  page-manager {
+    --section-padding-top: calc(var(--global-sections-padding) * {{section.settings.section_padding_top | divided_by: 100.00}});
+    --section-padding-bottom: calc(var(--global-sections-padding) * {{section.settings.section_padding_bottom | divided_by: 100.00}});
+    --collection-utils-compensate: {{section.settings.utils_sticky | replace: true, '4em' | replace: false, '0'}};
+  }
+  @media (max-width: {{settings.breakpoint_mobile}}){
+    page-manager {
+      --section-padding-top: calc(var(--global-sections-padding) * {{section.settings.section_padding_top_mobile | divided_by: 100.00}});
+      --section-padding-bottom: calc(var(--global-sections-padding) * {{section.settings.section_padding_bottom_mobile | divided_by: 100.00}});
+    }
+  }
+</style>
+
+{%- if search.types contains 'product' -%}
+  {%- if section.settings.filters and search.types contains 'product' and search.types.size == 1 and search.filters.size > 0 -%}
+    <style>
+      collection-filters {
+        --filters-border-radius: {{section.settings.filters_border_radius}}em;
+      }
+      {%- if section.settings.pagination_mode == 'infinite_scroll' or section.settings.pagination_mode == 'load_more' -%}
+      @media (min-width: {{settings.breakpoint_tablet | plus: 0.001}}em){
+        collection-filters:not(.layout-button) .filters-inner {position: sticky; top: calc(var(--header-offset) + var(--collection-utils-compensate) + 1.5em); overflow-y: auto; max-height: calc(100vh - var(--header-offset) - calc(1.5em * 2) - var(--collection-utils-compensate));}
+      }
+      {%- endif -%}
+    </style>
+    {{ 'collection_filters.css' | asset_url | stylesheet_tag }}
+    {{ 'util_accordion.css' | asset_url | stylesheet_tag }}
+    <script src="{{ 'util_accordion.js' | asset_url }}" defer="defer"></script>
+  {%- endif -%}
+  <script src="{{ 'collection_main.js' | asset_url }}" defer="defer"></script>
+{%- endif -%}
+
+{%- if search.types contains 'article' -%}
+{{ 'blog_base.css' | asset_url | stylesheet_tag }}
+{%- endif -%}
+
+{{ 'search_main.css' | asset_url | stylesheet_tag }}
+<script src="{{ 'pagination.js' | asset_url }}" defer="defer"></script>
+
+<div class="search-top text-{{section.settings.text_align}} scheme color-{{section.settings.heading_color_scheme}} {% if section.settings.heading_border %}scheme-border-bottom{% endif %} padding-bottom-{{section.settings.heading_padding}}">
+  <div class="container">
+    {%- liquid
+      for block in section.blocks
+        if block.type == 'breadcrumb' and block.settings.placement == 'inside'
+          render 'breadcrumb', section: block
+        endif
+      endfor 
+    -%}
+    <div class="wrap">
+      <h1>{{ 'search_main.search_page_title' | t }}</h1>
+      {%- assign types = search.types | join: ',' -%}
+      {%- render 'search_form', autocomplete: true, searchTypes: types, color_scheme: settings.modals_main_color_scheme -%}
+    </div>
+  </div>
+</div>
+
+{%- liquid 
+  if search.results.size == 0 or search.types contains 'product'
+    for filter in search.filters
+      if filter.type == "price_range"
+        if filter.min_value.value != nil or filter.max_value.value != nil
+          assign usingFilters = true
+          break
+        endif
+      elsif filter.active_values.size > 0
+        assign usingFilters = true
+        break
+      endif 
+    endfor
+  endif
+-%}
+
+{%- if search.performed -%}
+  {%- paginate search.results by section.settings.page_size -%}
+    <page-manager class="scheme color-{{section.settings.content_color_scheme}}" data-page-param="{{ paginate.page_param }}" data-pagination-mode="{{section.settings.pagination_mode}}" data-current-page="{{paginate.current_page}}" data-total-pages="{{paginate.pages}}" data-section-id="{{section.id}}" data-items-container-selector="#shopify-section-{{section.id}} .collection-grid" data-item-selector="#shopify-section-{{section.id}} .product-item, #shopify-section-{{section.id}} .featured-item">
+
+      {%- assign useGridLayout = false -%}
+      {%- if search.types contains 'product' and search.types.size == 1 -%}
+        {%- if  search.results.size > 0 or usingFilters == true -%}
+          {%- if section.settings.utils_show == true -%}
+            {%- render 'page_top', section: section, source: 'search', sticky: section.settings.utils_sticky, filters_layout: section.settings.filters_layout -%}
+            {%- assign useGridLayout = true -%}
+          {%- endif -%}
+        {%- endif -%}
+      {%- endif -%}
+
+      <div class="search-main collection-main">
+        <div class="container">
+          {%- if search.performed -%}
+            {%- if search.results.size > 0 or usingFilters == true -%}
+              <div class="flex flex-wrap">
+                {%- if section.settings.filters and search.types contains 'product' and search.types.size == 1 and search.filters.size > 0 -%}
+                  {%- render 'collection_filters', section: section, source: search, storefrontTags: section.settings.filters_allowed_storefront_tags -%}
+                {%- endif -%}
+
+                <div class="collection-wrapper flex-1">
+                  {%- if search.results.size > 0 -%}
+                    {% render 'page_manager_helper', type: 'scrollUp', paginate: paginate, paginationMode: section.settings.pagination_mode %}
+
+                    <div class="grid collection-grid" {% if useGridLayout and cart.attributes['_grid_layout'] and section.settings.utils_show == true and settings.dz_enable_cart_attribute_grid_layout %} data-grid-layout="{{cart.attributes['_grid_layout']}}"{% endif %}>
+                      {%- assign orderIndex = paginate.current_offset -%}
+                      {%- for item in search.results -%}
+                        {%- assign orderIndex = orderIndex | plus: 1 -%}
+                        {%- case item.object_type -%}
+                          {%- when 'product' -%}
+                            {% assign product = item %}
+                            <div class="grid-item product-item" style="order: {{orderIndex}}" data-page="{{paginate.current_page}}">
+                                {%- render 'product_card_atc', productCard: product -%}
+                            </div>
+                          {%- when 'article' -%}
+                            <div class="grid-item result-item article-item" style="order: {{orderIndex}}" data-page="{{paginate.current_page}}">
+                              {%- render 'article_card', article: item, openNewTab: section.settings.open_new_tab -%}
+                            </div>
+                          {%- when 'page' -%}
+                            <div class="grid-item result-item page-item" style="order: {{orderIndex}}" data-page="{{paginate.current_page}}">
+                              <a href="{{ item.url }}" class="page-card common-card text-left no-highlight-hover {% if settings.article_card_border %}scheme-border-box{% endif %} {% if settings.article_card_image_full_width %}image-full-width{% endif %} {% if section.settings.cards_color_scheme != blank %}scheme color-{{section.settings.cards_color_scheme}}{% endif %} same-scheme-{%- if section.settings.cards_color_scheme == section.settings.color_scheme -%}true{%- else -%}false{%- endif -%}" {% if settings.article_card_open_new_tab %}target="_blank"{% endif %} >
+                                <div class="image-container">
+                                  <div class="img ease-animation-slow">
+                                    <div class="item-content">
+                                      {{item.content}}
+                                    </div>
+                                  </div>
+                                </div>
+                                <div class="title heading-font">{{ item.title }}</div>
+                                <div class="{{settings.article_card_cta_label_style}}">{{ settings.article_card_cta_label }}</div>
+                              </a>
+                            </div>
+                        {%- endcase -%}
+                      {%- endfor -%}
+                      <page-results-end></page-results-end>
+                    </div>
+
+                    {% render 'page_manager_helper', type: 'scrollDown', paginate: paginate, paginationMode: section.settings.pagination_mode %}
+                  {%- else -%}    
+                    <div class="collection-grid"></div>
+                    <div class="empty text-{{section.settings.text_align}}">
+                      <div class="title">{{ 'search_main.no_results_for_filters_message' | t }}</div>
+                    </div>
+                  {%- endif -%}
+                </div>
+              </div>
+
+              {%- if section.settings.show_next_section_if_no_results -%}
+                <style>
+                  #shopify-section-{{section.id}} + .shopify-section {display: none;}
+                </style>
+              {%- endif -%}
+              
+            {%- else -%}
+              <div class="collection-grid"></div>
+              <div class="empty text-{{section.settings.text_align}}">
+                {%- if search.types contains 'product' -%}
+                  <div class="head">{% render 'icons', icon: 'product-tag' %}</div>
+                {%- endif -%}
+                <h2 class="title body-font">
+                  {%- assign searchTerm = search.terms | remove: '*' -%}
+                  {{ section.settings.no_results_title | replace: '[search_term]', searchTerm }}
+                </h2>
+              </div>
+            {%- endif -%}
+          {%- endif -%}
+        </div>
+      </div>
+    </page-manager>
+  {%- endpaginate -%}
+{%- endif -%}
+
+
+{%- if settings.product_match_title_height_grid -%}
+  <script type="module">
+    function layout() {
+      $s.matchHeight(document.querySelectorAll('#shopify-section-{{section.id}} .product-card .title'));
+    }
+    document.querySelector('#shopify-section-{{section.id}} page-manager').addEventListener('pageLoaded', layout);
+    $s.resizeWidthHandle(layout);
+  </script>
+{%- endif -%}
+{%- if settings.article_match_title_height_grid -%}
+  <script type="module">
+    function layout() {
+      $s.matchHeight(document.querySelectorAll('#shopify-section-{{section.id}} .article-card .title'));
+    }
+    document.querySelector('#shopify-section-{{section.id}} page-manager').addEventListener('pageLoaded', layout);
+    $s.resizeWidthHandle(layout);
+  </script>
+{%- endif -%}
+
+
+{% schema %}
+  {
+    "name": "Search Main",
+    "class": "type-search-main",
+    "tag": "section",
+    "settings": [
+      {
+        "type": "header",
+        "content": "Heading"
+      },
+      {
+        "type": "color_scheme",
+        "id": "heading_color_scheme",
+        "label": "Color scheme",
+        "default": "scheme-2"
+      },
+      {
+        "type": "select",
+        "id": "text_align",
+        "label": "Alignment (Desktop)",
+        "options": [
+          {"value": "left", "label": "Left"},
+          {"value": "center", "label": "Center"},
+          {"value": "right", "label": "Right"}
+        ],
+        "default": "center"
+      },
+      {
+        "type": "checkbox",
+        "id": "heading_border",
+        "label": "Border bottom",
+        "default": false
+      },
+      {
+        "type": "checkbox",
+        "id": "heading_padding",
+        "label": "Padding bottom",
+        "default": true
+      },
+      {
+        "type": "header",
+        "content": "Results"
+      },
+      {
+        "type": "color_scheme",
+        "id": "content_color_scheme",
+        "label": "Color scheme",
+        "default": "scheme-1"
+      },
+      {
+        "type": "color_scheme",
+        "id": "cards_color_scheme",
+        "label": "Cards color scheme",
+        "default": "scheme-1"
+      },
+      {
+        "type": "select",
+        "id": "pagination_mode",
+        "label": "Pagination Mode",
+        "options": [
+          {
+            "value": "pager",
+            "label": "Pager"
+          },
+          {
+            "value": "load_more",
+            "label": "Load More"
+          },
+          {
+            "value": "infinite_scroll",
+            "label": "Infinite Scroll"
+          }
+        ],
+        "default": "pager"
+      },
+      {
+        "type": "select",
+        "id": "product_count_label",
+        "label": "Products Count Label",
+        "options": [
+          {
+            "value": "filters",
+            "label": "In filters"
+          },
+          {
+            "value": "utils",
+            "label": "In utils"
+          },
+          {
+            "value": "none",
+            "label": "None"
+          }
+        ],
+        "default": "filters"
+      },
+      {
+        "type": "range",
+        "id": "page_size",
+        "min": 6,
+        "max": 50,
+        "step": 1,
+        "label": "Items per page",
+        "default": 24
+      },
+      {
+        "type": "range",
+        "id": "items_per_row",
+        "min": 1,
+        "max": 4,
+        "step": 1,
+        "label": "Items per row (Desktop)",
+        "default": 4
+      },
+      {
+        "type": "range",
+        "id": "items_per_row_tablet",
+        "min": 1,
+        "max": 3,
+        "step": 1,
+        "label": "Items per row (Tablet)",
+        "default": 3
+      },
+      {
+        "type": "range",
+        "id": "items_per_row_mobile",
+        "min": 1,
+        "max": 3,
+        "step": 1,
+        "label": "Items per row (Mobile)",
+        "default": 2
+      },
+      {
+        "type": "select",
+        "id": "grid_align",
+        "label": "Alignment",
+        "options": [
+          {
+            "value": "flex-start",
+            "label": "Left"
+          },
+          {
+            "value": "center",
+            "label": "Center"
+          },
+          {
+            "value": "flex-end",
+            "label": "Right"
+          }
+        ],
+        "default": "flex-start"
+      },
+      {
+        "type": "header",
+        "content": "Top utils"
+      },
+      {
+        "type": "checkbox",
+        "id": "utils_show",
+        "label": "Show",
+        "default": true
+      },
+      {
+        "type": "checkbox",
+        "id": "utils_sticky",
+        "label": "Make it sticky on scroll",
+        "default": true
+      },
+      {
+        "type": "header",
+        "content": "Filters"
+      },
+      {
+        "type": "checkbox",
+        "id": "filters",
+        "label": "Show",
+        "default": true
+      },
+      {
+        "visible_if": "{{ section.settings.filters == true }}",
+        "type": "textarea",
+        "id": "filters_allowed_storefront_tags",
+        "label": "Allowed filter tags",
+        "info": "Write tags separated by a comma and a space: New Arrivals, Best Sellers, Men, Women. Leave empty to display all tags.",
+        "default": "15-30, 30-45, 45-60, Men, Women"
+      },
+      {
+        "visible_if": "{{ section.settings.filters == true }}",
+        "type": "radio",
+        "id": "filters_layout",
+        "label": "Desktop Layout",
+        "options": [
+          {
+            "value": "sidebar",
+            "label": "Side bar"
+          },
+          {
+            "value": "sidebar layout-horizontal",
+            "label": "Horizontal dropdowns"
+          },
+          {
+            "value": "button",
+            "label": "Button"
+          }
+        ],
+        "default": "sidebar"
+      },
+      {
+        "visible_if": "{{ section.settings.filters == true }}",
+        "type": "select",
+        "id": "filters_default_state",
+        "label": "Filters default state",
+        "options": [
+            {"value": "expanded", "label": "Expanded"},
+            {"value": "collapsed", "label": "Collapsed"}
+        ],
+        "default": "collapsed",
+        "info": "When using 'Horizontal' dropdowns for desktop, this setting is ignored and 'collapsed' is used."
+      },
+      {
+        "visible_if": "{{ section.settings.filters == true }}",
+        "type": "select",
+        "id": "filters_accordion_border_position",
+        "label": "Filter group border position",
+        "options": [
+            {"value": "below_title", "label": "Below title"},
+            {"value": "below_items", "label": "Below items"}
+        ],
+        "default": "below_items"
+      },
+      {
+        "visible_if": "{{ section.settings.filters == true }}",
+        "type": "color_scheme",
+        "id": "filters_color_scheme",
+        "label": "Filters color scheme",
+        "default": "scheme-2"
+      },
+      {
+        "visible_if": "{{ section.settings.filters == true }}",
+        "type": "range",
+        "id": "filters_border_radius",
+        "min": 0,
+        "max": 10,
+        "step": 0.2,
+        "unit": "em",
+        "label": "Border radius",
+        "default": 0
+      },
+      {
+        "visible_if": "{{ section.settings.filters == true }}",
+        "type": "checkbox",
+        "id": "filters_border",
+        "label": "Border of filters block"
+      },
+      {
+        "type": "header",
+        "content": "When No Results"
+      },
+      {
+        "type": "text",
+        "id": "no_results_title",
+        "label": "Title",
+        "default": "Sorry, there are no results for \"[search_term]\".",
+        "info": "You can use the label [search_term] which will be replaced with the customer's search term."
+      },
+      {
+        "type": "checkbox",
+        "id": "show_next_section_if_no_results",
+        "label": "Show next section only when there are no results",
+        "default": true
+      },
+      {
+        "type": "header",
+        "content": "Section padding"
+      },
+      {
+        "type": "range",
+        "id": "section_padding_top",
+        "min": 0,
+        "max": 100,
+        "step": 10,
+        "unit": "%",
+        "label": "Padding top (Desktop)",
+        "default": 100
+      },
+      {
+        "type": "range",
+        "id": "section_padding_top_mobile",
+        "min": 0,
+        "max": 100,
+        "step": 10,
+        "unit": "%",
+        "label": "Padding top (Mobile)",
+        "default": 100
+      },
+      {
+        "type": "range",
+        "id": "section_padding_bottom",
+        "min": 0,
+        "max": 100,
+        "step": 10,
+        "unit": "%",
+        "label": "Padding bottom (Desktop)",
+        "default": 100
+      },
+      {
+        "type": "range",
+        "id": "section_padding_bottom_mobile",
+        "min": 0,
+        "max": 100,
+        "step": 10,
+        "unit": "%",
+        "label": "Padding bottom (Mobile)",
+        "default": 100
+      }
+    ],
+    "blocks": [
+      {
+        "type": "breadcrumb",
+        "name": "Breadcrumbs",
+        "limit": 1,
+        "settings": [
+          {
+            "type": "header",
+            "content": "Placement"
+          },
+          {
+            "type": "select",
+            "id": "placement",
+            "label": "Placement",
+            "options": [
+              {"value": "outside", "label": "Section on top"},
+              {"value": "inside", "label": "Flow as a Block"}
+            ],
+            "default": "outside",
+            "info": "Important: when 'Section on top' the breadcrumb block must be the first one of the section, otherwise it won't appear."
+          },
+          {
+            "type": "header",
+            "content": "Desktop settings"
+          },
+          {
+            "type": "color_scheme",
+            "id": "color_scheme",
+            "label": "Color scheme",
+            "default": "scheme-2"
+          },
+          {
+            "type": "select",
+            "id": "text_align",
+            "label": "Text align",
+            "options": [
+              {"value": "start", "label": "left"},
+              {"value": "center", "label": "center"},
+              {"value": "end", "label": "right"}
+            ],
+            "default": "start"
+          },
+          {
+            "type": "checkbox",
+            "id": "over_first_section",
+            "label": "Overlap the first section",
+            "info": "When placement is 'Section on top'",
+            "default": true
+          },
+          {
+            "type": "range",
+            "id": "padding_top",
+            "min": 0,
+            "max": 5,
+            "step": 0.5,
+            "unit": "rem",
+            "label": "Padding top",
+            "default": 1.5
+          },
+          {
+            "type": "range",
+            "id": "padding_bottom",
+            "min": 0,
+            "max": 5,
+            "step": 0.5,
+            "unit": "rem",
+            "label": "Padding bottom",
+            "default": 1.5
+          },
+          {
+            "type": "checkbox",
+            "id": "border_top",
+            "label": "Top border",
+            "default": false
+          },
+          {
+            "type": "checkbox",
+            "id": "border_bottom",
+            "label": "Bottom border",
+            "default": false
+          },
+          {
+            "type": "header",
+            "content": "Mobile settings"
+          },
+          {
+            "type": "color_scheme",
+            "id": "color_scheme_mobile",
+            "label": "Color scheme",
+            "default": "scheme-2"
+          },
+          {
+            "type": "select",
+            "id": "text_align_mobile",
+            "label": "Text align",
+            "options": [
+              {"value": "start", "label": "left"},
+              {"value": "center", "label": "center"},
+              {"value": "end", "label": "right"}
+            ],
+            "default": "start"
+          },
+          {
+            "type": "checkbox",
+            "id": "hide_mobile",
+            "label": "Hide on Mobile Phones",
+            "default": false
+          },
+          {
+            "type": "checkbox",
+            "id": "over_first_section_mobile",
+            "label": "Overlap the first section",
+            "info": "When placement is 'Section on top'"
+          },
+          {
+            "type": "range",
+            "id": "padding_top_mobile",
+            "min": 0,
+            "max": 5,
+            "step": 0.5,
+            "unit": "rem",
+            "label": "Padding top",
+            "default": 1.5
+          },
+          {
+            "type": "range",
+            "id": "padding_bottom_mobile",
+            "min": 0,
+            "max": 5,
+            "step": 0.5,
+            "unit": "rem",
+            "label": "Padding bottom",
+            "default": 1.5
+          },
+          {
+            "type": "checkbox",
+            "id": "border_top_mobile",
+            "label": "Top border",
+            "default": false
+          },
+          {
+            "type": "checkbox",
+            "id": "border_bottom_mobile",
+            "label": "Bottom border",
+            "default": false
+          }
+        ]
+      }
+    ]
+  }
+{% endschema %}

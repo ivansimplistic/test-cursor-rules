@@ -1,0 +1,145 @@
+<style>
+  #shopify-section-{{ section.id }} {
+    --text-width: {{section.settings.text_width | append: 'em' | replace: '100em', '100%'}};
+    --video-height: {{section.settings.video_height | default: 100}}%;
+    --text-border-radius: {{section.settings.text_border_radius}}em;
+    --image-border-radius: {{section.settings.image_border_radius | replace: '10', '1000'}}em;
+  }
+  @media (min-width: {{settings.breakpoint_tablet | plus: 0.001}}em){
+    #shopify-section-{{ section.id }} {
+      --section-padding-top: calc(var(--global-sections-padding) * {{section.settings.section_padding_top | divided_by: 100.00}});
+      --section-padding-bottom: calc(var(--global-sections-padding) * {{section.settings.section_padding_bottom | divided_by: 100.00}});
+      --image-width: {{section.settings.image_width | default: 0 | append: '%'}};
+      --image-min-height: {{section.settings.image_min_height_desktop | default: 0}}rem;
+      --text-padding: calc(var(--global-sections-padding) * {{section.settings.text_padding | divided_by: 100.00}});
+    }
+  }
+  @media (max-width: {{settings.breakpoint_tablet}}){
+    #shopify-section-{{ section.id }} {
+      --section-padding-top: calc(var(--global-sections-padding) * {{section.settings.section_padding_top_mobile | divided_by: 100.00}});
+      --section-padding-bottom: calc(var(--global-sections-padding) * {{section.settings.section_padding_bottom_mobile | divided_by: 100.00}});
+      --image-max-height: {{section.settings.image_max_height_mobile | default: 1000}}rem;
+      --text-padding: calc(var(--global-sections-padding) * {{section.settings.text_padding_mobile | divided_by: 100.00}});
+      --text-border-radius: {{section.settings.text_border_radius_mobile}}em;
+      --image-border-radius: {{section.settings.image_border_radius_mobile | default: section.settings.image_border_radius | replace: '10', '1000'}}em;
+    }
+  }
+</style>
+{{ 'image_text.css' | asset_url | stylesheet_tag }}
+
+{%- liquid 
+  assign imageHeight = section.settings.image_height | default: 'auto'
+
+  assign fullWidthDesktop = section.settings.full_width
+  assign fullWidthMobile = section.settings.full_width_mobile | default: section.settings.full_width, allow_false: true
+
+  if section.settings.full_width and section.settings.text_overlaps_media != true
+    assign correctTextPadding = true
+  elsif section.settings.full_width != true and section.settings.text_overlaps_media != true and section.settings.section_color_scheme == section.settings.content_color_scheme
+    assign correctTextPadding = true
+  endif
+
+  if section.settings.text != blank and section.settings.text != '<p></p>'
+    assign hasTextField = true
+  endif
+
+  assign disableLazySizes = false
+  if section.index == 1
+    assign disableLazySizes = true
+  endif
+-%}
+
+{%- capture imageColumn -%}
+  {%- if imageColumnHtml != blank -%}
+    {%- assign hasImageColumn = true -%}
+    <div class="media-column medium-down--one-whole">
+      {{imageColumnHtml}}
+    </div>
+  {%- elsif section.settings.video_mp4 != blank or section.settings.video_iframe != blank or section.settings.image != blank or imagePlaceholder == true -%}
+    {%- assign hasImageColumn = true -%}
+    <div class="media-column medium-down--one-whole">
+      {%- if section.settings.media_type == 'video' -%}
+        {%- if section.settings.video_mp4 != blank or section.settings.video_iframe != blank -%}
+          <div class="media-wrap video-wrap {% if section.settings.video_mp4_mobile != blank or section.settings.video_iframe_mobile != blank or section.settings.image_mobile != blank %}medium-down--hide{% endif %}">
+            {%- render 'media_video_html', section: section -%}
+          </div>
+        {%- endif -%}
+      {%- elsif section.settings.media_type == 'image' -%}
+        {%- if section.settings.image != blank or imagePlaceholder == true -%}
+          <div class="media-wrap {% if section.settings.video_mp4_mobile != blank or section.settings.video_iframe_mobile != blank or section.settings.image_mobile != blank %}medium-down--hide{% endif %}">
+            <img alt="{{section.settings.image.alt}}" class="img media {% unless disableLazySizes %}lazyload{% endunless %}" data-sizes="auto" src="{% render 'image_placeholder', image: section.settings.image %}" {% if disableLazySizes %}fetchpriority="high" {% else %}data-{% endif %}srcset="{% render 'lazy_src', image: section.settings.image %}" width="{{ section.settings.image.width }}" height="{{ section.settings.image.height }}" {% if section.settings.image.presentation.focal_point != blank %}style="object-position: {{section.settings.image.presentation.focal_point}};"{% endif %} />
+          </div>
+        {%- endif -%}
+      {%- endif -%}
+      {%- if section.settings.media_type_mobile == 'video' -%}
+        {%- if section.settings.video_mp4_mobile != blank or section.settings.video_iframe_mobile != blank -%}
+          <div class="media-wrap video-wrap hide medium-down--show">
+            {%- render 'media_video_html', section: section, videoMp4: section.settings.video_mp4_mobile, videoIframe: section.settings.video_iframe_mobile -%}
+          </div>
+        {%- endif -%}
+      {%- elsif section.settings.media_type_mobile == 'image' -%}
+        {%- if section.settings.image_mobile != blank -%}
+          <div class="media-wrap hide medium-down--show">
+            <img alt="{{section.settings.image_mobile.alt}}" class="img media {% unless disableLazySizes %}lazyload{% endunless %}" data-sizes="auto" src="{% render 'image_placeholder', image: section.settings.image_mobile %}" {% if disableLazySizes %}fetchpriority="high" {% else %}data-{% endif %}srcset="{% render 'lazy_src', image: section.settings.image_mobile %}" width="{{ section.settings.image_mobile.width }}" height="{{ section.settings.image_mobile.height }}" {% if section.settings.image_mobile.presentation.focal_point != blank %}style="object-position: {{section.settings.image_mobile.presentation.focal_point}};"{% endif %} />
+          </div>
+        {%- endif -%}
+      {%- endif -%}
+    </div>
+  {%- endif -%}
+{%- endcapture -%}
+
+{%- capture textColumn -%}
+  <div class="text-column large--flex-1 medium-down--one-whole flex large--justify-content-{{section.settings.text_position}} medium-down--justify-content-{{section.settings.text_position_mobile}} {% if imageHeight == 'cover' %}align-items-{{section.settings.content_vertical_alignment}}{% endif %}">
+    <div class="wrap richtext-wrap large--text-{{section.settings.text_align}} medium-down--text-{{section.settings.text_align_mobile}} {% if section.settings.text_overlaps_media or section.settings.column_gap %}scheme color-{{section.settings.content_color_scheme}}{% endif %}">
+      {% comment %}Static section settings{% endcomment %}
+      {%- if section.settings.eyebrow != blank -%}
+        {%- assign hasTextColumn = true -%}
+        <div class="{% if section.settings.title_size < 3 %}subheading{% else %}small-label{% endif %}">{{section.settings.eyebrow}}</div>
+      {%- endif -%}
+      {%- if section.settings.title != blank -%}
+        {%- assign hasTextColumn = true -%}
+        {{ '<' }}{%- if section.settings.is_h1 -%}h1{%- else -%}h2{%- endif %} class="title {{section.settings.title_size | replace: 0, '1-xl' | replace: -1, '1-xxl' | prepend: 'h' }}"{{ '>' }}
+          {{section.settings.title | replace: '[br]', '<br aria-hidden="true" />' | replace: '[hi]', '<span class="highlight">' | replace: '[/hi]', '</span>' |  replace: '[hi2]', '<span class="highlight2">' | replace: '[/hi2]', '</span>'}}
+        {{ '</' }}{%- if section.settings.is_h1 -%}h1{%- else -%}h2{%- endif -%}{{ '>' }}
+      {%- endif -%}
+      {%- if hasTextField -%}
+        {%- assign hasTextColumn = true -%}
+        <div class="text {{section.settings.text_size | prepend: 'p'}}">{{section.settings.text}}</div>
+      {%- endif -%}
+      {%- if section.settings.button != blank or section.settings.button2 != blank -%}
+        {%- assign hasTextColumn = true -%}
+        <div class="btn-wrap">
+          {%- if section.settings.button != blank -%}
+            <a href="{{ section.settings.link }}" class="btn">
+              {{ section.settings.button }}
+            </a>
+          {%- endif -%}
+          {%- if section.settings.button2 != blank -%}
+            <a href="{{ section.settings.link2 }}" class="btn">
+              {{ section.settings.button2 }}
+            </a>
+          {%- endif -%}
+        </div>
+      {%- endif -%}
+
+      {% comment %}customHTMLParam{% endcomment %}
+      {%- if textColumnHtml != blank -%}
+        {%- assign hasTextColumn = true -%}
+        {{textColumnHtml}}
+      {%- endif -%}
+    </div>
+  </div>
+{%- endcapture -%}
+
+<div class="image-text scheme color-{{section.settings.section_color_scheme}} {{imageHeight}} {% if section.settings.column_gap %}column-gap{% endif %} {% if correctTextPadding %}text-padding-correction{% endif %} {% if section.settings.section_padding_top > 0 %}padding-top{% endif %} {% if section.settings.section_padding_bottom > 0 %}padding-bottom{% endif %} {% if section.settings.image_padding %}media-padding{% endif %} {% if section.settings.text_overlaps_media %}text-overlaps-media{% endif %} {% if section.settings.section_color_scheme == section.settings.content_color_scheme %}same-scheme{% endif %}">
+  <div class="content-wrapper {% unless fullWidthDesktop %}large--container{% endunless %} {% unless fullWidthMobile %}medium-down--container{% endunless %}">
+    <div class="content flex medium-down--flex-wrap {% unless section.settings.text_overlaps_media or section.settings.column_gap %}scheme color-{{section.settings.content_color_scheme}}{% endunless %} {% if hasImageColumn %}{{section.settings.image_position}} {% if section.settings.full_width %}{% if section.settings.image_position == 'row-reverse' %}large--container-left{% else %}large--container-right{% endif %}{% endif %} {% else %}no-media {% if section.settings.full_width %}large--container-left large--container-right{% endif %}{% endif %} medium-down--{{section.settings.image_position_mobile}} {% if imageHeight != 'cover' %}align-items-{{section.settings.content_vertical_alignment}}{% endif %}">
+      {%- if hasImageColumn -%}
+        {{imageColumn}}
+      {%- endif -%}
+      {%- if hasTextColumn -%}
+        {{textColumn}}
+      {%- endif -%}
+    </div>
+  </div>
+</div>

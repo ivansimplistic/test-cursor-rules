@@ -1,0 +1,444 @@
+{%- liquid
+  if block.settings.positioning == 'sticky'
+    assign htmlTag = 'sticky-updown'
+  else
+    assign htmlTag = 'div'
+  endif
+-%}
+{{ '<' }}{{htmlTag}} class="grid-item tb-item {% if block.settings.grow %}grow{% endif %} {{ block.settings.positioning }}" {{  block.shopify_attributes }}
+  style="
+  --width-desktop: {{ block.settings.width_desktop }}%; 
+  --width-tablet: {{ block.settings.width_tablet }}%; 
+  --width-mobile: {{ block.settings.width_mobile }}%;
+  --padding-top: {{block.settings.section_padding_top | divided_by: 100.00}};
+  --padding-bottom: {{block.settings.section_padding_bottom | divided_by: 100.00}};
+  --spacing-desktop: {{block.settings.blocks_spacing}}rem;
+  --spacing-mobile: {{block.settings.blocks_spacing_mobile}}rem;
+  --box-sizing: {{block.settings.box_sizing}};
+  "
+{{ '>' }}
+  {%- assign newAlpha = block.settings.background_opacity | divided_by: 100.00 -%}
+  <div class="tb-container scheme color-{{block.settings.section_color_scheme}} {% unless block.settings.full_width %}container{% endunless %}"
+    style="
+    --scheme-background-gradient: {{ block.settings.section_color_scheme.settings.background | color_modify: 'alpha', newAlpha }};
+    "
+  >
+    <div id="block-{{ block.id }}" class="grid {% unless block.settings.flex_direction contains 'reverse' %}direction-{% endunless %}{{ block.settings.flex_direction }} small--{% unless block.settings.flex_direction_mobile contains 'reverse' %}direction-{% endunless %}{{ block.settings.flex_direction_mobile }} text-{{ block.settings.content_align }} align-items-{{ block.settings.align_items }} justify-content-{{ block.settings.justify_content }}">
+      {% content_for 'blocks' %}
+    </div>
+  </div>
+{{ '</' }}{{htmlTag}}{{ '>' }}
+
+{% schema %}
+{
+  "name": "Container",
+  "tag": null,
+  "blocks": [{"type": "@app"}, {"type": "@theme"}],
+  "presets": [
+    {
+      "name": "Container (Full Width)",
+      "category": "Layout",
+      "blocks": [
+      ],       
+      "settings": {
+        "full_width": true
+      }
+    },
+    {
+      "name": "Container (Contained)",
+      "category": "Layout",
+      "blocks": [
+      ],
+      "settings": {
+        "full_width": false
+      }
+    },
+    {
+      "name": "Image with content overlay",
+      "category": "Templates",
+      "blocks": [
+        {
+          "type": "image",
+          "settings": {
+          }
+        },
+        {
+          "type": "container",
+          "name": "Absolute content",
+          "settings": {
+            "full_width": false,
+            "positioning": "absolute",
+            "background_opacity": 0,
+            "box_sizing": "border-box",
+            "flex_direction": "column",
+            "justify_content": "end",
+            "section_padding_top": 30,
+            "section_padding_bottom": 30
+          },
+          "blocks": [
+            {
+              "type": "title",
+              "settings": {
+              }
+            },
+            {
+              "type": "text",
+              "settings": {
+              }
+            }
+          ]
+        }
+      ],
+      "settings": {
+        "full_width": true
+      }
+    },
+    {
+      "name": "Content with media background",
+      "category": "Templates",
+      "blocks": [
+        {
+          "type": "container",
+          "name": "Background image/video",
+          "settings": {
+            "positioning": "absolute",
+            "background_opacity": 0,
+            "justify_content": "center"
+          },
+          "blocks": [
+            {
+              "type": "image",
+              "settings": {
+              }
+            }
+          ]
+        },
+        {
+          "type": "container",
+          "name": "Foreground content",
+          "settings": {
+            "full_width": false,
+            "box_sizing": "border-box",
+            "flex_direction": "column",
+            "justify_content": "end",
+            "section_padding_top": 30,
+            "section_padding_bottom": 30,
+            "background_opacity": 0,
+            "width_desktop": 50,
+            "width_tablet": 50
+          },
+          "blocks": [
+            {
+              "type": "title",
+              "settings": {
+              }
+            },
+            {
+              "type": "text",
+              "settings": {
+              }
+            },
+            {
+              "type": "button",
+              "settings": {
+              }
+            }
+          ]
+        }
+      ],
+      "settings": {
+        "full_width": true,
+        "justify_content": "center"
+      }
+    },
+    {
+      "name": "2 Columns: Sticky media with content",
+      "category": "Templates",
+      "blocks": [
+        {
+          "type": "container",
+          "name": "Sticky container image/video",
+          "settings": {
+            "positioning": "sticky",
+            "background_opacity": 100,
+            "justify_content": "center",
+            "width_desktop": 50
+          },
+          "blocks": [
+            {
+              "type": "image",
+              "settings": {
+                "block_height": "window_height",
+                "block_height_mobile": "small"
+              }
+            }
+          ]
+        },
+        {
+          "type": "container",
+          "name": "Container (Contained)",
+          "blocks": [
+            {
+              "type": "title",
+              "settings": {
+              }
+            },
+            {
+              "type": "image",
+              "settings": {
+              }
+            },
+            {
+              "type": "text",
+              "settings": {
+              }
+            },
+            {
+              "type": "title",
+              "settings": {
+              }
+            },
+            {
+              "type": "text",
+              "settings": {
+              }
+            },
+            {
+              "type": "text",
+              "settings": {
+              }
+            },
+            {
+              "type": "text",
+              "settings": {
+              }
+            },
+            {
+              "type": "title",
+              "settings": {
+              }
+            },
+            {
+              "type": "image",
+              "settings": {
+              }
+            },
+            {
+              "type": "text",
+              "settings": {
+              }
+            }
+          ],
+          "settings": {
+            "full_width": false,
+            "width_desktop": 50,
+            "section_padding_top": 50,
+            "section_padding_bottom": 50
+          }
+        }
+      ],
+      "settings": {
+        "full_width": true,
+        "justify_content": "center",
+        "align_items": "start",
+        "flex_direction": "row-reverse"
+      }
+    }
+  ],
+  "settings": [
+    {
+      "type": "color_scheme",
+      "id": "section_color_scheme",
+      "label": "Container color scheme",
+      "default": "scheme-1",
+      "info": "Only visible when the section is not full width, or the section top/bottom paddings are enabled."
+    },
+    {
+      "type": "select",
+      "id": "box_sizing",
+      "label": "Box Sizing",
+      "options": [
+        {"value": "content-box", "label": "Content"},
+        {"value": "border-box", "label": "Border"}
+      ],
+      "default": "content-box",
+      "info": "Affects how paddings are calculated. Often when content gets out of the expected area this should be changed from content-box to border-box."
+    },
+    {
+      "type": "select",
+      "id": "positioning",
+      "label": "Poisitioning",
+      "options": [
+        {"value": "static", "label": "Default"},
+        {"value": "absolute", "label": "Absolute"},
+        {"value": "sticky", "label": "Sticky"}
+      ],
+      "default": "static",
+      "info": "When using Sticky, the parent container 'Align items' option must be set to 'start'."
+    },
+    {
+      "type": "range",
+      "id": "background_opacity",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "label": "Background opacity",
+      "default": 100
+    },
+    {
+      "type": "header",
+      "content": "Flex Settings"
+    },
+    {
+      "type": "select",
+      "id": "flex_direction",
+      "label": "Flex direction (Desktop)",
+      "options": [
+        {"value": "row", "label": "Horizontal"},
+        {"value": "column", "label": "Vertical"},
+        {"value": "row-reverse", "label": "Horizontal reverse"},
+        {"value": "column-reverse", "label": "Vertical reverse"}
+      ],
+      "default": "row"
+    },
+    {
+      "type": "select",
+      "id": "flex_direction_mobile",
+      "label": "Flex direction (Mobile)",
+      "options": [
+        {"value": "row", "label": "Horizontal"},
+        {"value": "column", "label": "Vertical"},
+        {"value": "row-reverse", "label": "Horizontal reverse"},
+        {"value": "column-reverse", "label": "Vertical reverse"}
+      ],
+      "default": "row"
+    },
+    {
+      "type": "select",
+      "id": "align_items",
+      "label": "Align items",
+      "options": [
+        {"value": "start", "label": "Start"},
+        {"value": "center", "label": "Center"},
+        {"value": "end", "label": "End"},
+        {"value": "stretch", "label": "Stretch"}
+      ],
+      "default": "stretch"
+    },
+    {
+      "type": "select",
+      "id": "justify_content",
+      "label": "Justify content",
+      "options": [
+        {"value": "start", "label": "Start"},
+        {"value": "center", "label": "Center"},
+        {"value": "end", "label": "End"},
+        {"value": "around", "label": "Space around"},
+        {"value": "between", "label": "Space between"},
+        {"value": "evenly", "label": "Space evenly"}
+      ],
+      "default": "start"
+    },
+    {
+      "type": "select",
+      "id": "content_align",
+      "label": "Content align",
+      "options": [
+        {"value": "left", "label": "Left"},
+        {"value": "center", "label": "Center"},
+        {"value": "right", "label": "Right"}
+      ],
+      "default": "center"
+    },
+    {
+      "type": "range",
+      "id": "width_desktop",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "label": "Block width (Desktop)",
+      "default": 100
+    },
+    {
+      "type": "range",
+      "id": "width_tablet",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "label": "Block width (Tablet)",
+      "default": 100
+    },
+    {
+      "type": "range",
+      "id": "width_mobile",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "label": "Block width (Mobile)",
+      "default": 100
+    },
+    {
+      "type": "checkbox",
+      "id": "grow",
+      "label": "Grow to fill row",
+      "default": false,
+      "info": "Let the item grow to fill the remaining space of the row. Useful when you need even items size but the sum of the width isn't exactly 100%. For example when having 3 columns of width: 33%."
+    },
+
+    {
+      "type": "header",
+      "content": "Child Containers Spacing"
+    },
+    {
+      "type": "range",
+      "id": "blocks_spacing",
+      "min": 0,
+      "max": 10,
+      "step": 0.1,
+      "default": 2,
+      "unit": "rem",
+      "label": "Blocks spacing (Desktop)"
+    },
+    {
+      "type": "range",
+      "id": "blocks_spacing_mobile",
+      "min": 0,
+      "max": 5,
+      "step": 0.1,
+      "default": 2,
+      "unit": "rem",
+      "label": "Blocks spacing (Mobile)"
+    },
+    {
+      "type": "checkbox",
+      "id": "full_width",
+      "label": "Full Width",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "section_padding_top",
+      "min": 0,
+      "max": 100,
+      "step": 10,
+      "unit": "%",
+      "label": "Outer padding top",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "section_padding_bottom",
+      "min": 0,
+      "max": 100,
+      "step": 10,
+      "unit": "%",
+      "label": "Outer padding bottom",
+      "default": 0
+    }
+  ]
+}
+{% endschema %}

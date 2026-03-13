@@ -1,0 +1,9 @@
+<a {% if customer %}href="{{ routes.account_url }}"{% else %}href="{{ routes.account_login_url }}"{% endif %} class="trigger-account item {% unless section.settings.user_show_mobile %}small--hide{% endunless %}" aria-label="{% if customer %}{{ 'top_utils_user.my_account_caption' | t | escape }}, {{ customer.first_name }}{% else %}{{ 'top_utils_user.login_caption' | t | escape }}{% endif %}">
+  <span class="icon-badge-wrap">
+    {%- render 'icons', icon: 'user' -%}
+    {%- if customer and section.settings.top_utils_badge_style == 'float' -%}
+      <span class="customer-name badge smaller">{{customer.first_name}}</span>
+    {%- endif -%}
+  </span>
+  <span class="label">{% if customer %}{{ 'top_utils_user.my_account_caption' | t }}{% else %}{{ 'top_utils_user.login_caption' | t }}{% endif %}</span>
+</a>

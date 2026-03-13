@@ -1,0 +1,24 @@
+{%- for link in links -%}
+  {%- if collection.url == link.url -%}
+    {%- assign collectionsDisplayed = ', ' -%}
+    {%- for child in link.links -%}
+      {%- if child.url contains '/collections/' -%}
+        {%- unless collectionsDisplayed contains child.url or collection.url == child.url -%}
+          <div class="keen-slider-slide">
+            <a href="{{child.url}}" class="col-subcategory-item scheme color-{{block.settings.cards_color_scheme}} border-{{block.settings.cards_border}} block no-highlight-hover {% if block.settings.images_border_radius == 50 %}text-center{% else %}large--text-{{section.settings.text_align}} medium-down--text-{{section.settings.text_align_mobile}}{% endif %} same-scheme-{%- if section.settings.content_color_scheme == block.settings.cards_color_scheme -%}true{%- else -%}false{%- endif -%}">
+              <div class="img-wrap {% if block.settings.images_border %}scheme-border-box{% endif %}">
+                {%- assign image = child.object.image -%}
+                <div class="lazyload img ease-animation-slow" data-bgset="{% render 'lazy_src', image: image %}"></div>
+              </div>
+              <div class="title small-label">{{child.object.title | truncatewords: 3}}</div>
+            </a>
+          </div>
+        {%- endunless -%}
+        {%- assign collectionsDisplayed = ', ' | append: collectionsDisplayed | append: child.url | remove: ', , ' | split: ', '  -%}
+      {%- endif -%}
+    {%- endfor -%}
+    {%- break -%}
+  {%- elsif link.links != blank -%}
+    {%- render 'collection_subcategories_loop', links: link.links, section: section, block: block -%}
+	{%- endif -%}
+{%- endfor -%}

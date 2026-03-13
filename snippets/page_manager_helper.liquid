@@ -1,0 +1,49 @@
+{%- comment -%}
+    Renders the pagination elements necessary for the page_manager component
+
+    Accepts:
+    - type: {String} "scrollUp" or "scrollDown"
+    - paginate: {Object} Paginate Liquid object
+    - paginationMode: {String} "pager", "load_more" or "infinite_scroll"
+
+    Usage:
+    {% render 'page_manager_helper', type: 'scrollDown', paginate: paginate, paginationMode: section.settings.pagination_mode %}
+{%- endcomment -%}
+
+{%- if type == 'scrollUp' -%}
+  {%- if paginationMode == 'infinite_scroll' or paginationMode == 'load_more' -%}
+    {%- if paginate.current_page > 1 -%}
+      <pagination-infinite-scroll data-type="up">
+        <div class="infinite-scroll-up">
+          <div class="pagination-loading hide"><div class="loader"></div></div>
+        </div>
+      </pagination-infinite-scroll>
+    {%- endif -%}
+  {%- endif -%}
+{%- endif -%}
+
+{%- if type == 'scrollDown' -%}
+  {%- if paginationMode == 'pager' -%}
+    <pagination-pager>
+      {%- render 'pagination', paginate: paginate -%}
+    </pagination-pager>
+  {%- else -%}
+    <noscript>
+      <div class="text-center container" style="padding-top: calc(var(--global-sections-padding) * 0.5)">{{- paginate | default_pagination -}}</div>
+    </noscript>
+  {%- endif -%}
+  {%- if paginate.pages > paginate.current_page -%}
+    {%- if paginationMode == 'load_more' -%}
+      <pagination-load-more>
+        <div class="pagination-loading hide"><div class="loader"></div></div>
+        <button type="button" class="btn hide btn-load-more">{{ 'page_manager_helper.load_more_button' | t }}</button>
+      </pagination-load-more>
+    {%- elsif paginationMode == 'infinite_scroll' -%}
+      <pagination-infinite-scroll data-type="down">
+        <div class="infinite-scroll-down">
+          <div class="pagination-loading hide"><div class="loader"></div></div>
+        </div>
+      </pagination-infinite-scroll>
+    {%- endif -%}
+  {%- endif -%}
+{%- endif -%}

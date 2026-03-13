@@ -1,0 +1,20 @@
+{%- assign formId = section.id | split: '__' | last | prepend: 'currency_selector_' -%}
+{%- form 'currency', id: formId, class: "localization-selector" -%}
+  <div class="localization-selector-content">
+    <label for="CurrencySelector-{{formId}}" class="flex align-items-center">
+      <img alt="{{cart.currency.iso_code}}" src="https://cdn.shopify.com/shopifycloud/web/assets/v1/{% render 'icons_flags', iso_code: cart.currency.iso_code %}" width="32" height="24" />
+      <span>{{cart.currency.iso_code}}</span>
+      {%- render 'icons', icon: 'chevron-down' -%}
+    </label>
+    <select name="currency" id="CurrencySelector-{{formId}}" class="localization-currency" aria-label="{{ 'currency_selector.change_currency_caption' | t | escape }}">
+      {% for currency in shop.enabled_currencies %}
+        <option value="{{currency.iso_code}}"{% if currency == cart.currency %} selected="selected"{% endif %}>{{currency.iso_code}}</option>
+      {% endfor %}
+    </select>
+  </div>
+  <script type="module">
+    document.getElementById('CurrencySelector-{{formId}}').addEventListener('change', (e) => {
+      e.target.form.submit()
+    })
+  </script>  
+{%- endform -%}

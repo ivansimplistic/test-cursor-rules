@@ -1,0 +1,140 @@
+<div class="grid-item">
+  {%- render 'richtext_blocks', blockType: 'content_video', block: block -%}
+</div>
+{% schema %}
+{
+  "name": "Video",
+  "tag": null,
+  "presets": [
+    {
+      "name": "Video",
+      "category": "Content",
+      "blocks": [
+      ]
+    }
+  ],
+  "settings": [
+    {
+      "type": "video",
+      "id": "video_mp4",
+      "label": "Video (MP4)"
+    },
+    {
+      "type": "video_url",
+      "id": "video_iframe",
+      "label": "Video (Youtube/Vimeo)",
+      "accept": ["youtube", "vimeo"]
+    },
+    {
+      "type": "checkbox",
+      "id": "video_autoplay",
+      "label": "Video autoplay"
+    },
+    {
+      "type": "select",
+      "id": "block_height",
+      "label": "Video Height (Desktop)",
+      "options": [
+        {"value": "small","label": "Small"},
+        {"value": "medium","label": "Medium"},
+        {"value": "large","label": "Large"},
+        {"value": "auto","label": "Keep aspect mp4 / Iframe ratio:1.7778 "},
+        {"value": "window_height","label": "Window height"}
+      ],
+      "default": "auto"
+    },
+    {
+      "type": "select",
+      "id": "block_height_mobile",
+      "label": "Video Height (Mobile)",
+      "options": [
+        {"value": "small","label": "Small"},
+        {"value": "medium","label": "Medium"},
+        {"value": "large","label": "Large"},
+        {"value": "auto","label": "Keep aspect mp4 / Iframe ratio:1.7778 "},
+        {"value": "window_height","label": "Window height"}
+      ],
+      "default": "auto"
+    },
+    {
+      "type": "range",
+      "id": "width",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "label": "Width (Desktop)",
+      "default": 100
+    },
+    {
+      "type": "range",
+      "id": "width_mobile",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "label": "Width (Mobile)",
+      "default": 100
+    },
+    {
+      "type": "range",
+      "id": "border_radius",
+      "min": 0,
+      "max": 10,
+      "step": 0.2,
+      "unit": "em",
+      "label": "Border radius",
+      "default": 0
+    },
+    {
+      "type": "checkbox",
+      "id": "border",
+      "label": "Border"
+    },
+    {
+      "type": "header",
+      "content": "Caption"
+    },
+    {
+      "type": "richtext",
+      "id": "caption",
+      "label": "Caption"
+    },
+    {
+      "visible_if": "{{ section.settings.caption != blank }}",
+      "type": "select",
+      "id": "caption_style",
+      "label": "Style",
+      "options": [
+        {"value": "normal","label": "Body"},
+        {"value": "heading-font","label": "Heading"},
+        {"value": "subheading","label": "Subheading"},
+        {"value": "small-label","label": "Small label"}
+      ],
+      "default": "normal"
+    },
+    {
+      "visible_if": "{{ section.settings.caption != blank }}",
+      "type": "range",
+      "id": "caption_size",
+      "min": 1,
+      "max": 5,
+      "step": 1,
+      "unit": "p",
+      "label": "Size",
+      "default": 4
+    },
+    {
+      "visible_if": "{{ section.settings.caption != blank }}",
+      "type": "range",
+      "id": "caption_spacing",
+      "min": 0,
+      "max": 5,
+      "step": 0.2,
+      "unit": "rem",
+      "label": "Spacing",
+      "default": 1
+    }
+  ]
+}
+{% endschema %}

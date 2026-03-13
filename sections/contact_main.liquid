@@ -1,0 +1,1437 @@
+{{ 'contact_main.css' | asset_url | stylesheet_tag }}
+
+{%- if section.blocks.size > 0 -%}
+  {%- capture contactForm -%}
+    <contact-form class="contact-main">
+      {%- assign class = 'flex direction-column large--align-items-' | append: section.settings.text_align | append: ' medium-down--align-items-' | append: section.settings.text_align_mobile | replace: 'left', 'start' | replace: 'right', 'end' -%}
+      {%- form 'contact', class: class -%}
+        <div class="success-msg hide" aria-live="assertive" {% if form.posted_successfully? %}style="display: block"{% endif %}>{{section.settings.success}}</div>
+        <div class="error-msg hide" aria-live="assertive" {% if form.posted_successfully? == false %}style="display: block"{% endif %}>{{ form.errors | default_errors }}</div>
+        <div class="form-wrap one-whole" {% if form.posted_successfully? %}style="display: none"{% endif %} >
+          <div class="grid">
+            {%- for block in section.blocks -%}
+              {%- if block.type == 'name' -%}
+                <div class="grid-item">
+                  <div class="field required">
+                    <input placeholder="{{block.settings.title}}" id="block-{{block.id}}" type="text" class="required" name="contact[name]" autocomplete="name" aria-required="true" />
+                    <label for="block-{{block.id}}">{{block.settings.title}}</label>
+                  </div>
+                </div>
+              {%- elsif block.type == 'email' -%}
+                <div class="grid-item">
+                  <div class="field required">
+                    <input placeholder="{{block.settings.title}}" id="block-{{block.id}}" type="email" class="email required" name="contact[email]" autocomplete="email" aria-required="true" />
+                    <label for="block-{{block.id}}">{{block.settings.title}}</label>
+                  </div>
+                </div>
+              {%- elsif block.type == 'phone' -%}
+                <div class="grid-item">
+                  <div class="field {% if block.settings.required %}required{% endif %}">
+                    <input placeholder="{{block.settings.title}}" id="block-{{block.id}}" type="phone" name="contact[{{block.settings.title}}]" autocomplete="tel" {% if block.settings.required %}class="required" aria-required="true"{% endif %} />
+                    <label for="block-{{block.id}}">{{block.settings.title}}</label>
+                  </div>
+                </div>
+              {%- elsif block.type == 'message' -%}
+                <div class="grid-item one-whole">
+                  <div class="field textarea required">
+                    <textarea placeholder="{{block.settings.title}}" id="block-{{block.id}}" class="required" name="contact[body]" aria-required="true"></textarea>
+                    <label for="block-{{block.id}}">{{block.settings.title}}</label>
+                  </div>
+                </div>
+              {%- elsif block.type == 'text' -%}
+                <div class="grid-item">
+                  <div class="field {% if block.settings.required %}required{% endif %}">
+                    <input placeholder="{{block.settings.title}}" id="block-{{block.id}}" type="text" name="contact[{{block.settings.title}}]" {% if block.settings.required %}class="required" aria-required="true"{% endif %} />
+                    <label for="block-{{block.id}}">{{block.settings.title}}</label>
+                  </div>
+                </div>
+              {%- elsif block.type == 'dropdown' -%}
+                <div class="grid-item">
+                  <div class="field select {% if block.settings.required %}required{% endif %}">
+                    {%- render 'icons', icon: 'chevron-down' -%}
+                    <select placeholder="{{block.settings.title}}" id="block-{{block.id}}" name="contact[{{block.settings.title}}]" {% if block.settings.required %}class="required" aria-required="true"{% endif %}>
+                      {%- assign options = block.settings.options | newline_to_br | split: '<br />' -%}
+                      {%- for option in options -%}
+                        <option value="{{option | strip | escape}}">{{option | strip | escape}}</option>
+                      {%- endfor -%}
+                    </select>
+                    <label for="block-{{block.id}}">{{block.settings.title}}</label>
+                  </div>
+                </div>
+              {%- elsif block.type == 'radio' -%}
+                <div class="grid-item one-whole">
+                  <div role="radiogroup" aria-labelledby="label-{{block.id}}" class="radio-group">
+                    <div id="label-{{block.id}}" class="small-label">{{block.settings.title}}{% if block.settings.required %}<span class="asterisk">*</span>{% endif %}</div>
+                    <div class="options {% unless block.settings.stack %}flex flex-wrap{% endunless %}">
+                      {%- assign options = block.settings.options | newline_to_br | split: '<br />' -%}
+                      {%- for option in options -%}
+                        <div class="radio-field">
+                          <input id="block-{{block.id}}-{{option | escape | handle}}" value="{{option | strip | escape}}" type="radio" name="contact[{{block.settings.title}}]" class="radio-custom {% if block.settings.required %}required{% endif %}" {% if block.settings.required %}aria-required="true"{% endif %} />
+                          <label for="block-{{block.id}}-{{option | escape | handle}}" class="radio-custom-label">{{option | strip | escape}}</label>
+                        </div>
+                      {%- endfor -%}
+                    </div>
+                  </div>
+                </div>
+              {%- elsif block.type == 'checkbox' -%}
+                <div class="grid-item one-whole">
+                  <div class="checkbox-field {% if block.settings.required %}required{% endif %}">
+                    <input id="block-{{block.id}}" type="checkbox" name="contact[{{block.settings.title}}]" class="checkbox-custom {% if block.settings.required %}required{% endif %}" {% if block.settings.required %}aria-required="true"{% endif %} />
+                    {%- assign ending = '' -%}{%- if block.settings.required -%}{%- assign ending = '<span class="asterisk">*</span>' -%}{%- endif -%}
+                    <label for="block-{{block.id}}" class="checkbox-custom-label">{{block.settings.label | replace: '</p>', ending | append: '</p>'}}</label>
+                  </div>
+                </div>
+              {%- elsif block.type == 'textarea' -%}
+                <div class="grid-item one-whole">
+                  <div class="field textarea {% if block.settings.required %}required{% endif %}">
+                    <textarea placeholder="{{block.settings.title}}" id="block-{{block.id}}" {% if block.settings.required %}class="required" aria-required="true"{% endif %} name="contact[{{block.settings.title}}]"></textarea>
+                    <label for="block-{{block.id}}">{{block.settings.title}}</label>
+                  </div>
+                </div>
+              {%- elsif block.type == 'form_copy' -%}
+                <div class="grid-item richtext-wrap one-whole">
+                  {%- if block.settings.title != blank -%}
+                    <h2 class="title {{block.settings.title_size | replace: 0, '1-xl' | replace: -1, '1-xxl' | prepend: 'h' }}" {{ block.shopify_attributes }}>
+                      {{block.settings.title | replace: '[br]', '<br aria-hidden="true" />' | replace: '[hi]', '<span class="highlight">' | replace: '[/hi]', '</span>' |  replace: '[hi2]', '<span class="highlight2">' | replace: '[/hi2]', '</span>'}}
+                    </h2>
+                  {%- endif -%}
+                  {%- if block.settings.text != blank and block.settings.text != '<p></p>' -%}
+                    <div class="text {{block.settings.text_style}} {{block.settings.text_size | prepend: 'p'}}" {{ block.shopify_attributes }}>
+                      {{block.settings.text | replace: '[Store Name]', shop.name | replace: '[[', '<span class="code highlight">' | replace: ']]', '</span>'}}
+                    </div>
+                  {%- endif -%}
+                </div>
+              {%- endif -%}
+            {%- endfor -%}
+          </div>
+          {%- for block in section.blocks -%}
+            {%- if block.type == 'submit' -%}
+              <input type="hidden" id="section" name="contact[section]" value="Contact Main Section" />
+              <div class="btn-wrap">
+                <button type="submit" class="btn">{{block.settings.title}}</button>
+              </div>
+            {%- endif -%}
+          {%- endfor -%}
+        </div>
+      {%- endform -%}
+    </contact-form>
+  {%- endcapture -%}
+  {%- capture contentHtml -%}
+    {%- render 'richtext_content', section: section, contactForm: contactForm -%}
+  {%- endcapture -%}
+{%- endif -%}
+
+{%- if section.settings.media_type == 'map' and section.settings.map_embed != blank -%}
+  {%- capture imageColumnHtml -%}
+    <div class="media-wrap video-wrap">
+      {{section.settings.map_embed}}
+    </div>
+  {%- endcapture -%}
+{%- else -%}
+  {%- assign imageColumnHtml = blank -%}
+{%- endif -%}
+
+{%- render 'section_image_text_structure', section: section, textColumnHtml: contentHtml, imageColumnHtml: imageColumnHtml -%}
+
+{% schema %}
+  {
+    "name": "Contact Main",
+    "class": "type-contact-main",
+    "tag": "section",
+    "presets": [
+      {
+        "name": "Contact Main",
+        "blocks": [
+          {
+            "type": "content_title",
+            "settings": {
+              "title": "Let's get in touch"
+            }
+          },
+          {
+            "type": "content_text",
+            "settings": {
+              "text": "<p>Leave us a message and we will get back to you as soon as possible.</p>"
+            }
+          },
+          {
+            "type": "separator"
+          },
+          {
+            "type": "name"
+          },
+          {
+            "type": "email"
+          },
+          {
+            "type": "phone"
+          },
+          {
+            "type": "message"
+          },
+          {
+            "type": "submit"
+          }
+        ]
+      }
+    ],
+	  "settings": [
+      {
+        "type": "header",
+        "content": "Form"
+      },
+      {
+        "type": "richtext",
+        "id": "success",
+        "label": "Success message",
+      	"default": "<p>Thanks for contacting us! We'll get back to you as soon as possible.</p>"
+      },
+      {
+        "type": "header",
+        "content": "Media"
+      },
+      {
+        "type": "select",
+        "id": "media_type",
+        "label": "Media type",
+        "options": [
+          {"value": "image", "label": "Image"},
+          {"value": "video", "label": "Video"},
+          {"value": "map", "label": "Map"}
+        ],
+        "default": "map"
+      },
+
+      {
+        "visible_if": "{{ section.settings.media_type == 'map' }}",
+        "type": "liquid",
+        "id": "map_embed",
+        "label": "Google maps embed code",
+        "default": "<iframe src='https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d41702.336818683165!2d-74.0639531403999!3d40.69040369907116!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x89c25090129c363d%3A0x40c6a5770d25022b!2sLiberty%20Statue!5e0!3m2!1ses-419!2sar!4v1667521466325!5m2!1ses-419!2sar' width='600' height='450' style='border:0;' allowfullscreen loading='lazy' referrerpolicy='no-referrer-when-downgrade'></iframe>"
+      },
+
+      {
+        "visible_if": "{{ section.settings.media_type == 'image' }}",
+        "type": "image_picker",
+        "id": "image",
+        "label": "Image"
+      },
+      {
+        "visible_if": "{{ section.settings.media_type == 'video' }}",
+        "type": "video",
+        "id": "video_mp4",
+        "label": "Video (MP4)"
+      },
+      {
+        "visible_if": "{{ section.settings.media_type == 'video' }}",
+        "type": "video_url",
+        "id": "video_iframe",
+        "label": "Video (Youtube/Vimeo)",
+        "accept": ["youtube", "vimeo"]
+      },
+      {
+        "visible_if": "{{ section.settings.media_type == 'video' }}",
+        "type": "checkbox",
+        "id": "video_autoplay",
+        "label": "Video autoplay"
+      },
+      {
+        "visible_if": "{{ section.settings.media_type == 'video' }}",
+        "type": "range",
+        "id": "video_height",
+        "min": 50,
+        "max": 150,
+        "step": 1,
+        "unit": "%",
+        "label": "Video natural height",
+        "default": 56
+      },
+      {
+        "type": "header",
+        "content": "Colors"
+      },
+      {
+        "type": "color_scheme",
+        "id": "section_color_scheme",
+        "label": "Section color scheme",
+        "default": "scheme-1",
+        "info": "Only visible when the section is not full width, or the section top/bottom paddings are enabled."
+      },
+      {
+        "type": "color_scheme",
+        "id": "content_color_scheme",
+        "label": "Content color scheme",
+        "default": "scheme-2"
+      },
+      {
+        "type": "header",
+        "content": "Media Settings"
+      },
+      {
+        "type": "select",
+        "id": "image_position",
+        "label": "Media Position",
+        "options": [
+          {"value": "normal", "label": "Left"},
+          {"value": "row-reverse", "label": "Right"}
+        ],
+        "default": "row-reverse"
+      },
+      {
+        "type": "select",
+        "id": "image_position_mobile",
+        "label": "Media position (Mobile)",
+        "options": [
+          {"value": "normal", "label": "Top"},
+          {"value": "column-reverse", "label": "Bottom"}
+        ],
+        "default": "normal"
+      },
+      {
+        "type": "range",
+        "id": "image_width",
+        "min": 0,
+        "max": 100,
+        "step": 1,
+        "unit": "%",
+        "label": "Media width",
+        "default": 50
+      },
+      {
+        "type": "radio",
+        "id": "image_height",
+        "label": "Media height (Desktop)",
+        "options": [
+          {"value": "auto", "label": "Auto (media natural height)"},
+          {"value": "cover", "label": "Cover the height of the text column"}
+        ],
+        "default": "cover"
+      },
+      {
+        "type": "range",
+        "id": "image_min_height_desktop",
+        "min": 0,
+        "max": 100,
+        "step": 1,
+        "unit": "rem",
+        "label": "Min-height (Desktop)",
+        "default": 50,
+        "info": "Useful when image height is set to 'Cover...'. Use 0 to ignore."
+      },
+      {
+        "type": "range",
+        "id": "image_max_height_mobile",
+        "min": 0,
+        "max": 100,
+        "step": 1,
+        "unit": "rem",
+        "label": "Max-height (Mobile)",
+        "default": 33,
+        "info": "Helps keep images consistent in size, no matter their original specs. Use 100 to ignore."
+      },
+      {
+        "type": "range",
+        "id": "image_border_radius",
+        "min": 0,
+        "max": 10,
+        "step": 0.2,
+        "unit": "em",
+        "label": "Border radius",
+        "default": 0
+      },
+      {
+        "type": "checkbox",
+        "id": "image_padding",
+        "label": "Padding"
+      },
+      {
+        "type": "header",
+        "content": "Text Settings"
+      },
+      {
+        "type": "range",
+        "id": "text_width",
+        "min": 0,
+        "max": 100,
+        "step": 1,
+        "unit": "em",
+        "label": "Width",
+        "default": 50
+      },
+      {
+        "type": "select",
+        "id": "text_position",
+        "label": "Position (Desktop)",
+        "options": [
+          {"value": "start", "label": "Left"},
+          {"value": "center", "label": "Center"},
+          {"value": "end", "label": "Right"}
+        ],
+        "default": "start",
+        "info": "Within the Text column"
+      },
+      {
+        "type": "select",
+        "id": "text_align",
+        "label": "Alignment (Desktop)",
+        "options": [
+          {"value": "left", "label": "Left"},
+          {"value": "center", "label": "Center"},
+          {"value": "right", "label": "Right"}
+        ],
+        "default": "left"
+      },
+      {
+        "type": "select",
+        "id": "text_position_mobile",
+        "label": "Position (Mobile)",
+        "options": [
+          {"value": "start", "label": "Left"},
+          {"value": "center", "label": "Center"},
+          {"value": "end", "label": "Right"}
+        ],
+        "default": "start",
+        "info": "Within the Text column"
+      },
+      {
+        "type": "select",
+        "id": "text_align_mobile",
+        "label": "Alignment (Mobile)",
+        "options": [
+          {"value": "left", "label": "Left"},
+          {"value": "center", "label": "Center"},
+          {"value": "right", "label": "Right"}
+        ],
+        "default": "left"
+      },
+      {
+        "type": "range",
+        "id": "text_border_radius",
+        "min": 0,
+        "max": 10,
+        "step": 0.2,
+        "unit": "em",
+        "label": "Border radius (Desktop)",
+        "default": 0
+      },
+      {
+        "type": "range",
+        "id": "text_border_radius_mobile",
+        "min": 0,
+        "max": 10,
+        "step": 0.2,
+        "unit": "em",
+        "label": "Border radius (Mobile)",
+        "default": 0
+      },
+      {
+        "type": "header",
+        "content": "Section Settings"
+      },
+      {
+        "type": "select",
+        "id": "content_vertical_alignment",
+        "label": "Content vertical alignment (Desktop)",
+        "options": [
+          {"value": "start", "label": "Top"},
+          {"value": "center", "label": "Center"},
+          {"value": "end", "label": "Bottom"}
+        ],
+        "default": "center"
+      },
+      {
+        "type": "checkbox",
+        "id": "full_width",
+        "label": "Full width (Desktop)",
+        "default": true
+      },
+      {
+        "type": "checkbox",
+        "id": "full_width_mobile",
+        "label": "Full width (Mobile)",
+        "default": true
+      },
+      {
+        "type": "checkbox",
+        "id": "column_gap",
+        "label": "Column gap"
+      },
+      {
+        "type": "checkbox",
+        "id": "text_overlaps_media",
+        "label": "Text overlaps media",
+        "default": false
+      },
+      {
+        "type": "header",
+        "content": "Padding Desktop"
+      },
+      {
+        "type": "range",
+        "id": "text_padding",
+        "min": 0,
+        "max": 100,
+        "step": 10,
+        "unit": "%",
+        "label": "Inner padding (Desktop)",
+        "default": 100
+      },
+      {
+        "type": "range",
+        "id": "section_padding_top",
+        "min": 0,
+        "max": 100,
+        "step": 10,
+        "unit": "%",
+        "label": "Outer padding top (Desktop)",
+        "default": 0
+      },
+      {
+        "type": "range",
+        "id": "section_padding_bottom",
+        "min": 0,
+        "max": 100,
+        "step": 10,
+        "unit": "%",
+        "label": "Outer padding bottom (Desktop)",
+        "default": 0
+      },
+      {
+        "type": "header",
+        "content": "Padding Mobile"
+      },
+      {
+        "type": "range",
+        "id": "text_padding_mobile",
+        "min": 0,
+        "max": 100,
+        "step": 10,
+        "unit": "%",
+        "label": "Inner padding (Mobile)",
+        "default": 100
+      },
+      {
+        "type": "range",
+        "id": "section_padding_top_mobile",
+        "min": 0,
+        "max": 100,
+        "step": 10,
+        "unit": "%",
+        "label": "Outer padding top (Mobile)",
+        "default": 0
+      },
+      {
+        "type": "range",
+        "id": "section_padding_bottom_mobile",
+        "min": 0,
+        "max": 100,
+        "step": 10,
+        "unit": "%",
+        "label": "Outer padding bottom (Mobile)",
+        "default": 0
+      }
+    ],
+    "blocks": [
+      {
+        "type": "form_copy",
+        "name": "Form: Heading",
+        "limit": 1,
+        "settings": [
+          {
+            "type": "text",
+            "id": "title",
+            "label": "Title",
+            "default": "Lorem ipsum dolor"
+          },
+          {
+            "type": "range",
+            "id": "title_size",
+            "min": -1,
+            "max": 6,
+            "step": 1,
+            "unit": "h",
+            "label": "Title size",
+            "default": 3,
+            "info": "Equivalent to the heading tags: 6 = <h6> (smallest), 1 = <h1> (largest), 0 and -1 are even larger."
+          },
+          {
+            "type": "richtext",
+            "id": "text",
+            "label": "Text",
+            "default": "<p>Lorem ipsum dolor sit amet, consectur adipiscing elit.</p>"
+          },
+          {
+            "type": "select",
+            "id": "text_style",
+            "label": "Text style",
+            "options": [
+              {"value": "normal","label": "Body"},
+              {"value": "subheading","label": "Subheading"},
+              {"value": "small-label","label": "Small label"}
+            ],
+            "default": "normal"
+          },
+          {
+            "type": "range",
+            "id": "text_size",
+            "min": 1,
+            "max": 5,
+            "step": 1,
+            "unit": "p",
+            "label": "Text size",
+            "default": 3
+          }
+        ]
+      },
+      { 
+        "type": "name",
+        "name": "Form field: Name",
+        "limit": 1,
+        "settings": [
+          {
+            "type": "header",
+            "content": "This field is required, do not hide it."
+          },
+          {
+            "type": "text",
+            "id": "title",
+            "label": "Field title",
+            "default": "Name"
+          }
+        ]
+      },
+      {
+        "type": "email",
+        "name": "Form field: Email",
+        "limit": 1,
+        "settings": [
+          {
+            "type": "header",
+            "content": "This field is required, do not hide it."
+          },
+          {
+            "type": "text",
+            "id": "title",
+            "label": "Field title",
+            "default": "Email address"
+          }
+        ]
+      },
+      {
+        "type": "phone",
+        "name": "Form field: Phone",
+        "limit": 1,
+        "settings": [
+          {
+            "type": "text",
+            "id": "title",
+            "label": "Field title",
+            "default": "Phone"
+          },
+          {
+            "type": "checkbox",
+            "id": "required",
+            "label": "Required"
+          }
+        ]
+      },
+      {
+        "type": "message",
+        "name": "Form field: Message",
+        "limit": 1,
+        "settings": [
+          {
+            "type": "header",
+            "content": "This field is required, do not hide it."
+          },
+          {
+            "type": "text",
+            "id": "title",
+            "label": "Field title",
+            "default": "Message"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "Form field: Text",
+        "settings": [
+          {
+            "type": "text",
+            "id": "title",
+            "label": "Field title",
+            "default": "Custom text"
+          },
+          {
+            "type": "checkbox",
+            "id": "required",
+            "label": "Required"
+          }
+        ]
+      },
+      {
+        "type": "dropdown",
+        "name": "Form field: Dropdown",
+        "settings": [
+          {
+            "type": "text",
+            "id": "title",
+            "label": "Field title",
+            "default": "Custom dropdown"
+          },
+          {
+            "type": "textarea",
+            "id": "options",
+            "label": "Options",
+            "default": "Option 1\nOption 2\nOption 3",
+            "info": "Each option in a new line."
+          },
+          {
+            "type": "checkbox",
+            "id": "required",
+            "label": "Required"
+          }
+        ]
+      },
+      {
+        "type": "textarea",
+        "name": "Form field: Textarea",
+        "settings": [
+          {
+            "type": "text",
+            "id": "title",
+            "label": "Field title",
+            "default": "Custom textarea"
+          },
+          {
+            "type": "checkbox",
+            "id": "required",
+            "label": "Required"
+          }
+        ]
+      },
+      {
+        "type": "checkbox",
+        "name": "Form field: Checkbox",
+        "settings": [
+          {
+            "type": "text",
+            "id": "title",
+            "label": "Field title",
+            "default": "Checkbox field"
+          },
+          {
+            "type": "richtext",
+            "id": "label",
+            "label": "Checkbox label",
+            "default": "<p>I accept the Terms and Conditions.</p>"
+          },
+          {
+            "type": "checkbox",
+            "id": "required",
+            "label": "Required"
+          }
+        ]
+      },
+      {
+        "type": "radio",
+        "name": "Form field: Radio",
+        "settings": [
+          {
+            "type": "text",
+            "id": "title",
+            "label": "Field title",
+            "default": "Radio buttons"
+          },
+          {
+            "type": "textarea",
+            "id": "options",
+            "label": "Options",
+            "default": "Option 1\nOption 2\nOption 3",
+            "info": "Each option in a new line."
+          },
+          {
+            "type": "checkbox",
+            "id": "stack",
+            "label": "Stack fields"
+          },
+          {
+            "type": "checkbox",
+            "id": "required",
+            "label": "Required"
+          }
+        ]
+      },
+      {
+        "type": "submit",
+        "name": "Form: Submit",
+        "limit": 1,
+        "settings": [
+          {
+            "type": "text",
+            "id": "title",
+            "label": "Button label",
+            "default": "Submit"
+          }
+        ]
+      },
+      {
+        "type": "content_title",
+        "name": "Title",
+        "settings": [
+          {
+            "type": "text",
+            "id": "title",
+            "label": "Title",
+            "default": "Lorem ipsum dolor"
+          },
+          {
+            "type": "checkbox",
+            "id": "is_h1",
+            "label": "This is the first title of the page (H1)"
+          },
+          {
+            "type": "range",
+            "id": "title_size",
+            "min": -1,
+            "max": 6,
+            "step": 1,
+            "unit": "h",
+            "label": "Title size",
+            "default": 1,
+            "info": "Equivalent to the heading tags: 6 = <h6> (smallest), 1 = <h1> (largest), 0 and -1 are even larger."
+          }
+        ]
+      },
+      {
+        "type": "content_text",
+        "name": "Text",
+        "settings": [
+          {
+            "type": "richtext",
+            "id": "text",
+            "label": "Text",
+            "default": "<p>Lorem ipsum dolor sit amet, consectur adipiscing elit. Nunc eu eros augue. Cras tempus finibus mi, at aliquet orci vestibulum sit amet.</p>"
+          },
+          {
+            "type": "select",
+            "id": "text_style",
+            "label": "Text style",
+            "options": [
+              {"value": "normal","label": "Body"},
+              {"value": "subheading","label": "Subheading"},
+              {"value": "small-label","label": "Small label"}
+            ],
+            "default": "normal"
+          },
+          {
+            "type": "range",
+            "id": "text_size",
+            "min": 1,
+            "max": 5,
+            "step": 1,
+            "unit": "p",
+            "label": "Text size",
+            "default": 3
+          }
+        ]
+      },
+      {
+        "type": "content_button",
+        "name": "Button",
+        "settings": [
+          {
+            "type": "header",
+            "content": "Primary Button"
+          },
+          {
+            "type": "text",
+            "id": "button",
+            "label": "Button",
+            "default": "Button"
+          },
+          {
+            "visible_if": "{{ block.settings.button != blank }}",
+            "type": "url",
+            "id": "link",
+            "label": "Link"
+          },
+          {
+            "visible_if": "{{ block.settings.button != blank }}",
+            "type": "select",
+            "id": "cta_style",
+            "label": "Style",
+            "options": [
+                {"value": "link", "label": "Link"},
+                {"value": "btn", "label": "Button"},
+                {"value": "btn v2", "label": "Button V2"}
+            ],
+            "default": "btn"
+          },
+          {
+            "type": "header",
+            "content": "Secondary Button"
+          },
+          {
+            "type": "text",
+            "id": "button_2",
+            "label": "Button"
+          },
+          {
+            "visible_if": "{{ block.settings.button_2 != blank }}",
+            "type": "url",
+            "id": "link_2",
+            "label": "Link"
+          },
+          {
+            "visible_if": "{{ block.settings.button_2 != blank }}",
+            "type": "select",
+            "id": "cta_style2",
+            "label": "Style",
+            "options": [
+                {"value": "link", "label": "Link"},
+                {"value": "btn", "label": "Button"},
+                {"value": "btn v2", "label": "Button v2"}
+            ],
+            "default": "btn v2"
+          }
+        ]
+      },
+      {
+        "type": "content_badge",
+        "name": "Badge",
+        "settings": [
+          {
+            "type": "text",
+            "id": "badge",
+            "label": "Badge",
+            "default": "Limited"
+          },
+          {
+            "visible_if": "{{ block.settings.badge != blank }}",
+            "type": "select",
+            "id": "style",
+            "label": "Style",
+            "options": [
+              {"value": "pill", "label": "Pill"},
+              {"value": "round", "label": "Round"}
+            ],
+            "default": "pill"
+          }
+        ]
+      },
+      {
+        "type": "accordion_item",
+        "name": "Accordion",
+        "settings": [
+          {
+            "type": "text",
+            "id": "title",
+            "label": "Title",
+            "default": "Lorem ipsum dolor sit amet?"
+          },
+          {
+            "type": "range",
+            "id": "title_size",
+            "min": 1,
+            "max": 3,
+            "step": 1,
+            "unit": "p",
+            "label": "Title size",
+            "default": 2,
+            "info": "1 = larger. 2 = normal. 3 = smaller."
+          },
+          {
+            "type": "select",
+            "id": "title_style",
+            "label": "Title style",
+            "options": [
+              {"value": "normal","label": "Body"},
+              {"value": "heading-font","label": "Heading"},
+              {"value": "subheading","label": "Subheading"},
+              {"value": "small-label","label": "Small label"}
+            ],
+            "default": "normal"
+          },
+          {
+            "type": "richtext",
+            "id": "content",
+            "label": "Text",
+            "default": "<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus ut tellus nec mi tincidunt imperdiet eget vitae sapien. Integer massa velit, commodo at magna eget, semper vehicula quam. Morbi laoreet tellus at neque blandit, eu congue sem congue. Mauris dapibus est ut ipsum malesuada tincidunt. Curabitur tempus commodo suscipit. Sed eu blandit urna, at porttitor ligula. In maximus lobortis tellus.</p>"
+          },
+          {
+            "type": "range",
+            "id": "text_size",
+            "min": 1,
+            "max": 5,
+            "step": 1,
+            "unit": "p",
+            "label": "Text size",
+            "default": 3
+          },
+          {
+            "type": "checkbox",
+            "id": "accordion_border_top",
+            "label": "Border Top",
+            "default": false
+          },
+          {
+            "type": "checkbox",
+            "id": "accordion_border_bottom",
+            "label": "Border Bottom",
+            "default": true
+          },
+          {
+            "type": "header",
+            "content": "Image next to title"
+          },
+          {
+            "type": "image_picker",
+            "id": "image",
+            "label": "Image"
+          },
+          {
+            "visible_if": "{{ block.settings.image != blank }}",
+            "type": "range",
+            "id": "image_width",
+            "min": 0,
+            "max": 5,
+            "step": 0.5,
+            "unit": "em",
+            "label": "Width",
+            "default": 2
+          },
+          {
+            "visible_if": "{{ block.settings.image != blank }}",
+            "type": "range",
+            "id": "image_border_radius",
+            "min": 0,
+            "max": 10,
+            "step": 0.2,
+            "unit": "em",
+            "label": "Border radius",
+            "default": 0
+          },
+          {
+            "visible_if": "{{ block.settings.image != blank }}",
+            "type": "checkbox",
+            "id": "image_border",
+            "label": "Border"
+          }
+        ]
+      },
+      {
+        "type": "content_image",
+        "name": "Image",
+        "settings": [
+          {
+            "type": "image_picker",
+            "id": "image",
+            "label": "Image"
+          },
+          {
+            "visible_if": "{{ block.settings.image != blank }}",
+            "type": "url",
+            "id": "link",
+            "label": "Link"
+          },
+          {
+            "visible_if": "{{ block.settings.image != blank }}",
+            "type": "range",
+            "id": "width",
+            "min": 0,
+            "max": 100,
+            "step": 1,
+            "unit": "%",
+            "label": "Width (Desktop)",
+            "default": 50
+          },
+          {
+            "visible_if": "{{ block.settings.image != blank }}",
+            "type": "range",
+            "id": "width_mobile",
+            "min": 0,
+            "max": 100,
+            "step": 1,
+            "unit": "%",
+            "label": "Width (Mobile)",
+            "default": 100
+          },
+          {
+            "visible_if": "{{ block.settings.image != blank }}",
+            "type": "range",
+            "id": "border_radius",
+            "min": 0,
+            "max": 10,
+            "step": 0.2,
+            "unit": "em",
+            "label": "Border radius",
+            "default": 0
+          },
+          {
+            "visible_if": "{{ block.settings.image != blank }}",
+            "type": "checkbox",
+            "id": "border",
+            "label": "Border"
+          },
+          {
+            "type": "header",
+            "content": "Caption"
+          },
+          {
+            "type": "richtext",
+            "id": "caption",
+            "label": "Caption"
+          },
+          {
+            "visible_if": "{{ block.settings.caption != blank }}",
+            "type": "select",
+            "id": "caption_position",
+            "label": "Position",
+            "options": [
+              {"value": "bottom","label": "Bottom"},
+              {"value": "right","label": "Right"}
+            ],
+            "default": "bottom"
+          },
+          {
+            "visible_if": "{{ block.settings.caption != blank }}",
+            "type": "select",
+            "id": "caption_style",
+            "label": "Style",
+            "options": [
+              {"value": "normal","label": "Body"},
+              {"value": "heading-font","label": "Heading"},
+              {"value": "subheading","label": "Subheading"},
+              {"value": "small-label","label": "Small label"}
+            ],
+            "default": "normal"
+          },
+          {
+            "visible_if": "{{ block.settings.caption != blank }}",
+            "type": "range",
+            "id": "caption_size",
+            "min": 1,
+            "max": 5,
+            "step": 1,
+            "unit": "p",
+            "label": "Size",
+            "default": 4
+          },
+          {
+            "visible_if": "{{ block.settings.caption != blank }}",
+            "type": "range",
+            "id": "caption_spacing",
+            "min": 0,
+            "max": 5,
+            "step": 0.2,
+            "unit": "rem",
+            "label": "Spacing (Desktop)",
+            "default": 1
+          },
+          {
+            "visible_if": "{{ block.settings.caption != blank }}",
+            "type": "range",
+            "id": "caption_spacing_mobile",
+            "min": 0,
+            "max": 5,
+            "step": 0.2,
+            "unit": "rem",
+            "label": "Spacing (Mobile)",
+            "default": 1
+          }
+        ]
+      },
+      {
+        "type": "content_video",
+        "name": "Video",
+        "settings": [
+          {
+            "type": "video",
+            "id": "video_mp4",
+            "label": "Video (MP4)"
+          },
+          {
+            "type": "video_url",
+            "id": "video_iframe",
+            "label": "Video (Youtube/Vimeo)",
+            "accept": ["youtube", "vimeo"]
+          },
+          {
+            "type": "select",
+            "id": "video_orientation",
+            "label": "Video orientation",
+            "options": [
+              {"value": "landscape", "label": "Landscape/Horizontal"},
+              {"value": "square", "label": "Square"},
+              {"value": "portrait", "label": "Portrait/Vertical"}
+            ],
+            "default": "landscape"
+          },
+          {
+            "type": "range",
+            "id": "width",
+            "min": 0,
+            "max": 100,
+            "step": 1,
+            "unit": "%",
+            "label": "Width (Desktop)",
+            "default": 50
+          },
+          {
+            "type": "range",
+            "id": "width_mobile",
+            "min": 0,
+            "max": 100,
+            "step": 1,
+            "unit": "%",
+            "label": "Width (Mobile)",
+            "default": 100
+          },
+          {
+            "type": "range",
+            "id": "border_radius",
+            "min": 0,
+            "max": 10,
+            "step": 0.2,
+            "unit": "em",
+            "label": "Border radius",
+            "default": 0
+          },
+          {
+            "type": "checkbox",
+            "id": "border",
+            "label": "Border"
+          },
+          {
+            "type": "header",
+            "content": "Caption"
+          },
+          {
+            "type": "richtext",
+            "id": "caption",
+            "label": "Caption"
+          },
+          {
+            "visible_if": "{{ block.settings.caption != blank }}",
+            "type": "select",
+            "id": "caption_style",
+            "label": "Style",
+            "options": [
+              {"value": "normal","label": "Body"},
+              {"value": "heading-font","label": "Heading"},
+              {"value": "subheading","label": "Subheading"},
+              {"value": "small-label","label": "Small label"}
+            ],
+            "default": "normal"
+          },
+          {
+            "visible_if": "{{ block.settings.caption != blank }}",
+            "type": "range",
+            "id": "caption_size",
+            "min": 1,
+            "max": 5,
+            "step": 1,
+            "unit": "p",
+            "label": "Size",
+            "default": 4
+          },
+          {
+            "visible_if": "{{ block.settings.caption != blank }}",
+            "type": "range",
+            "id": "caption_spacing",
+            "min": 0,
+            "max": 5,
+            "step": 0.2,
+            "unit": "rem",
+            "label": "Spacing (Desktop)",
+            "default": 1
+          },
+          {
+            "visible_if": "{{ block.settings.caption != blank }}",
+            "type": "range",
+            "id": "caption_spacing_mobile",
+            "min": 0,
+            "max": 5,
+            "step": 0.2,
+            "unit": "rem",
+            "label": "Spacing (Mobile)",
+            "default": 1
+          }
+        ]
+      },
+      {
+        "type": "flexbox_definition",
+        "name": "-- Flexbox Definition --",
+        "settings": [
+          {
+            "type": "paragraph",
+            "content": "Use this block to group the following blocks into a custom sized area."
+          },
+          {
+            "type": "range",
+            "id": "flexbox_width_desktop",
+            "min": 0,
+            "max": 100,
+            "step": 1,
+            "unit": "%",
+            "label": "Block width (Desktop)",
+            "default": 50
+          },
+          {
+            "type": "range",
+            "id": "flexbox_width_tablet",
+            "min": 0,
+            "max": 100,
+            "step": 1,
+            "unit": "%",
+            "label": "Block width (Tablet)",
+            "default": 50
+          },
+          {
+            "type": "range",
+            "id": "flexbox_width_mobile",
+            "min": 0,
+            "max": 100,
+            "step": 1,
+            "unit": "%",
+            "label": "Block width (Mobile)",
+            "default": 100
+          },
+          {
+            "type": "color_scheme",
+            "id": "content_color_scheme",
+            "label": "Content color scheme",
+            "default": "scheme-2"
+          },
+          {
+            "type": "range",
+            "id": "border_radius",
+            "min": 0,
+            "max": 10,
+            "step": 0.2,
+            "unit": "em",
+            "label": "Border radius",
+            "default": 0
+          },
+          {
+            "type": "checkbox",
+            "id": "border",
+            "label": "Border"
+          },
+          {
+            "type": "select",
+            "id": "align_self_desktop",
+            "label": "Align vertically (Desktop)",
+            "options": [
+              {"value": "stretch", "label": "Stretch"},
+              {"value": "start", "label": "Top"},
+              {"value": "center", "label": "Center"},
+              {"value": "end", "label": "Bottom"}
+            ],
+            "default": "stretch"
+          },
+          {
+            "type": "select",
+            "id": "align_self_mobile",
+            "label": "Align vertically (Mobile)",
+            "options": [
+              {"value": "stretch", "label": "Stretch"},
+              {"value": "start", "label": "Top"},
+              {"value": "center", "label": "Center"},
+              {"value": "end", "label": "Bottom"}
+            ],
+            "default": "stretch"
+          },
+          {
+            "type": "select",
+            "id": "text_align",
+            "label": "Text align (Desktop)",
+            "options": [
+              {"value": "inherit", "label": "Inherit"},
+              {"value": "left", "label": "Left"},
+              {"value": "center", "label": "Center"},
+              {"value": "right", "label": "Right"}
+            ],
+            "default": "inherit"
+          },
+          {
+            "type": "select",
+            "id": "text_align_mobile",
+            "label": "Text align (Mobile)",
+            "options": [
+              {"value": "inherit", "label": "Inherit"},
+              {"value": "left", "label": "Left"},
+              {"value": "center", "label": "Center"},
+              {"value": "right", "label": "Right"}
+            ],
+            "default": "inherit"
+          },
+          {
+            "type": "range",
+            "id": "padding_desktop",
+            "min": 0,
+            "max": 100,
+            "step": 10,
+            "unit": "%",
+            "label": "Padding (Desktop)",
+            "default": 50
+          },
+          {
+            "type": "range",
+            "id": "padding_mobile",
+            "min": 0,
+            "max": 100,
+            "step": 10,
+            "unit": "%",
+            "label": "Padding (Mobile)",
+            "default": 30
+          }
+        ]
+      },
+      {
+        "type": "separator",
+        "name": "Separator",
+        "settings": [
+          {
+            "type": "checkbox",
+            "id": "border",
+            "label": "Border",
+            "default": true
+          },
+          {
+            "type": "range",
+            "id": "padding",
+            "min": 0,
+            "max": 20,
+            "step": 0.5,
+            "unit": "rem",
+            "label": "Padding (Desktop)",
+            "default": 2.5
+          },
+          {
+            "type": "range",
+            "id": "padding_mobile",
+            "min": 0,
+            "max": 20,
+            "step": 0.5,
+            "unit": "rem",
+            "label": "Padding (Mobile)",
+            "default": 2.5
+          }
+        ]
+      },
+      {
+        "type": "content_liquid",
+        "name": "Liquid code",
+        "settings": [
+          {
+            "type": "liquid",
+            "id": "liquid",
+            "label": "Liquid code"
+          }
+        ]
+      }
+    ]
+  }
+{% endschema %}

@@ -1,0 +1,135 @@
+{%- render 'breadcrumb' -%}
+
+{% schema %}
+  {
+    "name": "Breadcrumbs",
+    "class": "type-breadcrumb",
+    "tag": "section",
+    "settings": [
+      {
+        "type": "header",
+        "content": "Desktop settings"
+      },
+      {
+        "type": "color_scheme",
+        "id": "color_scheme",
+        "label": "Color scheme",
+        "default": "scheme-2"
+      },
+      {
+        "type": "select",
+        "id": "text_align",
+        "label": "Text align",
+        "options": [
+          {"value": "start", "label": "left"},
+          {"value": "center", "label": "center"},
+          {"value": "end", "label": "right"}
+        ],
+        "default": "start"
+      },
+      {
+        "type": "checkbox",
+        "id": "over_first_section",
+        "label": "Overlap the first section",
+        "info": "When placement is 'Section on top'"
+      },
+      {
+        "type": "range",
+        "id": "padding_top",
+        "min": 0,
+        "max": 5,
+        "step": 0.5,
+        "unit": "rem",
+        "label": "Padding top",
+        "default": 1.5
+      },
+      {
+        "type": "range",
+        "id": "padding_bottom",
+        "min": 0,
+        "max": 5,
+        "step": 0.5,
+        "unit": "rem",
+        "label": "Padding bottom",
+        "default": 1.5
+      },
+      {
+        "type": "checkbox",
+        "id": "border_top",
+        "label": "Top border",
+        "default": false
+      },
+      {
+        "type": "checkbox",
+        "id": "border_bottom",
+        "label": "Bottom border",
+        "default": false
+      },
+      {
+        "type": "header",
+        "content": "Mobile settings"
+      },
+      {
+        "type": "color_scheme",
+        "id": "color_scheme_mobile",
+        "label": "Color scheme",
+        "default": "scheme-2"
+      },
+      {
+        "type": "select",
+        "id": "text_align_mobile",
+        "label": "Text align",
+        "options": [
+          {"value": "start", "label": "left"},
+          {"value": "center", "label": "center"},
+          {"value": "end", "label": "right"}
+        ],
+        "default": "start"
+      },
+      {
+        "type": "checkbox",
+        "id": "hide_mobile",
+        "label": "Hide on Mobile Phones",
+        "default": false
+      },
+      {
+        "type": "checkbox",
+        "id": "over_first_section_mobile",
+        "label": "Overlap the first section",
+        "info": "When placement is 'Section on top'"
+      },
+      {
+        "type": "range",
+        "id": "padding_top_mobile",
+        "min": 0,
+        "max": 5,
+        "step": 0.5,
+        "unit": "rem",
+        "label": "Padding top",
+        "default": 1.5
+      },
+      {
+        "type": "range",
+        "id": "padding_bottom_mobile",
+        "min": 0,
+        "max": 5,
+        "step": 0.5,
+        "unit": "rem",
+        "label": "Padding bottom",
+        "default": 1.5
+      },
+      {
+        "type": "checkbox",
+        "id": "border_top_mobile",
+        "label": "Top border",
+        "default": false
+      },
+      {
+        "type": "checkbox",
+        "id": "border_bottom_mobile",
+        "label": "Bottom border",
+        "default": false
+      }
+    ]
+  }
+{% endschema %}

@@ -1,0 +1,40 @@
+{
+  "sections": {
+    "list_collections_hero": {
+      "type": "list_collections_hero",
+      "blocks": {
+        "breadcrumb": {
+          "type": "breadcrumb",
+          "settings": {
+          }
+        },
+        "title": {
+          "type": "title",
+          "settings": {
+          }
+        },
+        "quantity": {
+          "type": "quantity",
+          "settings": {
+          }
+        }
+      },
+      "block_order": [
+        "breadcrumb",
+        "title",
+        "quantity"
+      ],
+      "settings": {
+      }
+    },
+    "list_collections_main": {
+      "type": "list_collections_main",
+      "settings": {
+      }
+    }
+  },
+  "order": [
+    "list_collections_hero",
+    "list_collections_main"
+  ]
+}

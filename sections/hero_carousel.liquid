@@ -1,0 +1,687 @@
+{%- render 'section_banner_structure', section: section -%}
+
+{% schema %}
+  {
+    "name": "Hero Carousel",
+    "class": "shopify-section-hero-banner type-hero-carousel",
+    "tag": "section",
+    "presets": [
+      {
+        "name": "Hero Carousel",
+        "blocks": [
+          {
+            "type": "slide"
+          },
+          {
+            "type": "slide"
+          }
+        ]
+      }
+    ],
+    "settings": [
+      {
+        "type": "header",
+        "content": "Desktop Settings"
+      },
+      {
+        "type": "select",
+        "id": "section_height",
+        "label": "Section Height",
+        "options": [
+          {"value": "small","label": "Small"},
+          {"value": "medium","label": "Medium"},
+          {"value": "large","label": "Large"},
+          {"value": "first_image","label": "First image height"},
+          {"value": "window_height","label": "Window height"}
+        ],
+        "default": "medium"
+      },
+      {
+        "type": "checkbox",
+        "id": "full_width",
+        "label": "Full width",
+        "default": true
+      },
+      {
+        "type": "range",
+        "id": "section_padding_top",
+        "min": 0,
+        "max": 100,
+        "step": 10,
+        "unit": "%",
+        "label": "Outer padding top",
+        "default": 0
+      },
+      {
+        "type": "range",
+        "id": "section_padding_bottom",
+        "min": 0,
+        "max": 100,
+        "step": 10,
+        "unit": "%",
+        "label": "Outer padding bottom",
+        "default": 0
+      },
+      {
+        "type": "range",
+        "id": "border_radius",
+        "min": 0,
+        "max": 10,
+        "step": 0.2,
+        "unit": "em",
+        "label": "Border radius",
+        "default": 0
+      },
+      {
+        "type": "header",
+        "content": "Desktop Navigation"
+      },
+      {
+        "type": "checkbox",
+        "id": "show_arrows",
+        "label": "Show Arrows",
+        "default": true
+      },
+      {
+        "visible_if": "{{ section.settings.show_arrows == true }}",
+        "type": "select",
+        "id": "arrows_position",
+        "label": "Arrows position",
+        "options": [
+            {"value": "sides", "label": "Sides"},
+            {"value": "bottom", "label": "Bottom"}
+        ],
+        "default": "sides"
+      },
+      {
+        "type": "checkbox",
+        "id": "show_dots",
+        "label": "Show Dots",
+        "default": true
+      },
+      {
+        "visible_if": "{{ section.settings.show_dots == true }}",
+        "type": "select",
+        "id": "dots_position",
+        "label": "Dots position",
+        "options": [
+            {"value": "inside", "label": "Inside"},
+            {"value": "outside", "label": "Outside"}
+        ],
+        "default": "inside"
+      },
+      {
+        "visible_if": "{{ section.settings.show_dots == true }}",
+        "type": "select",
+        "id": "dots_align",
+        "label": "Dots alignment",
+        "options": [
+            {"value": "start", "label": "Left"},
+            {"value": "center", "label": "Center"},
+            {"value": "end", "label": "Right"}
+        ],
+        "default": "center",
+        "info": "Also applies to the arrows when placed on the bottom."
+      },
+      {
+        "visible_if": "{{ section.settings.show_arrows == true or block.settings.show_dots == true }}",
+        "type": "color_scheme",
+        "id": "nav_color_desktop",
+        "label": "Navigation color",
+        "default": "scheme-3"
+      },
+      {
+        "type": "header",
+        "content": "Mobile Settings"
+      },
+      {
+        "type": "select",
+        "id": "layout_mobile",
+        "label": "Layout",
+        "options": [
+          {"value": "background","label": "Image as background"},
+          {"value": "above","label": "Image at the top"},
+          {"value": "below","label": "Image at the bottom"}
+        ],
+        "default": "above"
+      },
+      {
+        "type": "select",
+        "id": "section_height_mobile",
+        "label": "Section/Image Height",
+        "options": [
+          {"value": "small","label": "Small"},
+          {"value": "medium","label": "Medium"},
+          {"value": "large","label": "Large"},
+          {"value": "first_image","label": "First image height"},
+          {"value": "window_height","label": "Window height"}
+        ],
+        "default": "medium"
+      },
+      {
+        "type": "checkbox",
+        "id": "full_width_mobile",
+        "label": "Full width",
+        "default": true
+      },
+      {
+        "type": "range",
+        "id": "section_padding_top_mobile",
+        "min": 0,
+        "max": 100,
+        "step": 10,
+        "unit": "%",
+        "label": "Outer padding top",
+        "default": 0
+      },
+      {
+        "type": "range",
+        "id": "section_padding_bottom_mobile",
+        "min": 0,
+        "max": 100,
+        "step": 10,
+        "unit": "%",
+        "label": "Outer padding bottom",
+        "default": 0
+      },
+      {
+        "type": "range",
+        "id": "border_radius_mobile",
+        "min": 0,
+        "max": 10,
+        "step": 0.2,
+        "unit": "em",
+        "label": "Border radius",
+        "default": 0
+      },
+      {
+        "type": "header",
+        "content": "Mobile Navigation"
+      },
+      {
+        "type": "checkbox",
+        "id": "show_dots_mobile",
+        "label": "Show Dots",
+        "default": true
+      },
+      {
+        "visible_if": "{{ section.settings.show_dots_mobile == true }}",
+        "type": "select",
+        "id": "dots_position_mobile",
+        "label": "Dots position",
+        "options": [
+            {"value": "inside", "label": "Inside"},
+            {"value": "outside", "label": "Outside"}
+        ],
+        "default": "inside"
+      },
+      {
+        "visible_if": "{{ section.settings.show_dots_mobile == true }}",
+        "type": "select",
+        "id": "dots_align_mobile",
+        "label": "Dots alignment",
+        "options": [
+            {"value": "start", "label": "Left"},
+            {"value": "center", "label": "Center"},
+            {"value": "end", "label": "Right"}
+        ],
+        "default": "center"
+      },
+      {
+        "visible_if": "{{ section.settings.show_dots_mobile == true }}",
+        "type": "color_scheme",
+        "id": "nav_color_mobile",
+        "label": "Navigation color",
+        "default": "scheme-3"
+      },
+      {
+        "type": "header",
+        "content": "Slider Settings"
+      },
+      {
+        "type": "select",
+        "id": "slides_per_view",
+        "label": "Slides per view",
+        "options": [
+          {"value": "1","label": "1"},
+          {"value": "2","label": "2"},
+          {"value": "1-2","label": "1 / 2"},
+          {"value": "2-1","label": "2 / 1"}
+        ],
+        "default": "1"
+      },
+      {
+        "type": "select",
+        "id": "transition",
+        "label": "Transition",
+        "options": [
+          {"value": "slide","label": "Slide"},
+          {"value": "fade","label": "Fade"}
+        ],
+        "default": "slide"
+      },
+      {
+        "type": "range",
+        "id": "autoplay",
+        "min": 0,
+        "max": 15,
+        "step": 1,
+        "unit": "s",
+        "label": "Autoplay interval",
+        "default": 8
+      },
+      {
+        "type": "range",
+        "id": "automove",
+        "min": 0,
+        "max": 3,
+        "step": 0.1,
+        "unit": "%",
+        "label": "Automove speed",
+        "default": 0,
+        "info": "0 = off"
+      },
+      {
+        "type": "checkbox",
+        "id": "pause_on_hover",
+        "label": "Pause autoplay on hover",
+        "default": false
+      },
+      {
+        "type": "header",
+        "content": "Outer section color"
+      },
+      {
+        "type": "color_scheme",
+        "id": "section_color_scheme",
+        "label": "Outer section color scheme",
+        "default": "scheme-1",
+        "info": "Visible only when the outer padding is enabled or full width is disabled."
+      }
+    ],
+    "blocks": [
+      {
+        "type": "slide",
+        "name": "Slide",
+        "settings": [
+          {
+            "type": "header",
+            "content": "Content"
+          },
+          {
+            "type": "text",
+            "id": "eyebrow",
+            "label": "Eyebrow",
+            "default": "Lorem ipsum"
+          },
+          {
+            "visible_if": "{{ block.settings.eyebrow != blank }}",
+            "type": "range",
+            "id": "eyebrow_size",
+            "min": 1,
+            "max": 5,
+            "step": 1,
+            "unit": "p",
+            "label": "Eyebrow size",
+            "default": 3
+          },
+          {
+            "type": "text",
+            "id": "title",
+            "label": "Title",
+            "default": "Lorem ipsum"
+          },
+          {
+            "visible_if": "{{ block.settings.title != blank }}",
+            "type": "checkbox",
+            "id": "is_h1",
+            "label": "This is the first title of the page (H1)"
+          },
+          {
+            "visible_if": "{{ block.settings.title != blank }}",
+            "type": "range",
+            "id": "title_size",
+            "min": -1,
+            "max": 6,
+            "step": 1,
+            "unit": "h",
+            "label": "Title size",
+            "default": 1,
+            "info": "Equivalent to the heading tags."
+          },
+          {
+            "type": "richtext",
+            "id": "text",
+            "label": "Text",
+            "default": "<p>Lorem ipsum dolor sit amet, consectur adipiscing elit. Nunc eu eros augue. Cras tempus finibus mi, at aliquet orci vestibulum sit amet.</p>"
+          },
+          {
+            "visible_if": "{{ block.settings.text != blank }}",
+            "type": "range",
+            "id": "text_size",
+            "min": 1,
+            "max": 5,
+            "step": 1,
+            "unit": "p",
+            "label": "Text size",
+            "default": 3
+          },
+          {
+            "type": "header",
+            "content": "Buttons"
+          },
+          {
+            "type": "text",
+            "id": "button",
+            "label": "Button label #1",
+            "default": "Button"
+          },
+          {
+            "visible_if": "{{ block.settings.button != blank }}",
+            "type": "url",
+            "id": "link",
+            "label": "Button link #1"
+          },
+          {
+            "visible_if": "{{ block.settings.button != blank }}",
+            "type": "select",
+            "id": "cta_style",
+            "label": "Style",
+            "options": [
+                {"value": "link", "label": "Link"},
+                {"value": "btn", "label": "Button"},
+                {"value": "btn v2", "label": "Button V2"}
+            ],
+            "default": "btn"
+          },
+          {
+            "type": "text",
+            "id": "button2",
+            "label": "Button label #2",
+            "default": "Button"
+          },
+          {
+            "visible_if": "{{ block.settings.button2 != blank }}",
+            "type": "url",
+            "id": "link2",
+            "label": "Button link #2"
+          },
+          {
+            "visible_if": "{{ block.settings.button2 != blank }}",
+            "type": "select",
+            "id": "cta_style2",
+            "label": "Style",
+            "options": [
+                {"value": "link", "label": "Link"},
+                {"value": "btn", "label": "Button"},
+                {"value": "btn v2", "label": "Button V2"}
+            ],
+            "default": "btn v2"
+          },
+          {
+            "type": "header",
+            "content": "Desktop Media"
+          },
+          {
+            "type": "select",
+            "id": "media_type",
+            "label": "Media type",
+            "options": [
+              {"value": "image", "label": "Image"},
+              {"value": "video", "label": "Video"}
+            ],
+            "default": "image"
+          },
+          {
+            "visible_if": "{{ block.settings.media_type == 'image' }}",
+            "type": "image_picker",
+            "id": "image_desktop",
+            "label": "Image"
+          },
+          {
+            "visible_if": "{{ block.settings.media_type == 'video' }}",
+            "type": "video",
+            "id": "video_mp4_desktop",
+            "label": "Video (MP4)"
+          },
+          {
+            "visible_if": "{{ block.settings.media_type == 'video' }}",
+            "type": "video_url",
+            "id": "video_iframe_desktop",
+            "label": "Video (Youtube/Vimeo)",
+            "accept": ["youtube", "vimeo"]
+          },
+          {
+            "type": "header",
+            "content": "Mobile Media"
+          },
+          {
+            "type": "paragraph",
+            "content": "If left blank, Mobile inherits what was set up for Desktop."
+          },
+          {
+            "type": "select",
+            "id": "media_type_mobile",
+            "label": "Media type",
+            "options": [
+              {"value": "image", "label": "Image"},
+              {"value": "video", "label": "Video"}
+            ],
+            "default": "image"
+          },
+          {
+            "visible_if": "{{ block.settings.media_type == 'image' }}",
+            "type": "image_picker",
+            "id": "image_mobile",
+            "label": "Image (Mobile)"
+          },
+          {
+            "visible_if": "{{ block.settings.media_type == 'video' }}",
+            "type": "video",
+            "id": "video_mp4_mobile",
+            "label": "Video (MP4)"
+          },
+          {
+            "visible_if": "{{ block.settings.media_type == 'video' }}",
+            "type": "video_url",
+            "id": "video_iframe_mobile",
+            "label": "Video (Youtube/Vimeo)",
+            "accept": ["youtube", "vimeo"]
+          },
+          {
+            "type": "header",
+            "content": "Colors"
+          },
+          {
+            "type": "color_scheme",
+            "id": "content_color_scheme_desktop",
+            "label": "Color scheme (Desktop)",
+            "default": "scheme-3"
+          },
+          {
+            "type": "color_scheme",
+            "id": "content_color_scheme_mobile",
+            "label": "Color scheme (Mobile)",
+            "default": "scheme-2"
+          },
+          {
+            "type": "color",
+            "id": "custom_background_desktop",
+            "label": "Custom background (Desktop)",
+            "default": "#999999",
+            "info": "Optional"
+          },
+          {
+            "type": "color",
+            "id": "custom_background_mobile",
+            "label": "Custom background (Mobile)",
+            "info": "Optional"
+          },
+          {
+            "type": "header",
+            "content": "Text protection"
+          },
+          {
+            "type": "checkbox",
+            "id": "tint_enable",
+            "label": "Show text protection",
+            "default": true,
+            "info": "Helps your text be more readable."
+          },
+          {
+            "visible_if": "{{ block.settings.tint_enable == true }}",
+            "type": "select",
+            "id": "tint_type",
+            "label": "Type",
+            "options": [
+              {"value": "full", "label": "Full"},
+              {"value": "box", "label": "Box"},
+              {"value": "shadow", "label": "Shadow"}
+            ],
+            "default": "box"
+          },
+          {
+            "visible_if": "{{ block.settings.tint_enable == true }}",
+            "type": "color",
+            "id": "tint_color",
+            "label": "Color",
+            "default": "#000"
+          },
+          {
+            "visible_if": "{{ block.settings.tint_enable == true }}",
+            "type": "range",
+            "id": "tint_opacity",
+            "min": 0,
+            "max": 100,
+            "step": 1,
+            "unit": "%",
+            "label": "Opacity",
+            "default": 20
+          },
+          {
+            "visible_if": "{{ block.settings.tint_enable == true and block.settings.tint_type != 'shadow' }}",
+            "type": "range",
+            "id": "tint_border_radius",
+            "min": 0,
+            "max": 10,
+            "step": 0.2,
+            "unit": "em",
+            "label": "Text box border radius",
+            "default": 0
+          },
+          {
+            "visible_if": "{{ block.settings.tint_enable == true }}",
+            "type": "range",
+            "id": "tint_blur",
+            "min": 0,
+            "max": 50,
+            "step": 1,
+            "unit": "px",
+            "label": "Blur effect size",
+            "default": 24
+          },
+          {
+            "type": "header",
+            "content": "Text settings"
+          },
+          {
+            "type": "range",
+            "id": "text_width",
+            "min": 0,
+            "max": 100,
+            "step": 1,
+            "unit": "em",
+            "label": "Width (Desktop)",
+            "default": 40
+          },
+          {
+            "type": "range",
+            "id": "text_padding",
+            "min": 0,
+            "max": 100,
+            "step": 10,
+            "unit": "%",
+            "label": "Padding (Desktop)",
+            "default": 80
+          },
+          {
+            "type": "select",
+            "id": "text_position_desktop",
+            "label": "Position (Desktop)",
+            "options": [
+                {"value": "justify-content-start align-items-start", "label": "Top left"},
+                {"value": "justify-content-center align-items-start", "label": "Top center"},
+                {"value": "justify-content-end align-items-start", "label": "Top right"},
+                {"value": "justify-content-start align-items-center", "label": "Center left"},
+                {"value": "justify-content-center align-items-center", "label": "Center"},
+                {"value": "justify-content-end align-items-center", "label": "Center right"},
+                {"value": "justify-content-start align-items-end", "label": "Bottom left"},
+                {"value": "justify-content-center align-items-end", "label": "Bottom center"},
+                {"value": "justify-content-end align-items-end", "label": "Bottom right"}
+            ],
+            "default": "justify-content-center align-items-center"
+          },
+          {
+            "type": "select",
+            "id": "text_align_desktop",
+            "label": "Alignment (Desktop)",
+            "options": [
+                {"value": "text-left", "label": "Left"},
+                {"value": "text-center", "label": "Center"},
+                {"value": "text-right", "label": "Right"}
+            ],
+            "default": "text-center"
+          },
+          {
+            "type": "range",
+            "id": "text_width_mobile",
+            "min": 0,
+            "max": 100,
+            "step": 1,
+            "unit": "em",
+            "label": "Width (Mobile)",
+            "default": 30
+          },
+          {
+            "type": "range",
+            "id": "text_padding_mobile",
+            "min": 0,
+            "max": 100,
+            "step": 10,
+            "unit": "%",
+            "label": "Padding (Mobile)",
+            "default": 100
+          },
+          {
+            "type": "select",
+            "id": "text_position_mobile",
+            "label": "Position (Mobile)",
+            "options": [
+                {"value": "justify-content-start align-items-start", "label": "Top left"},
+                {"value": "justify-content-center align-items-start", "label": "Top center"},
+                {"value": "justify-content-end align-items-start", "label": "Top right"},
+                {"value": "justify-content-start align-items-center", "label": "Center left"},
+                {"value": "justify-content-center align-items-center", "label": "Center"},
+                {"value": "justify-content-end align-items-center", "label": "Center right"},
+                {"value": "justify-content-start align-items-end", "label": "Bottom left"},
+                {"value": "justify-content-center align-items-end", "label": "Bottom center"},
+                {"value": "justify-content-end align-items-end", "label": "Bottom right"}
+            ],
+            "default": "justify-content-center align-items-center"
+          },
+          {
+            "type": "select",
+            "id": "text_align_mobile",
+            "label": "Alignment (Mobile)",
+            "options": [
+                {"value": "text-left", "label": "Left"},
+                {"value": "text-center", "label": "Center"},
+                {"value": "text-right", "label": "Right"}
+            ],
+            "default": "text-center"
+          }
+        ]
+      }
+    ]
+  }
+{% endschema %}

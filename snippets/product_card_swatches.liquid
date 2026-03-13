@@ -1,0 +1,65 @@
+{%- comment -%}
+    Renders the product card color swatches
+
+    Accepts:
+    - productCard: {Object} Product Liquid object
+
+    Usage:
+    {%- render 'product_card_swatches', productCard: productObject -%}
+{%- endcomment -%}
+
+{%- assign optionIndex = 0 -%}
+{%- assign sectionId = section.id | split: '__' | last -%}
+{%- assign colorSwatchesOptions = settings.product_color_swatches | replace: ', ', ',' | split: ',' -%}
+{%- for option in productCard.options -%}
+  {%- if  colorSwatchesOptions contains option -%}
+      <div class="inline-swatch-group swatch-group product-swatch color-swatches flex flex-wrap" role="group" aria-label="{{ 'product_card_swatches.option_selection_group_caption' | t: option: option | escape }}">
+        {%- liquid 
+      	assign optionIndex = forloop.index0
+        assign values = ''
+        assign swatchesLimit = settings.product_card_swatches_trim_limit
+        assign totalSwatchesCount = 0
+        -%}
+        {%- for variant in productCard.variants -%}
+          {%- if variant.available -%}
+            {%- assign value = variant.options[optionIndex] -%}
+            {%- unless values contains value -%}
+              {%- liquid 
+              assign variantImageUrl = blank
+              assign priceCompare = blank
+              assign values = values | join: '*|*'
+              assign values = values | append: '*|*' | append: value
+              assign values = values | split: '*|*'
+              if variant.image != blank
+                assign variantImageUrl = variant.image | image_url: width: 600
+              endif
+              if variant.compare_at_price > variant.price
+                assign priceCompare = variant.compare_at_price | money | remove: '.00' | remove: ' '
+              endif
+              assign priceFinal = variant.price | money | remove: '.00' | remove: ' '
+              assign totalSwatchesCount = totalSwatchesCount | plus: 1 
+              -%}
+              {% if totalSwatchesCount <= swatchesLimit or swatchesLimit == 0 %} 
+                <div class="swatch ">
+                  <input class="visually-hidden" id="swatch-{{sectionId}}-{{ productCard.id }}-{{ value | handle }}" type="radio" name="swatch-{{ productCard.id }}" value="{{ value | escape }}" data-variant-url="{{variant.url}}" data-price-final="{{ priceFinal }}" {% if priceCompare != blank %}data-price-compare="{{ priceCompare }}"{% endif %} {% if variantImageUrl != blank %}data-variant-img="{{ variantImageUrl }}"{% endif %} />
+                  <label class="animation color" for="swatch-{{sectionId}}-{{ productCard.id }}-{{ value | handle }}">
+                    <div class="animation label-inner color-{{ value | handle }}">
+                      <span>{{ value }}</span>
+                      {%- if variant.image != blank and settings.use_variant_images_as_swatches -%}
+                        <img loading="lazy" width="80" height="80" alt="" src="{{ variant.image | image_url: width: 80 }}">
+                      {%- endif -%}
+                    </div>
+                  </label>
+                </div>
+              {% endif %}
+            {%- endunless -%}
+          {%- endif -%}
+        {%- endfor -%}
+        {% if totalSwatchesCount > swatchesLimit and swatchesLimit > 0 %}
+          <div class="swatch swatch-remaining">+{{ totalSwatchesCount | minus: swatchesLimit }} {{ 'product_card.swatches_more_label' | t }}</div>
+        {%- endif -%}
+
+      </div>
+  	{%- break -%}
+  {%- endif -%}
+{%- endfor -%}

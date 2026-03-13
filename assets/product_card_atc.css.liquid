@@ -1,0 +1,43 @@
+.product-card.atc:not(.expand) .close {display: none !important;}
+.product-card.atc.expand .close {display: flex; align-items: center; justify-content: center; background: var(--scheme-background-color); position: absolute; right: 0; top: -0.75em; z-index: 2; font-size: 0.8em; width: 2em; height: 2em; border-radius: 50%; box-shadow: 0 0 5px rgba(0,0,0,.2);}
+.product-card.atc.expand .close svg {margin: 0;}
+.product-card.atc.expand .close:before {content: ''; position: absolute; width: 215%; height: 215%;}
+.product-card.atc .quantity-box {height: 2em; max-width: 6em;}
+.product-card.atc .quantity-button {font-size: 0.7em;}
+.product-card.atc .quantity-input[type=number] {font-size: 0.9em;}
+
+.product-card.atc form product-price {margin-right: -0.4em;}
+.product-card.atc form product-price > * {padding-right: 0.4em;}
+.product-card.atc form product-price .compare {opacity: .6; text-decoration: line-through;}
+.product-card.atc product-variants {display: block;}
+.product-card.atc .option-name {font-size: 0.7em; margin-bottom: 0.5em;}
+.product-card.atc product-variants {margin-bottom: 1em;}
+.product-card.atc product-variants > * {display: block; margin-top: 1em;}
+
+.product-card.atc .quantity-box {margin-bottom: 1em;}
+.product-card.atc .field {--fields-padding-horizontal: 0.5em; --fields-padding-vertical: 0.5em;}
+.product-card.atc product-buttons {display: block;}
+
+.product-card.atc add-to-cart-form {width: 100%; display: block;}
+.product-card.atc:not(.expand) .atc-options,
+.product-card.atc:not(.expand) .info .price {display: none !important;}
+.product-card.atc.colors-out add-to-cart-form > .color-swatches {margin-bottom: -0.5em;}
+.product-card.atc.colors-out .color-swatches {margin-top: 0.25em; margin-bottom: 0;}
+.product-card .add-cta {z-index: 2;}
+
+.product-card.atc.expand form {background: var(--scheme-background-color); position: absolute; z-index: 1; bottom: 0; width: 100%; padding: 0.9em 0.7em 0.7em; transform: scale(0); transform-origin: left bottom; transition: all var(--animation-speed-fast) linear; visibility: hidden; opacity: 0; box-shadow: 0 0 5px rgba(0,0,0,.2);}
+.product-card.atc.expand product-variants > *:first-child {margin-top: 0;}
+.product-card.atc.expand .atc-options-wrapper.open form {visibility: visible; opacity: 1; transform: scale(1);}
+.product-card.atc.expand {display: flex; flex-direction: column;}
+.product-card.atc.expand .info {flex: 1; display: flex; flex-direction: column; justify-content: {{ settings.product_card_bottom_alignment }};}
+
+.product-card.atc product-selling-plan {display: block; margin-bottom: 0.8em;}
+.product-card.atc product-selling-plan [data-plans] {margin-top: 0.3em;}
+.product-card.atc product-selling-plan .radio-custom-label {font-size: 0.9em;}
+.product-card.atc product-selling-plan [name=purchase_option]:not(:checked) ~ .frequency-hidden {display: none;}
+
+/** START OF EXPAND ANIMATION **/
+/* only used if panel always fits inside .product-card */
+.product-card.atc.expand form {transform: translateY(1em); opacity: 0; visibility: hidden;}
+.product-card.atc.expand .atc-options-wrapper.open form {transform: translateY(0); opacity: 1; visibility: visible;}
+/** END OF EXPAND ANIMATION **/

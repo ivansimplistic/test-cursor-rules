@@ -1,0 +1,129 @@
+<div class="slide-wrapper flex {% unless spv == '2' or spv == '2-1' or spv == '1-2' %}keen-slider-slide direction-column{% endunless %} scheme large--color-{{block.settings.content_color_scheme_desktop}} medium-down--color-{{block.settings.content_color_scheme_mobile }} block-{{block.id}}" {{ block.shopify_attributes }}>
+  <style>
+    {%- if block.settings.tint_enable -%}
+    #shopify-section-{{ section.id }} .block-{{block.id}} {
+      {% assign tintOpacity = block.settings.tint_opacity | divided_by: 100.00 %}
+      --tint: {{block.settings.tint_color | color_modify: 'alpha', tintOpacity}};
+      --tint-blur: {{block.settings.tint_blur}}px;
+      --tint-border-radius: {{block.settings.tint_border_radius}}em;
+    }
+    {%- endif -%}
+    @media (min-width: {{settings.breakpoint_tablet | plus: 0.001}}em){
+      #shopify-section-{{ section.id }} .block-{{block.id}} {
+        --text-padding: calc(var(--global-sections-padding) * {{block.settings.text_padding | divided_by: 100.00}});
+        --text-width: {{block.settings.text_width | append: 'em' | replace: '100em', '100%'}};
+        {% if block.settings.custom_background_desktop != blank and block.settings.custom_background_desktop != 'rgba(0,0,0,0)' %}--scheme-background-gradient: {{block.settings.custom_background_desktop}};{% endif %}
+      }
+    }
+    @media (max-width: {{settings.breakpoint_tablet}}) {
+      #shopify-section-{{ section.id }} .block-{{block.id}} {
+        --text-padding: calc(var(--global-sections-padding) * {{block.settings.text_padding_mobile | divided_by: 100.00}});
+        --text-width: {{block.settings.text_width_mobile | append: 'em' | replace: '100em', '100%'}};
+        {% if block.settings.custom_background_mobile != blank and block.settings.custom_background_mobile != 'rgba(0,0,0,0)' %}--scheme-background-gradient: {{block.settings.custom_background_mobile}};{% endif %}
+      }
+    }
+  </style>
+  {%- liquid 
+    assign disableLazySizes = false
+    if section.index == 1 
+      if forloop == nil or forloop.first
+        assign disableLazySizes = true
+      endif 
+    endif
+  -%}
+  {{ '<' }}{% if block.settings.button == blank and block.settings.button2 == blank and block.settings.link != blank %}a href="{{block.settings.link}}"{% else %}div{% endif %} class="slide flex {% if section.settings.layout_mobile contains 'below' %}column-reverse{% else %}direction-column{% endif %} {% if block.settings.tint_enable %}tint-{{block.settings.tint_type}}{% endif %} flex-1 no-highlight-hover"{{ '>' }}
+    {%- if block.settings.media_type == 'video' -%}
+      {%- if block.settings.video_mp4_desktop != blank or block.settings.video_iframe_desktop != blank -%}
+        <div class="media-wrap video {% if block.settings.video_mp4_mobile != blank or block.settings.video_iframe_mobile != blank or block.settings.image_mobile != blank %}medium-down--hide{% endif %}">
+          {%- if block.settings.video_mp4_desktop != blank -%}
+            {%- assign videoObject = block.settings.video_mp4_desktop -%}
+            <video class="media video video-element" data-autoplay="autoplay" muted playsinline loop poster="{{videoObject.preview_image | image_url: width: 4100}}" {% if videoObject.presentation.focal_point != blank %}style="object-position: left {{videoObject.presentation.focal_point | split: ' ' | last}};"{% endif %}>
+              {% for videoSource in videoObject.sources %}
+                <source src="{{videoSource.url}}" type="{{videoSource.mime_type}}" />
+              {% endfor %}
+            </video> 
+          {%- elsif block.settings.video_iframe_desktop != blank -%}
+            {%- if block.settings.video_iframe_desktop.type == 'youtube' -%}
+              <div class="video-element js-youtube" data-video-id="{{block.settings.video_iframe_desktop.id}}" data-width="1280" data-height="720" style="min-height: 1px;"></div>
+            {%- else -%}
+              <iframe class="video-element js-vimeo" src="//player.vimeo.com/video/{{block.settings.video_iframe_desktop.id}}?h=dcaa89d3e0&title=0&byline=0&portrait=0&muted=1&controls=0&loop=1&background=1&app_id=122963&" width="480" height="270" frameborder="0" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen title="{{ 'video.vimeo_player_title' | t | escape }}" data-ready="true" tabindex="-1">></iframe>
+            {%- endif -%}
+          {%- endif -%}
+          <div class="controls"><button class="play keen-arrow {{settings.carousel_arrows_frame}} shadow" aria-label="{{ 'general.play_video' | t | escape }}">{%- render 'icons', icon: 'play' -%}</button><button class="pause keen-arrow {{settings.carousel_arrows_frame}} shadow" style="display: none;" aria-label="{{ 'general.pause_video' | t | escape }}">{%- render 'icons', icon: 'pause' -%}</button></div>
+        </div>
+      {%- endif -%}
+    {%- elsif block.settings.media_type == 'image' and block.settings.image_desktop != blank -%}
+      <div class="media-wrap {% if block.settings.video_mp4_mobile != blank or block.settings.video_iframe_mobile != blank or block.settings.image_mobile != blank %}medium-down--hide{% endif %}">
+        <img class="media {% unless disableLazySizes %}lazyload{% endunless %}" data-sizes="auto" alt="{{block.settings.image_desktop.alt}}" src="{% render 'image_placeholder', image: block.settings.image_desktop %}" {% if disableLazySizes %}fetchpriority="high" {% else %}data-{%- endif -%}srcset="{% render 'lazy_src', image: block.settings.image_desktop %}" width="{{ block.settings.image_desktop.width }}" height="{{ block.settings.image_desktop.height }}" {% if block.settings.image_desktop.presentation.focal_point != blank %}style="object-position: {{block.settings.image_desktop.presentation.focal_point}};"{% endif %} />
+      </div>
+    {%- endif -%}
+    {%- if block.settings.video_mp4_mobile != blank or block.settings.video_iframe_mobile != blank -%}
+      <div class="media-wrap video hide medium-down--show">
+        {%- if block.settings.video_mp4_mobile != blank -%}
+          {%- assign videoObject = block.settings.video_mp4_mobile -%}
+          <video class="media video video-element" data-autoplay="autoplay" muted playsinline loop poster="{{videoObject.preview_image | image_url: width: 4100}}" {% if videoObject.presentation.focal_point != blank %}style="object-position: left {{videoObject.presentation.focal_point | split: ' ' | last}};"{% endif %}>
+            {% for videoSource in videoObject.sources %}
+              <source src="{{videoSource.url}}" type="{{videoSource.mime_type}}" />
+            {% endfor %}
+          </video> 
+        {%- elsif block.settings.video_iframe_mobile != blank -%}
+          {%- if block.settings.video_iframe_mobile.type == 'youtube' -%}
+            <div class="video-element js-youtube" data-video-id="{{block.settings.video_iframe_mobile.id}}" data-width="1280" data-height="720" style="min-height: 1px;"></div>
+          {%- else -%}
+            <iframe class="video-element js-vimeo" src="//player.vimeo.com/video/{{block.settings.video_iframe_mobile.id}}?h=dcaa89d3e0&title=0&byline=0&portrait=0&muted=1&controls=0&loop=1&background=1&app_id=122963&" width="480" height="270" frameborder="0" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen title="{{ 'video.vimeo_player_title' | t | escape }}" data-ready="true" tabindex="-1">></iframe>
+          {%- endif -%}
+        {%- endif -%}
+        <div class="controls"><button class="play keen-arrow {{settings.carousel_arrows_icon}} {{settings.carousel_arrows_frame}} {{settings.carousel_arrows_shadow | remove: false | replace: true, 'shadow'}}" aria-label="{{ 'general.play_video' | t | escape }}">{%- render 'icons', icon: 'play' -%}</button><button class="pause keen-arrow {{settings.carousel_arrows_icon}} {{settings.carousel_arrows_frame}} {{settings.carousel_arrows_shadow | remove: false | replace: true, 'shadow'}}" style="display: none;" aria-label="{{ 'general.pause_video' | t | escape }}">{%- render 'icons', icon: 'pause' -%}</button></div>
+      </div>
+    {%- elsif block.settings.image_mobile != blank -%}
+      <div class="media-wrap hide medium-down--show">
+        <img class="media {% unless disableLazySizes %}lazyload{% endunless %}" data-sizes="auto" alt="{{block.settings.image_mobile.alt}}" src="{% render 'image_placeholder', image: block.settings.image_mobile %}" {% if disableLazySizes %}fetchpriority="high" {% else %}data-{%- endif -%}srcset="{% render 'lazy_src', image: block.settings.image_mobile %}" width="{{ block.settings.image_mobile.width }}" height="{{ block.settings.image_mobile.height }}" {% if block.settings.image_mobile.presentation.focal_point != blank %}style="object-position: {{block.settings.image_mobile.presentation.focal_point}};"{% endif %} />
+      </div>
+    {%- endif -%}
+    {%- if block.settings.text != blank and block.settings.text != '<p></p>' -%}
+      {%- assign hasTextField = true -%}
+    {%- endif -%}
+    {%- if block.settings.eyebrow != blank or block.settings.title != blank or hasTextField or block.settings.button != blank or textColumnHtml != blank -%}
+      <div class="overlay flex-1">
+        <div class="container flex large--{{block.settings.text_position_desktop | split: ' ' | join: ' large--'}} medium-down--{{block.settings.text_position_mobile | split: ' ' | join: ' medium-down--'}}"> 
+          <div class="captions richtext-wrap large--{{block.settings.text_align_desktop }} medium-down--{{block.settings.text_align_mobile}}">
+            {%- if block.settings.eyebrow != blank -%}
+              <div class="subheading {{block.settings.eyebrow_size | prepend: 'p'}}">{{ block.settings.eyebrow }}</div>
+            {%- endif -%}
+            {%- if block.settings.title != blank -%}
+              {{ '<' }}{% if block.settings.is_h1 %}h1{% else %}h2{% endif %} class="title {{block.settings.title_size | replace: 0, '1-xl' | replace: -1, '1-xxl' | prepend: 'h' }}"{{ '>' }}
+                {{ block.settings.title | replace: '[br]', '<br aria-hidden="true" />' | replace: '[hi]', '<span class="highlight">' | replace: '[/hi]', '</span>' |  replace: '[hi2]', '<span class="highlight2">' | replace: '[/hi2]', '</span>' }}
+              {{ '</' }}{% if block.settings.is_h1 %}h1{% else %}h2{% endif %}{{ '>' }}
+            {%- endif -%}
+            {%- if hasTextField -%}
+              <div class="text {{block.settings.text_size | prepend: 'p'}}">{{ block.settings.text }}</div>
+            {%- endif -%}
+            {%- if block.settings.button != blank or block.settings.button2 != blank -%}
+              <div class="btn-wrap">
+                {%- if block.settings.button != blank -%}
+                  {%- if block.settings.cta_style contains 'link' and settings.links_arrow != 'none' -%}
+                    {%- capture linkIcon -%}{%- render 'icons', icon: settings.links_arrow -%}{%- endcapture -%}
+                  {%- endif -%}
+                  <a href="{{ block.settings.link }}" class="{{ block.settings.cta_style }}">
+                    {{ block.settings.button }}{{linkIcon}}
+                  </a>
+                {%- endif -%}
+                {%- if block.settings.button2 != blank -%}
+                  {%- if block.settings.cta_style2 contains 'link' and settings.links_arrow != 'none' -%}
+                    {%- capture linkIcon2 -%}{%- render 'icons', icon: settings.links_arrow -%}{%- endcapture -%}
+                  {%- endif -%}
+                  <a href="{{ block.settings.link2 }}" class="{{ block.settings.cta_style2 }}">
+                    {{ block.settings.button2 }}{{linkIcon2}}
+                  </a>
+                {%- endif -%}
+              </div>
+            {%- endif -%}
+
+            {% comment %}customHTMLParam{% endcomment %}
+            {{textColumnHtml}}
+          </div>
+        </div>
+      </div>
+    {%- endif -%}
+  {{ '</' }}{% if block.settings.button == blank and block.settings.button2 == blank and block.settings.link != blank %}a{% else %}div{% endif %}{{ '>' }}
+</div>

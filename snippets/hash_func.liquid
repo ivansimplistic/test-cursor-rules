@@ -1,0 +1,48 @@
+{%- comment -%}
+    Custom Hash function
+
+    Accepts:
+    - value: string to hash
+
+    Usage:
+    {%- render 'hash_func', value: 'this is a test' -%}
+{%- endcomment -%}
+
+{%- comment -%}
+#CART SCRIPT
+def hashFunc(value)
+  text = value.upcase + 'ZAYAJB'
+  power = 1
+  hashVal = 0
+  m = 1000000009
+  p = 37
+
+  text.chars.each do | char |
+    if (char.ord >= 48 && char.ord <= 57) || (char.ord >= 65 && char.ord <= 90)
+      hashVal = ((char.ord * power) + hashVal) % m
+      power = (power * 37) % m
+    end
+  end
+  result = hashVal
+end
+puts 'result'
+puts hashFunc('this is a test') #instructions quota allows up to 440 executions
+
+Output.cart = Input.cart
+{%- endcomment -%}
+
+{%- liquid 
+      assign hashMap = 'A:65;B:66;C:67;D:68;E:69;F:70;G:71;H:72;I:73;J:74;K:75;L:76;M:77;N:78;O:79;P:80;Q:81;R:82;S:83;T:84;U:85;V:86;W:87;X:88;Y:89;Z:90;0:48;1:49;2:50;3:51;4:52;5:53;6:54;7:55;8:56;9:57' | split: ';'
+      assign string = value | handle | remove: '-' | upcase | append: 'ZAYAJB' | split: ''
+      assign hashVal = 0
+      assign power = 1
+
+      for char in string
+        assign filter = char | append: ':'
+        assign newCharVal = hashMap | where: filter | first | split: ':' | last
+        assign hashVal = newCharVal | times: power | plus: hashVal | modulo: 1000000009
+        assign power = power | times: 37 | modulo: 1000000009
+      endfor
+      echo hashVal
+    -%}
+

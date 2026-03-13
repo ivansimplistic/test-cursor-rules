@@ -1,0 +1,41 @@
+<div class="grid-item">
+  {%- render 'richtext_blocks', blockType: 'content_title', block: block -%}
+</div>
+{% schema %}
+{
+  "name": "Title",
+  "tag": null,
+  "presets": [
+    {
+      "name": "Title",
+      "category": "Content",
+      "blocks": [
+      ]
+    }
+  ],
+  "settings": [
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Title",
+      "default": "Lorem ipsum dolor"
+    },
+    {
+      "type": "checkbox",
+      "id": "is_h1",
+      "label": "This is the first title of the page (H1)"
+    },
+    {
+      "type": "range",
+      "id": "title_size",
+      "min": -1,
+      "max": 6,
+      "step": 1,
+      "unit": "h",
+      "label": "Title size",
+      "default": 1,
+      "info": "Equivalent to the heading tags: 6 = <h6> (smallest), 1 = <h1> (largest), 0 and -1 are even larger."
+    }
+  ]
+}
+{% endschema %}

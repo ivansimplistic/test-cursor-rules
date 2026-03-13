@@ -1,0 +1,109 @@
+if(!customElements.get('contact-form')) {
+  class ContactForm extends HTMLElement {
+  	constructor() {
+      super();
+      this.useKlaviyo = this.dataset.useKlaviyo=='true';
+      this.querySelector('form').addEventListener('submit', this.contactFormSubmitHandler.bind(this));
+      if (location.search.indexOf('customer_posted=true')>-1 && !location.hash) {
+        var nearestVisibleForm = Array.from(document.querySelectorAll('[name="form_type"][value="customer"]')).map(x=>x.closest('form')).find(x=>{return $s.isVisible(x)});
+        if (nearestVisibleForm) {
+          $s.scrollToElement(nearestVisibleForm);
+        }
+      } else if (location.href.indexOf('/challenge')>-1) {
+        window.addEventListener('load', ()=>{
+          $s.scrollToElement(document.querySelector('main'));
+        }, {once: true})
+      }
+    }
+
+    contactFormSubmitHandler(e) {
+      var self = this;
+      var form = self.querySelector('form');
+      var error = false;
+      var errorMsg = form.querySelector('.error-msg');
+      var msg = '';
+      var requiredFields = [];
+
+      errorMsg.style.display = 'none';
+      form.querySelectorAll('.error').forEach((elem)=>{
+        elem.classList.remove('error');
+      });
+      form.querySelectorAll('.required').forEach((elem)=>{
+        if(elem.value=="" || (elem.type=='radio' && !form.querySelector('input[name="'+elem.name+'"]:checked')) || (elem.type=='checkbox' && !elem.checked) ) {
+          error = true;
+          elem.classList.add('error');
+          if (elem.ariaLabel) {
+            requiredFields.push(elem.ariaLabel);
+          } else if (elem.placeholder) {
+            requiredFields.push(elem.placeholder);
+          } else if (elem.labels && elem.labels.length > 0) {
+            requiredFields.push(elem.labels[0].innerText);
+          }
+        }
+      });
+      if (requiredFields.length==1) {
+        msg = lngg.general__forms__complete_the_field_message.replace(new RegExp(/{% raw %}{{ *field *}}{% endraw %}/), requiredFields[0]);
+      }
+      if(error) {
+        errorMsg.innerHTML = msg || lngg.general__forms__complete_all_the_fields_message;
+        errorMsg.style.display = 'block';
+      } else {
+        if(!$s.validateEmail(form.querySelector('.email').value)) {
+          error = true;
+          form.querySelector('.email').classList.add('error');
+          errorMsg.style.display = 'block';
+          errorMsg.innerHTML = lngg.general__forms__enter_a_valid_email_message;
+        }
+      }
+      if(!error) {
+        var onsubmit = form.getAttribute('onsubmit');
+        if (onsubmit && onsubmit.indexOf('recaptcha')>-1) {
+          self.dispatchEvent(new CustomEvent('submitSuccess'));
+          return true;
+        }
+
+        var params = {
+          data: new FormData(form),
+          success: function(data, response){
+            if(response.url.includes('/challenge')) {
+              form.removeEventListener('submit', self.contactFormSubmitHandler);
+              form.submit();
+            } else {
+              form.querySelector('.form-wrap').style.display = 'none';
+              form.querySelector('.success-msg').style.display = 'block';
+              self.dispatchEvent(new CustomEvent('submitSuccess'));
+            }
+          },
+          error: function(){
+            form.removeEventListener('submit', self.contactFormSubmitHandler);
+            form.submit();
+          }
+        }
+        if (self.useKlaviyo) {
+          params['url'] = form.dataset.ajaxSubmit;
+        } else {
+          params['url'] = form.getAttribute('action');
+          params['type'] = 'text';
+        }
+
+        if (self.useKlaviyo {% if settings.contact_submit_ajax %} || true{% endif %} ) {
+          e.preventDefault();
+          e.stopImmediatePropagation();
+          $s.post(params);
+        } else {
+          return true;
+        }
+
+      } else {
+        e.preventDefault();
+        e.stopImmediatePropagation();
+        
+      }
+    }
+
+
+  }
+  customElements.define('contact-form', ContactForm);
+}
+
+

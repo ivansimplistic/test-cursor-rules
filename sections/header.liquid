@@ -1,0 +1,684 @@
+<style>
+@media (min-width: {{settings.breakpoint_tablet | plus: 0.001}}em) {
+  {%- if section.settings.behavior == 'sticky' -%}
+  .header-outer {position: sticky; top: 0px;}
+  {%- endif -%}
+  {%- if section.settings.behavior == 'drop_header' -%}
+  .header-outer.animate {transition: transform var(--animation-speed-fast) ease-out;}
+  .header-outer.header-hidden {transform: translateY(-100%);}
+  .header-outer.header-sticky {position: sticky; top: 0px;}
+  .header-sticky:not(.header-hidden) ~ main .sticky-below-header {top: var(--header-height) !important; transition-delay: 20ms !important;}
+  .header-sticky:not(.header-hidden) ~ main .page-top-wrap.sticky + .page-top-shadow,
+  .header-sticky:not(.header-hidden) ~ main .customer-portal-menu-shadow {top: calc(var(--header-height) + 4em) !important; transition-delay: 20ms !important;}
+  .header-outer.header-hidden.animate {transition-delay: 20ms !important;}
+  {%- endif -%}
+
+  .header-outer {
+    --header-logo-width: {{section.settings.logo_width}}rem;
+    --header-logo-margin-vertical: {{section.settings.logo_margin_vertical}}rem;
+    --header-logo-margin-horizontal: {{section.settings.logo_margin_horizontal}}%;
+    --header-links-margin-horizontal: {{section.settings.menu_margin_horizontal}}rem;
+    --header-links-margin-vertical: {{section.settings.menu_margin_vertical}}rem;
+    --header-links-size: {{section.settings.menu_size}}%;
+    --header-links-weight: {{section.settings.menu_weight}};
+    --header-links-transform: {{section.settings.menu_transform}};
+    --header-links-letter-spacing: {{section.settings.menu_letter_spacing | divided_by: 10.00}}em;
+    --header-top-utils-icons-size: {{section.settings.top_utils_icons_size}}%;
+  }
+}
+
+@media (max-width: {{settings.breakpoint_tablet}}) {
+  {%- if section.settings.behavior_mobile == 'sticky' -%}
+  .header-outer {position: sticky; top: 0px;}
+  {%- endif -%}
+  {%- if section.settings.behavior_mobile == 'drop_header' -%}
+  .header-outer.animate {transition: transform var(--animation-speed-fast) ease-out;}
+  .header-outer.header-hidden {transform: translateY(-100%);}
+  .header-outer.header-sticky {position: sticky; top: 0px;}
+  .header-sticky:not(.header-hidden) ~ main .sticky-below-header {top: var(--header-height) !important; transition-delay: 20ms !important;}
+  .header-sticky:not(.header-hidden) ~ main .customer-portal-menu-shadow,
+  .header-sticky:not(.header-hidden) ~ main .page-top-shadow {top: calc(var(--header-height) + 4em) !important; transition-delay: 20ms !important;}
+  .header-outer.header-hidden.animate {transition-delay: 20ms !important;}
+  {%- endif -%}
+
+  .header-outer {
+    --header-logo-width: {{section.settings.logo_width_mobile}}rem;
+    --header-logo-margin-vertical: {{section.settings.logo_margin_vertical_mobile }}rem;
+    --header-top-utils-icons-size: {{section.settings.top_utils_icons_size_mobile}}%;
+  }
+}
+</style>
+
+{%- assign megaMenuTriggers = '' | split: ',' -%}
+{%- for i in (1..5) -%}
+  {%- assign settingKey = 'mega_menu_' | append: i | append: '_parent_link' -%}
+  {%- if settings[settingKey] != blank -%}
+    {%- assign megaMenuTriggers = settings[settingKey] | handleize | split: ',' | concat: megaMenuTriggers -%}
+  {%- endif -%}
+{%- endfor -%}
+
+{%- assign layout = section.settings.layout -%} 
+{%- assign menuLimit = 0 -%} 
+<div class="header-content desktop-mode--{{section.settings.behavior}} mobile-mode--{{section.settings.behavior_mobile}} scheme color-{{section.settings.color_scheme}} {{layout}} border-{{section.settings.border}} shadow-{{section.settings.shadow}}">
+
+  <div class="container flex align-items-center">
+
+    <div class="left-content flex align-items-center justify-content-between">
+      {%- render 'top_utils_left', section: section, layout: layout -%}
+      {%- if layout == 'logo-center menu-split' or layout == 'logo-center menu-left' -%}
+        {%- if layout contains 'menu-split' -%}
+          {%- assign justify = 'end' -%}
+          {%- assign menuLimit = linklists[section.settings.menu].links.size | divided_by: 2.0 | ceil -%}
+        {%- else -%}
+          {%- assign justify = 'start' -%}
+          {%- assign menuLimit = linklists[section.settings.menu].links.size -%}
+        {%- endif -%}
+        <nav class="header-main-menu medium-down--hide large--flex large--flex-wrap large--justify-content-{{justify}}">
+          {%- for link in linklists[section.settings.menu].links limit: menuLimit -%}
+            {%- render 'main_menu_item', link: link, megaMenuTriggers: megaMenuTriggers -%}
+          {%- endfor -%}
+        </nav>
+      {%- endif -%}
+    </div>
+
+    {%- if section.settings.logo != blank -%}
+      <div class="logo img flex align-items-center">
+        <a href="{{ routes.root_url }}">
+          <img class="main" src="{{section.settings.logo | image_url: width: 400}}" alt="{{shop.name}}" width="{{ section.settings.logo.width }}" height="{{ section.settings.logo.height }}" />
+        </a>
+      </div>
+    {%- elsif section.settings.logo_svg != blank -%}
+      <div class="logo svg flex align-items-center">
+        <a href="{{ routes.root_url }}" aria-label="{{shop.name}}">
+          {{ section.settings.logo_svg }}
+        </a>
+      </div>
+    {%- else -%}
+      <div class="logo text flex align-items-center">
+        <a href="{{ routes.root_url }}">
+          <div class="shop-name heading-font">{{shop.name}}</div>
+        </a>
+      </div>
+    {%- endif -%}
+
+    <div class="right-content flex align-items-center justify-content-between">
+      {%- unless layout contains 'bottom' -%}
+        <nav class="header-main-menu medium-down--hide large--flex large--flex-wrap">
+          {%- for link in linklists[section.settings.menu].links offset: menuLimit -%}
+            {%- render 'main_menu_item', link: link, megaMenuTriggers: megaMenuTriggers -%}
+          {%- endfor -%}
+        </nav>
+      {%- endunless -%}
+      {%- unless layout == 'logo-left menu-center' -%}
+        {%- render 'top_utils_right', section: section, layout: layout -%}
+      {%- endunless -%}
+    </div>
+    {%- if layout == 'logo-left menu-center' -%}
+      {%- render 'top_utils_right', section: section, layout: layout -%}
+    {%- endif -%}
+
+  </div>
+
+  {%- if layout contains 'bottom' -%}
+    <div class="menu-bottom-wrapper scheme color-{{section.settings.menu_color_scheme}} {% if section.settings.menu_border_top %}scheme-border-top{% endif %} {% if section.settings.menu_border_bottom %}scheme-border-bottom{% endif %} medium-down--hide">
+      <div class="container">
+        <nav class="header-main-menu medium-down--hide large--flex large--flex-wrap {% if layout contains 'logo-center' %}justify-content-center{% endif %}">
+          {%- for link in linklists[section.settings.menu].links offset: menuLimit -%}
+            {%- render 'main_menu_item', link: link, megaMenuTriggers: megaMenuTriggers -%}
+          {%- endfor -%}
+        </nav>
+      </div>
+    </div>
+  {%- endif -%}
+  
+</div>
+
+<header-scroll data-behavior-desktop="{{ section.settings.behavior }}" data-behavior-mobile="{{ section.settings.behavior_mobile }}"></header-scroll>
+
+<script type="module">
+  function setVariablesHeaderStyle() {
+    var headerHeight = document.querySelector('.header-inner').offsetHeight - 1;
+    var announcementBarHeight = 0;
+    if(document.querySelector('.announcement-bar')){
+      announcementBarHeight = document.querySelector('.announcement-bar').offsetHeight;
+    }
+    var initialHeaderTotalHeight = headerHeight + announcementBarHeight;
+    var initialHeaderHeight = headerHeight + announcementBarHeight;
+    if(window.getComputedStyle(document.querySelector('.header-inner')).position == 'absolute'){
+      initialHeaderHeight = announcementBarHeight;
+    }
+    var scrollHeaderHeight = headerHeight;
+    if(document.querySelector('.announcement-bar') && document.querySelector('.announcement-bar').closest('.header-outer')){
+      scrollHeaderHeight = headerHeight + announcementBarHeight;
+    }
+    var headerOffset;
+    var headerOffsetScrollUp;
+    
+    if($s.media.isLarge){ 
+      {%- if section.settings.behavior == 'sticky' -%}
+        headerOffset = scrollHeaderHeight;
+        headerOffsetScrollUp = scrollHeaderHeight;
+      {%- else -%}
+        headerOffset = 0;
+        {%- if section.settings.behavior == 'drop_header' -%}
+          headerOffsetScrollUp = scrollHeaderHeight;
+        {%- else -%}
+          headerOffsetScrollUp = 0;
+        {%- endif -%}
+      {%- endif -%}
+    }
+    if($s.media.isMediumDown){ 
+      {%- if section.settings.behavior_mobile == 'sticky' -%}
+        headerOffset = scrollHeaderHeight;
+        headerOffsetScrollUp = scrollHeaderHeight;
+      {%- else -%}
+        headerOffset = 0;
+        {%- if section.settings.behavior_mobile == 'drop_header' -%}
+          headerOffsetScrollUp = scrollHeaderHeight;
+        {%- else -%}
+          headerOffsetScrollUp = 0;
+        {%- endif -%}
+      {%- endif -%}
+    }
+    document.documentElement.style.setProperty('--header-offset', headerOffset + 'px');
+    document.documentElement.style.setProperty('--header-offset-scroll-up', headerOffsetScrollUp + 'px');
+    document.documentElement.style.setProperty('--initial-header-total-height', initialHeaderTotalHeight + 'px');
+    document.documentElement.style.setProperty('--initial-header-height', initialHeaderHeight + 'px');
+    document.documentElement.style.setProperty('--header-height', scrollHeaderHeight + 'px');
+  }
+  window.addEventListener('mediaChange', $s.debounce(setVariablesHeaderStyle, 1000, true)); //1000ms delay before calculating height to allow animations to end.
+  setVariablesHeaderStyle();
+</script>
+
+{% schema %}
+  {
+    "name": "Header",
+    "class": "header-inner type-header",
+    "settings": [
+      {
+        "type": "header",
+        "content": "Behavior"
+      },
+      {
+        "type": "select",
+        "id": "behavior",
+        "label": "Behavior (Desktop)",
+        "options": [
+          {
+            "value": "static",
+            "label": "Static"
+          },
+          {
+            "value": "sticky",
+            "label": "Sticky"
+          },
+          {
+            "value": "drop_header",
+            "label": "Shows on Scroll"
+          }
+        ],
+        "default": "sticky"
+      },
+      {
+        "type": "select",
+        "id": "behavior_mobile",
+        "label": "Behavior (Mobile)",
+        "options": [
+          {
+            "value": "static",
+            "label": "Static"
+          },
+          {
+            "value": "sticky",
+            "label": "Sticky"
+          },
+          {
+            "value": "drop_header",
+            "label": "Shows on Scroll"
+          }
+        ],
+        "default": "drop_header"
+      },
+      {
+        "type": "header",
+        "content": "Layout"
+      },
+      {
+        "type": "select",
+        "id": "layout",
+        "label": "Layout (Desktop)",
+        "options": [
+          {
+            "value": "logo-left menu-left",
+            "label": "Logo left - Menu left"
+          },
+          {
+            "value": "logo-left menu-center",
+            "label": "Logo left - Menu center"
+          },
+          {
+            "value": "logo-left menu-right",
+            "label": "Logo left - Menu right"
+          },
+          {
+            "value": "logo-left menu-bottom",
+            "label": "Logo left - Menu bottom"
+          },
+          {
+            "value": "logo-center menu-left",
+            "label": "Logo center - Menu left"
+          },
+          {
+            "value": "logo-center menu-split",
+            "label": "Logo center - Menu split"
+          },
+          {
+            "value": "logo-center menu-bottom",
+            "label": "Logo center - Menu bottom"
+          }
+        ],
+        "default": "logo-left menu-left",
+        "info": "It will adapt automatically on Mobile."
+      },
+      {
+        "type": "header",
+        "content": "Logo"
+      },
+      {
+        "type": "image_picker",
+        "id": "logo",
+        "label": "Logo"
+      },
+      {
+        "type": "liquid",
+        "id": "logo_svg",
+        "label": "Logo (SVG)"
+      },
+      {
+        "type": "range",
+        "id": "logo_width",
+        "min": 0,
+        "max": 30,
+        "step": 0.5,
+        "unit": "rem",
+        "label": "Width (Desktop)",
+        "default": 15
+      },
+      {
+        "type": "range",
+        "id": "logo_width_mobile",
+        "min": 0,
+        "max": 20,
+        "step": 0.5,
+        "unit": "rem",
+        "label": "Width (Mobile)",
+        "default": 8
+      },
+      {
+        "type": "range",
+        "id": "logo_margin_vertical",
+        "min": 0,
+        "max": 3,
+        "step": 0.1,
+        "unit": "rem",
+        "label": "Top/bottom margin (Desktop)",
+        "default": 1.5
+      },
+      {
+        "type": "range",
+        "id": "logo_margin_vertical_mobile",
+        "min": 0,
+        "max": 3,
+        "step": 0.1,
+        "unit": "rem",
+        "label": "Top/bottom margin (Mobile)",
+        "default": 0.8
+      },
+      {
+        "type": "range",
+        "id": "logo_margin_horizontal",
+        "min": 0,
+        "max": 10,
+        "step": 1,
+        "unit": "%",
+        "label": "Left/right margin",
+        "default": 4
+      },
+      {
+        "type": "header",
+        "content": "Menu"
+      },
+      {
+        "type": "link_list",
+        "id": "menu",
+        "label": "Menu",
+        "default": "main-menu"
+      },
+      {
+        "type": "paragraph",
+        "content": "Desktop settings:"
+      },
+      {
+        "type": "select",
+        "id": "menu_font_style",
+        "label": "Font style",
+        "options": [
+          {
+            "value": "body-font",
+            "label": "Match body"
+          },
+          {
+            "value": "heading-font",
+            "label": "Match headings"
+          }
+        ],
+        "default": "body-font"
+      },
+      {
+        "type": "select",
+        "id": "menu_transform",
+        "label": "Capitalization",
+        "options": [
+          {
+            "value": "none",
+            "label": "Natural"
+          },
+          {
+            "value": "uppercase",
+            "label": "Uppercase"
+          }
+        ],
+        "default": "none"
+      },
+      {
+        "type": "range",
+        "id": "menu_size",
+        "min": 80,
+        "max": 120,
+        "step": 1,
+        "unit": "%",
+        "label": "Font size",
+        "default": 100
+      },
+      {
+        "type": "range",
+        "id": "menu_weight",
+        "min": 100,
+        "max": 900,
+        "step": 100,
+        "unit": "%",
+        "label": "Font weight",
+        "default": 400
+      },
+      {
+        "type": "range",
+        "id": "menu_letter_spacing",
+        "min": -0.5,
+        "max": 2,
+        "step": 0.1,
+        "unit": "em",
+        "label": "Letter spacing",
+        "default": 0,
+        "info": "This value will be divided by 10, so 0.5 is 0.05em."
+      },
+      {
+        "type": "range",
+        "id": "menu_margin_horizontal",
+        "min": 0,
+        "max": 3,
+        "step": 0.1,
+        "unit": "rem",
+        "label": "Space between items",
+        "default": 1.5
+      },
+      {
+        "type": "range",
+        "id": "menu_margin_vertical",
+        "min": 0,
+        "max": 3,
+        "step": 0.1,
+        "unit": "rem",
+        "label": "Top/bottom margin",
+        "default": 1.5
+      },
+      {
+        "type": "header",
+        "content": "Top utils"
+      },
+      {
+        "type": "select",
+        "id": "top_utils_badge_style",
+        "label": "Badges style",
+        "options": [
+            {"value": "float", "label": "Floating"},
+            {"value": "right", "label": "Right"}
+        ],
+        "default": "float",
+        "info": "When using 'right', the cart quantity appears on the right of the icon, and other badges are hidden."
+      },
+      {
+        "type": "range",
+        "id": "top_utils_icons_size",
+        "min": 90,
+        "max": 150,
+        "step": 1,
+        "unit": "%",
+        "label": "Icons size (Desktop)",
+        "default": 100
+      },
+      {
+        "type": "range",
+        "id": "top_utils_icons_size_mobile",
+        "min": 90,
+        "max": 150,
+        "step": 1,
+        "unit": "%",
+        "label": "Icons size (Mobile)",
+        "default": 100
+      },
+      {
+        "type": "paragraph",
+        "content": "Desktop settings:"
+      },
+      {
+        "type": "checkbox",
+        "id": "top_utils_show_labels",
+        "label": "Show labels",
+        "info": "Only on screens larger than 1200px."
+      },
+      {
+        "type": "select",
+        "id": "top_utils_labels_position",
+        "label": "Labels position",
+        "options": [
+            {"value": "right", "label": "Right"},
+            {"value": "bottom", "label": "Bottom"}
+        ],
+        "default": "right"
+      },
+      {
+        "type": "select",
+        "id": "search_form_style",
+        "label": "Search style (Desktop)",
+        "options": [
+          {
+            "value": "embedded",
+            "label": "Embedded"
+          },
+          {
+            "value": "dropdown",
+            "label": "Drop down"
+          }
+        ],
+        "default": "dropdown",
+        "info": "Default on Mobile is 'Drop down'."
+      },
+      {
+        "type": "paragraph",
+        "content": "Mobile settings:"
+      },
+      {
+        "type": "checkbox",
+        "id": "search_show_mobile",
+        "label": "Show search (Mobile)",
+        "default": true
+      },
+      {
+        "type": "checkbox",
+        "id": "user_show_mobile",
+        "label": "Show user (Mobile)",
+        "default": true
+      },
+      {
+        "type": "header",
+        "content": "Colors"
+      },
+      {
+        "type": "paragraph",
+        "content": "Main section:"
+      },
+      {
+        "type": "color_scheme",
+        "id": "color_scheme",
+        "label": "Color scheme",
+        "default": "scheme-1"
+      },
+      {
+        "type": "color_scheme",
+        "id": "submenu_color_scheme",
+        "label": "Submenu color scheme",
+        "default": "scheme-1",
+        "info": "Used for submenus and search bar."
+      },
+      {
+        "type": "select",
+        "id": "shadow",
+        "label": "Shadow",
+        "options": [
+            {"value": "false", "label": "Never"},
+            {"value": "true", "label": "Always"},
+            {"value": "scroll-true", "label": "Only on scroll"}
+        ],
+        "default": "false"
+      },
+      {
+        "type": "select",
+        "id": "border",
+        "label": "Border",
+        "options": [
+            {"value": "false", "label": "Never"},
+            {"value": "true", "label": "Always"},
+            {"value": "scroll-true", "label": "Only on scroll"}
+        ],
+        "default": "false"
+      },
+      {
+        "type": "paragraph",
+        "content": "Menu bar (only when it's below the logo):"
+      },
+      {
+        "type": "color_scheme",
+        "id": "menu_color_scheme",
+        "label": "Color scheme",
+        "default": "scheme-1"
+      },
+      {
+        "type": "checkbox",
+        "id": "menu_border_top",
+        "label": "Top border"
+      },
+      {
+        "type": "checkbox",
+        "id": "menu_border_bottom",
+        "label": "Bottom border"
+      }
+    ],
+    "blocks": [
+      {
+        "type": "custom_util",
+        "name": "Custom util",
+        "settings": [
+          {
+            "type": "select",
+            "id": "type",
+            "label": "Type",
+            "options": [
+              {"value": "normal", "label": "Icon"},
+              {"value": "btn", "label": "Button"},
+              {"value": "btn v2", "label": "Button V2"}
+            ],
+            "default": "normal"
+          },
+          {
+            "type": "select",
+            "id": "icon",
+            "label": "Icon",
+            "options": [
+              {"value": "none", "label": "None"},
+              {"value": "arrow-left", "label": "Arrow left"},
+              {"value": "arrow-right", "label": "Arrow right"},
+              {"value": "chevron-left", "label": "Chevron left"},
+              {"value": "chevron-right", "label": "Chevron right"},
+              {"value": "bag", "label": "Bag"},
+              {"value": "bell", "label": "Bell"},
+              {"value": "bubble", "label": "Bubble"},
+              {"value": "calendar", "label": "Calendar"},
+              {"value": "cart", "label": "Cart"},
+              {"value": "carrot", "label": "Carrot"},
+              {"value": "checkmark", "label": "Checkmark"},
+              {"value": "clock", "label": "Clock"},
+              {"value": "close", "label": "Cross"},
+              {"value": "eye", "label": "Eye"},
+              {"value": "filters", "label": "Filters"},
+              {"value": "fullscreen", "label": "Fullscreen"},
+              {"value": "gift", "label": "Gift"},
+              {"value": "hamburger", "label": "Menu"},
+              {"value": "hand", "label": "Hand"},
+              {"value": "heart", "label": "Heart"},
+              {"value": "help", "label": "Help"},
+              {"value": "email", "label": "Envelope"},
+              {"value": "map", "label": "Map pointer"},
+              {"value": "minus", "label": "Minus"},
+              {"value": "plus", "label": "Plus"},
+              {"value": "tag", "label": "Product tag"},
+              {"value": "edit", "label": "Pencil"},
+              {"value": "edit-paper", "label": "Edit paper"},
+              {"value": "piggybank", "label": "Piggybank"},
+              {"value": "play", "label": "Play"},
+              {"value": "pause", "label": "Pause"},
+              {"value": "search", "label": "Search"},
+              {"value": "share", "label": "Share"},
+              {"value": "shipping", "label": "Shipping truck"},
+              {"value": "shipping-fast", "label": "Shipping truck - fast"},
+              {"value": "star", "label": "Star"},
+              {"value": "store", "label": "Store"},
+              {"value": "delete", "label": "Trash"},
+              {"value": "user", "label": "User"},
+              {"value": "zoom", "label": "Zoom"}
+            ],
+            "default": "heart"
+          },
+          {
+            "type": "text",
+            "id": "title",
+            "label": "Label",
+            "default": "Custom Util",
+            "info": "* Required (even for icons)"
+          },
+          {
+            "type": "url",
+            "id": "url",
+            "label": "URL",
+            "info": "* Required"
+          },
+          {
+            "type": "checkbox",
+            "id": "mobile_show",
+            "label": "Show on Mobile",
+            "default": true
+          }
+        ]
+      }
+    ]
+  }
+{% endschema %}

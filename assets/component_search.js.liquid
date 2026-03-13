@@ -1,0 +1,288 @@
+if (!customElements.get('search-form')) {
+  class ComponentSearch extends HTMLElement {
+    constructor() {
+      super();
+      this.searchField = this.querySelector('input[name="q"]');
+      this.results = this.querySelector('.search-results');
+      this.form = this.querySelector('form');
+      this.searchDelay = 300;
+      this.searchType = this.querySelector('input[name="type"]').value || 'product';
+      this.controller = null;
+      this.requestTimeout = 0;
+      this.predictiveSearch = this.dataset.predictiveSearch=='true';
+      this.wildcard = this.dataset.wildcard=='true' ? '*' : '';
+      this.showPrice = this.dataset.showPrice=='true';
+
+      if (this.dataset.autocomplete == "true") {
+        if (this.predictiveSearch) {
+          this.searchType += ',collection';
+        }
+        this.documentClickHandler = this.documentClick.bind(this);
+        this.searchField.addEventListener('input', this.doSearch.bind(this));
+        this.searchField.addEventListener('focus', ()=> {
+          if (!this.resultsVisible) {
+            this.searchField.dispatchEvent(new CustomEvent('input'));
+          }
+        });
+      }
+
+      this.form.addEventListener('submit', (e)=>{
+        e.preventDefault();
+        const formData = new FormData(this.form);
+        const searchParams = new URLSearchParams(formData);
+        const query = searchParams.get('q');
+        this.saveSearchTerm(query);
+        if(query && query!="") {
+          searchParams.set('q', this.wildcard + query + this.wildcard);
+          location = this.form.action + '?' + searchParams.toString();
+        }
+      });
+    }
+
+    saveSearchTerm(query) {
+      {% if settings.search_show_user_terms %}
+      try {
+        query = query.trim();
+        var typeParam = this.form.querySelector('[name="type"]').value;
+        if (typeParam.indexOf('product') > -1) {
+          var lastTerms = this.getLastSearchTerms();
+          if (lastTerms.indexOf(query) == -1) {
+            lastTerms.splice(0,0,query);
+            lastTerms = lastTerms.slice(0, 5);
+            sessionStorage.setItem('last_search_terms', lastTerms.join(','));
+          }
+        }
+      } catch (e) {
+        console.warn(e);
+      }
+      {% endif %}
+    }
+
+    getLastSearchTerms() {
+      var lastTerms = [];
+      {% if settings.search_show_user_terms %}
+      try {
+        lastTerms = (sessionStorage.getItem('last_search_terms') || '').split(',').map(x=>x.trim()).filter(x=>x!='');
+      } catch (e) {
+        console.warn(e);
+      }
+      {% endif %}
+      return lastTerms;
+    }
+    //term param allows to trigger custom search from js code.
+    doSearch(term) {
+      var standardSearchTerm = typeof(term)=="string" ? term : this.wildcard + this.searchField.value.trim() + this.wildcard;
+      if (this.predictiveSearch)
+        term = typeof(term)=="string" ? term : this.searchField.value.trim();
+      else 
+        term = standardSearchTerm;
+      if (this.controller) {
+        this.controller.abort();
+        this.controller = null;
+      }
+      clearTimeout(this.requestTimeout);
+      if (standardSearchTerm.length>=3) {
+        this.showSearchingResults();
+        this.requestTimeout = setTimeout(()=>{
+          this.controller = new AbortController();
+          var searchSectionId = this.predictiveSearch ? 'search_predictive_json' : 'search_standard_json';
+          var predictiveLimitQty = 10; //max=10
+          var searchUrl = this.predictiveSearch ? routes.predictive_search_url + '?resources[type]='+ this.searchType +'&q='+ encodeURIComponent(term) + '&resources[limit]='+predictiveLimitQty+'&section_id='+ searchSectionId : routes.search_url + '?section_id='+ searchSectionId +'&type='+ this.searchType +'&q='+ encodeURIComponent(term);
+          $s.get({
+            signal: this.controller.signal,
+            url: searchUrl,
+            success: (data)=>{
+              if (!this.resultsVisible) {
+                return;
+              }
+              var parser = new DOMParser();
+              var doc = parser.parseFromString(data, "text/html");
+              var response = JSON.parse(doc.querySelector('div').innerHTML);
+              this.clearResults(false);
+              var categories = 0;
+              if (response.results_count > 0 || (response.collections && response.collections.length>0)) {
+                var title = document.createElement('div'); 
+                title.innerHTML = lngg.search_js__search_results_caption; //title for screen reader
+                title.classList.add('visually-hidden');
+                this.results.appendChild(title);
+                var items = document.createElement('div');
+                items.classList.add('search-results-items');
+                this.results.appendChild(items);
+                if (response.results.length > 0) {
+                  categories++;
+                }
+                if (response.collections && response.collections.length > 0) {
+                  categories++;
+                }
+                if (response.articles.length > 0) {
+                  categories++;
+                }
+                if (response.pages.length > 0) {
+                  categories++;
+                }
+                if (response.results.length > 0) {
+                  if (categories==1) response.results = response.results.slice(0, 5);
+                  this.buildCategory(items, 'product', lngg.search_js__products_title, response.results);
+                }
+                if (response.collections && response.collections.length > 0) {
+                  if (categories==1) response.collections = response.collections.slice(0, 5);
+                  this.buildCategory(items, 'collections', lngg.search_js__collections_title, response.collections||[]);
+                }
+                if (response.articles.length > 0) {
+                  if (categories==1) response.articles = response.articles.slice(0, 5);
+                  this.buildCategory(items, 'article', lngg.search_js__articles_title, response.articles);
+                }
+                if (response.pages.length > 0) {
+                  if (categories==1) response.pages = response.pages.slice(0, 5);
+                  this.buildCategory(items, 'page', lngg.search_js__pages_title, response.pages);
+                }
+                if (categories>1) {
+                  items.classList.add('multi-category');
+                }
+                if (response.results_count > (response.results.length + response.articles.length + response.pages.length)) {
+                  var linkUrl = routes.search_url + '?type='+ this.searchType +'&q='+ encodeURIComponent(standardSearchTerm);
+                  this.results.appendChild(this.buildSeeAllLink(linkUrl, response.results_count));
+                }
+                if (window.LinkPrefetch && window.LinkPrefetch.addHoverListener) {
+                  window.LinkPrefetch.addHoverListener(this.results);
+                }          
+              } else {
+                this.noResults();
+              }
+            }
+          });
+        }, this.searchDelay);
+      } else {
+        this.suggestedResults();
+      }
+    }
+
+    buildItem(itemJson) {
+      var info = document.createElement('div');
+      var title = document.createElement('div');
+      var a = document.createElement('a');
+      a.classList.add("result-item", "flex", "direction-row", "justify-content-start", "align-items-start");
+      a.href = itemJson.url;
+      if (typeof(itemJson.thumbnail)!='undefined') {
+        var img = document.createElement('img');
+        img.src = itemJson.thumbnail ? itemJson.thumbnail : '';
+        img.alt = '';
+        a.appendChild(img);
+      }
+
+      title.classList.add('title');
+      title.innerHTML = itemJson.title;
+      a.appendChild(info);
+      info.appendChild(title);
+      info.classList.add('info');
+      if (this.showPrice && itemJson.price != undefined) {
+        var price = document.createElement('div');
+        price.classList.add('price', 'money');
+        price.innerHTML = $s.formatMoney(itemJson.price).replace('.00', '');
+        info.appendChild(price);
+      }
+      return a;
+    }
+
+    buildCategory(container, type, categoryTitle, results) {
+      var group = document.createElement('div');
+      group.classList.add('search-results-'+type, 'search-results-group');
+      var title = document.createElement('div');
+      container.appendChild(title);
+      title.outerHTML = '<div class="result-group-title-wrapper"><div class="result-group-title small-label">'+categoryTitle+'</div></div>'
+      container.appendChild(group);
+      results.forEach((item)=>{
+        group.appendChild(this.buildItem(item));
+      });
+    }
+
+    buildSeeAllLink(url, resultsQuantity) {
+      var a = document.createElement('a');
+      a.classList.add('btn');
+      a.href = url;
+      if (this.predictiveSearch) {
+        a.innerHTML = lngg.search_js__see_all_results_link;
+      } else {
+        a.innerHTML = lngg.search_js__see_all_n_results_link.replace(new RegExp(/{% raw %}{{ *quantity *}}{% endraw %}/), resultsQuantity);
+      }
+      return a;
+    }
+
+    showSearchingResults() {
+      this.resultsVisible = true;
+      if (!this.results.style.minHeight) {
+        document.addEventListener('click', this.documentClickHandler);
+
+        var height = this.results.offsetHeight;
+        this.results.style.minHeight = Math.max(height, 80)  + 'px';
+        this.results.innerHTML = '<div class="loader-wrap flex justify-content-center align-items-center"><div class="loader"></div></div>';
+      }
+    }
+
+    clearResults(removeEvents=true) {
+      if(removeEvents) {
+        document.removeEventListener('click', this.documentClickHandler);
+        this.resultsVisible = false;
+      }
+      this.results.innerHTML = '';
+      this.results.style.minHeight = '';
+    }
+
+    noResults() {
+      this.suggestedResults();
+      this.results.innerHTML = '<div class="no-results">' + lngg.search_js__no_products_found_message + '</div>' + this.results.innerHTML;
+    }
+
+    suggestedResults() {
+      this.clearResults();
+      var popularTerms = {{ settings.search_popular_terms | default: '' | split: ',' | json}}.map(x=>x.trim()).filter(x=>x!='');
+      var typeParam = this.form.querySelector('[name="type"]').value;
+      var lastTerms = this.getLastSearchTerms();
+      var popularSearches = this.dataset.popularSearches ? JSON.parse(this.dataset.popularSearches) : [];
+      var html = `<div class="suggested-results" ${popularSearches.length==0 && popularTerms.length==0 && lastTerms.length==0 ? 'style="display: none;"' : ''}>
+        <div class="grid">
+          <div class="grid-item flex-1" ${popularSearches.length==0 ? 'style="display: none;"' : ''}>
+            <div class="title heading-font">${lngg.search_js__popular_searches_title}</div>
+            <ul>`;
+      for (var i=0; i<popularSearches.length; i++) {
+        html += `<li class="suggested-item"><a href="${popularSearches[i].url}">${popularSearches[i].title}</a></li>`;
+      }
+
+      html += `</ul>
+          </div>
+          <div class="grid-item flex-1" ${popularTerms.length==0 ? 'style="display: none;"' : ''}>
+            <div class="title heading-font">${lngg.search_js__popular_search_terms_title}</div>
+            <ul>`;
+      for (var i=0; i<popularTerms.length; i++) {
+        html += `<li class="suggested-item"><a href="${routes.search_url}?type=${typeParam}&q=${this.wildcard}${encodeURIComponent(popularTerms[i])}${this.wildcard}">${popularTerms[i]}</a></li>`;
+      }
+
+      html += `</ul>
+          </div>
+          <div class="grid-item flex-1" ${lastTerms.length==0 ? 'style="display: none;"' : ''}>
+            <div class="title heading-font">${lngg.search_js__your_last_searches_title}</div>
+            <ul>`;
+      for (var i=0; i<lastTerms.length; i++) {
+        html += `<li class="suggested-item"><a href="${routes.search_url}?type=${typeParam}&q=${this.wildcard}${encodeURIComponent(lastTerms[i])}${this.wildcard}">${lastTerms[i]}</a></li>`;
+      }
+        
+      html += `</ul>
+          </div>
+        </div>
+      </div>`;
+      
+      if(popularSearches.length !==0 || popularTerms.length !==0 || lastTerms.length !==0){
+        this.results.innerHTML = html;
+      }
+
+      document.addEventListener('click', this.documentClickHandler);
+    }
+
+    documentClick(e) {
+      if(!this.contains(e.target)) {
+        this.clearResults();
+      }
+    }
+  }
+  customElements.define('search-form', ComponentSearch);
+}

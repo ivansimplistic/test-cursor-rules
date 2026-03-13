@@ -1,0 +1,31 @@
+{%- assign titlePart = link.title | split: '**' -%}
+{%- if printFirstLink -%}
+  {%- assign linkUrlLastChar = link.url | slice: -1 -%}
+  {{ '<' }}{%- if linkUrlLastChar != '#' -%}a href="{{link.url}}" {% if link.url contains 'http' %}target="_blank"{% endif %}{%- else -%}div{%- endif %} class="item {% if link.active %}active{% endif %}"{{ '>' }}
+    <div class="flex flex-wrap align-items-center">
+      <span>{{ titlePart[0] | strip }}</span> {%- if titlePart.size > 1 -%}<span class="badge smaller {{titlePart[1] | handle}}">{{titlePart[1] | strip}}</span>{%- endif -%}
+    </div>
+  {{ '</' }}{%- if linkUrlLastChar != '#' -%}a{%- else -%}div{%- endif -%}{{ '>' }}
+{%- endif -%}
+{%- if link.links != blank -%}
+  {%- for link_level2 in link.links -%}
+    {%- assign titlePart = link_level2.title | split: '**' -%}
+    {%- assign linkUrlLastChar2 = link_level2.url | slice: -1 -%}
+    {{ '<' }}{%- if linkUrlLastChar2 != '#' -%}a href="{{link_level2.url}}" {% if link_level2.url contains 'http' %}target="_blank"{% endif %}{%- else -%}div{%- endif %} class="item {% if printFirstLink %}sublink{% endif %} {% if link_level2.active %}active{% endif %}"{{ '>' }}
+      <div class="flex flex-wrap align-items-center">
+        <span>{{ titlePart[0] | strip }}</span> {%- if titlePart.size > 1 -%}<span class="badge smaller {{titlePart[1] | handle}}">{{titlePart[1] | strip}}</span>{%- endif -%}
+      </div>
+    {{ '</' }}{%- if linkUrlLastChar2 != '#' -%}a{%- else -%}div{%- endif -%}{{ '>' }}
+    {%- if link_level2.links != blank -%}
+      {%- for link_level3 in link_level2.links -%}
+        {%- assign titlePart = link_level3.title | split: '**' -%}
+        {%- assign linkUrlLastChar3 = link_level3.url | slice: -1 -%}
+        {{ '<' }}{%- if linkUrlLastChar3.url != '#' -%}a href="{{link_level3.url}}" {% if link_level3.url contains 'http' %}target="_blank"{% endif %}{%- else -%}div{%- endif %} class="item sublink {% if printFirstLink %}third{% endif %} {% if link_level3.active %}active{% endif %}"{{ '>' }}
+          <div class="flex flex-wrap align-items-center">
+            <span>{{ titlePart[0] }}</span> {%- if titlePart.size > 1 -%}<span class="badge smaller {{titlePart[1] | handle}}">{{titlePart[1] | strip}}</span>{%- endif -%}
+          </div>
+        {{ '</' }}{%- if linkUrlLastChar3.url != '#' -%}a{%- else -%}div{%- endif -%}{{ '>' }}
+      {%- endfor -%}
+    {%- endif -%}
+  {%- endfor -%}
+{%- endif -%}

@@ -1,0 +1,294 @@
+{%- if section.settings.revert_colors_hover -%}
+  {%- assign revertOnHover = ':not(:hover)' -%}
+{%- endif -%}
+{%- if section.settings.revert_colors_scroll -%}
+  {%- assign revertOnScroll = ':not(.scroll)' -%}
+{%- endif -%}
+
+{%- capture styling -%}
+  .header-outer{{revertOnScroll}} .header-inner {position: absolute; width: 100%;}
+  {%- if section.settings.revert_colors_scroll -%}
+    .header-outer.header-sticky.scroll {margin-bottom: calc(var(--header-height) * -1);}
+  {%- endif -%}
+  .header-outer.header-hidden {transition: transform var(--animation-speed-fast) ease-out;}
+  .header-outer{{revertOnHover}}{{revertOnScroll}} .header-content,
+  .header-outer{{revertOnHover}}{{revertOnScroll}} .header-content .menu-bottom-wrapper {background-color: transparent;}
+  #search-bar {opacity: 0; transition-property: opacity, transform; transition-duration: var(--animation-speed-fast); transition-timing-function: linear;}
+  #search-bar.open {opacity: 1;}
+  .shopify-section-hero-banner:first-child .controls,
+  .shopify-section-header-style:first-child + .shopify-section-hero-banner .controls {top: var(--header-height);}
+{%- endcapture -%}
+
+<style>
+.header-content,
+.header-content .menu-bottom-wrapper {transition: background-color var(--animation-speed-fast) linear;}
+
+{%- if section.settings.over_hero_desktop -%}
+@media (min-width: {{settings.breakpoint_tablet | plus: 0.001}}em) {
+  {{styling}}
+  .breadcrumb-wrapper.desktop-over {top: var(--initial-header-total-height);}
+}
+{%- endif -%}
+
+{%- if section.settings.over_hero_mobile -%}
+@media (max-width: {{settings.breakpoint_tablet}}) {
+  {{styling}}
+  .breadcrumb-wrapper.mobile-over {top: var(--initial-header-total-height);}
+}
+{%- endif -%}
+
+{%- if section.settings.logo_desktop != blank or section.settings.logo_mobile != blank -%}
+  .header-content .logo.img {position: relative;}
+  .header-content .logo.img img {transition: opacity var(--animation-speed-fast) ease-out;}
+  .header-content .logo.img .scroll-logo {opacity: 0; position: absolute; width: 100%; top: 50%; left: 50%; -webkit-transform: translate(-50%, -50%); transform: translate(-50%, -50%);}
+{%- endif -%}
+
+@media (min-width: {{settings.breakpoint_tablet | plus: 0.001}}em) {
+  .header-outer{{revertOnHover}}{{revertOnScroll}} .header-content,
+  .header-outer{{revertOnHover}}{{revertOnScroll}} .header-content .menu-bottom-wrapper {
+    {%- if section.settings.background_desktop != blank and section.settings.background_desktop != 'rgba(0,0,0,0)' -%}
+      {%- assign backgroundOpacityDesktop = section.settings.background_opacity_desktop | divided_by: 100.00 -%}
+      background-color: {{section.settings.background_desktop | color_modify: 'alpha', backgroundOpacityDesktop }};
+    {%- endif -%}
+    {%- if section.settings.text_color_desktop != blank and section.settings.text_color_desktop != 'rgba(0,0,0,0)' -%}
+      color: {{section.settings.text_color_desktop}}; --scheme-icons-color: {{section.settings.text_color_desktop}};
+    {%- endif -%}
+    {%- if section.settings.highlights_color_desktop != blank and section.settings.highlights_color_desktop != 'rgba(0,0,0,0)' -%}
+      --scheme-highlights: {{section.settings.highlights_color_desktop}};
+      --scheme-buttons-background: {{section.settings.highlights_color_desktop}};
+      --scheme-buttons-label: {{section.settings.highlights_contrast_desktop}};
+    {%- endif -%}
+  }
+  {%- if section.settings.text_color_desktop != blank and section.settings.text_color_desktop != 'rgba(0,0,0,0)' -%}
+    .header-outer{{revertOnHover}}{{revertOnScroll}} .header-content .shop-name {
+      color: {{section.settings.text_color_desktop}};
+    }
+    .header-outer{{revertOnHover}}{{revertOnScroll}} .header-content input::placeholder {color: {{section.settings.text_color_desktop}};}
+  {%- endif -%}
+  {%- if section.settings.logo_desktop != blank -%}
+    .header-outer{{revertOnHover}}{{revertOnScroll}} .header-content .logo.img img.main {opacity: 0;}
+    .header-outer{{revertOnHover}}{{revertOnScroll}} .header-content .logo.img img.scroll-logo.desktop {opacity: 1;}
+  {%- elsif section.settings.logo_svg_color_desktop != blank and section.settings.logo_svg_color_desktop != 'rgba(0,0,0,0)' -%}
+    .header-outer{{revertOnHover}}{{revertOnScroll}} .header-content .logo svg {--logo-color: {{section.settings.logo_svg_color_desktop}};}
+  {%- endif -%}
+  {%- if section.settings.hide_border_desktop -%}
+    .header-outer{{revertOnHover}}{{revertOnScroll}} .header-content {border-color: transparent;}
+  {%- endif -%}
+  {%- if section.settings.hide_shadow_desktop -%}
+    .header-outer{{revertOnHover}}{{revertOnScroll}} .header-content.shadow-true:after {opacity: 0;}
+  {%- endif -%}
+}
+@media (max-width: {{settings.breakpoint_tablet}}) {
+  .header-outer{{revertOnHover}}{{revertOnScroll}} .header-content,
+  .header-outer{{revertOnHover}}{{revertOnScroll}} .header-content .menu-bottom-wrapper {
+    {%- if section.settings.background_mobile != blank and section.settings.background_mobile != 'rgba(0,0,0,0)' -%}
+      {%- assign backgroundOpacityMobile = section.settings.background_opacity_mobile | divided_by: 100.00 -%}
+      background-color: {{section.settings.background_mobile | color_modify: 'alpha', backgroundOpacityMobile}};
+    {%- endif -%}
+    {%- if section.settings.text_color_mobile != blank and section.settings.text_color_mobile != 'rgba(0,0,0,0)' -%}
+      color: {{section.settings.text_color_mobile}}; --scheme-icons-color: {{section.settings.text_color_mobile}};
+    {%- endif -%}
+    {%- if section.settings.highlights_color_mobile != blank and section.settings.highlights_color_mobile != 'rgba(0,0,0,0)' -%}
+      --scheme-highlights: {{section.settings.highlights_color_mobile}};
+      --scheme-buttons-background: {{section.settings.highlights_color_mobile}};
+      --scheme-buttons-label: {{section.settings.highlights_contrast_mobile}};
+    {%- endif -%}
+  }
+  {%- if section.settings.text_color_mobile != blank and section.settings.text_color_mobile != 'rgba(0,0,0,0)' -%}
+    .header-outer{{revertOnHover}}{{revertOnScroll}} .header-content .shop-name {
+      color: {{section.settings.text_color_mobile}};
+    }
+  {%- endif -%}
+  {%- if section.settings.logo_mobile != blank -%}
+    .header-outer{{revertOnHover}}{{revertOnScroll}} .header-content .logo.img img.main {opacity: 0;}
+    .header-outer{{revertOnHover}}{{revertOnScroll}} .header-content .logo.img img.scroll-logo.mobile {opacity: 1;}
+  {%- elsif section.settings.logo_svg_color_mobile != blank and section.settings.logo_svg_color_mobile != 'rgba(0,0,0,0)' -%}
+    .header-outer{{revertOnHover}}{{revertOnScroll}} .header-content .logo svg {--logo-color: {{section.settings.logo_svg_color_mobile}};}
+  {%- endif -%}
+  {%- if section.settings.hide_border_mobile -%}
+    .header-outer{{revertOnHover}}{{revertOnScroll}} .header-content {border-color: transparent;}
+  {%- endif -%}
+  {%- if section.settings.hide_shadow_mobile -%}
+    .header-outer{{revertOnHover}}{{revertOnScroll}} .header-content.shadow-true:after {opacity: 0;}
+  {%- endif -%}
+}
+</style>
+{%- if section.settings.logo_desktop != blank or section.settings.logo_mobile != blank -%}
+  <script>
+    document.querySelector('header .logo.img a').insertAdjacentHTML('beforeend', `
+      {%- if section.settings.logo_desktop != blank -%}
+        <img aria-hidden="true" class="scroll-logo desktop {% if section.settings.logo_mobile == section.settings.logo_desktop %}mobile{% endif %}" src="{{section.settings.logo_desktop | image_url: width: 400}}" alt="" width="{{ section.settings.logo_desktop.width }}" height="{{ section.settings.logo_desktop.height }}" />
+      {%- endif -%}
+      {%- if section.settings.logo_mobile != blank and section.settings.logo_mobile != section.settings.logo_desktop -%}
+        <img aria-hidden="true" class="scroll-logo mobile" src="{{section.settings.logo_mobile | image_url: width: 400}}" alt="" width="{{ section.settings.logo_mobile.width }}" height="{{ section.settings.logo_mobile.height }}" />
+      {%- endif -%}
+    `);
+  </script>
+{%- endif -%}
+
+{% schema %}
+  {
+    "name": "Header style",
+    "limit": 1,
+    "class": "shopify-section-header-style type-header-style",
+    "tag": "section",
+    "presets": [
+      {
+        "name": "Header style"
+      }
+    ],
+    "settings": [
+      {
+        "type": "paragraph",
+        "content": "WARNING: Use this section as the 2nd section in the page template. That way the first section can ignore lazyloading. Also, being the 2nd section, the necessary CSS loads as soon as possible to minimize LCP and CLS issues in the Header."
+      },
+      {
+        "type": "paragraph",
+        "content": "The initial state of the Header can be edited through this Section. If a color is left empty/transparent, the value will be ignored and the default color will be used."
+      },
+      {
+        "type": "checkbox",
+        "id": "revert_colors_hover",
+        "label": "Change colors back to the original on hover",
+        "default": true
+      },
+      {
+        "type": "checkbox",
+        "id": "revert_colors_scroll",
+        "label": "Change colors back to the original on scroll",
+        "default": true
+      },
+      {
+        "type": "header",
+        "content": "Desktop"
+      },
+      {
+        "type": "checkbox",
+        "id": "over_hero_desktop",
+        "label": "Header overlaps the first section",
+        "default": true
+      },
+      {
+        "type": "color",
+        "id": "background_desktop",
+        "label": "Background"
+      },
+      {
+        "type": "range",
+        "id": "background_opacity_desktop",
+        "min": 0,
+        "max": 100,
+        "step": 1,
+        "unit": "%",
+        "label": "Background opacity",
+        "default": 50
+      },
+      {
+        "type": "color",
+        "id": "text_color_desktop",
+        "label": "Text and icons"
+      },
+      {
+        "type": "color",
+        "id": "highlights_color_desktop",
+        "label": "Highlights",
+        "info": "Used for links on hover, and buttons"
+      },
+      {
+        "type": "color",
+        "id": "highlights_contrast_desktop",
+        "label": "Highlights contrast",
+        "info": "Used for buttons labels"
+      },
+      {
+        "type": "image_picker",
+        "id": "logo_desktop",
+        "label": "Logo"
+      },
+      {
+        "type": "color",
+        "id": "logo_svg_color_desktop",
+        "label": "Logo SVG color",
+        "info": "If the original logo in the Header section is an SVG, and the image above this field is empty."
+      },
+      {
+        "type": "checkbox",
+        "id": "hide_border_desktop",
+        "label": "Hide border",
+        "info": "If the default header has a border"
+      },
+      {
+        "type": "checkbox",
+        "id": "hide_shadow_desktop",
+        "label": "Hide shadow",
+        "info": "If the default header has a shadow",
+        "default": true
+      },
+      {
+        "type": "header",
+        "content": "Mobile"
+      },
+      {
+        "type": "checkbox",
+        "id": "over_hero_mobile",
+        "label": "Header overlaps the first section",
+        "default": false
+      },
+      {
+        "type": "color",
+        "id": "background_mobile",
+        "label": "Background"
+      },
+      {
+        "type": "range",
+        "id": "background_opacity_mobile",
+        "min": 0,
+        "max": 100,
+        "step": 1,
+        "unit": "%",
+        "label": "Background opacity",
+        "default": 50
+      },
+      {
+        "type": "color",
+        "id": "text_color_mobile",
+        "label": "Text and icons"
+      },
+      {
+        "type": "color",
+        "id": "highlights_color_mobile",
+        "label": "Highlights",
+        "info": "Used for links on hover, and buttons."
+      },
+      {
+        "type": "color",
+        "id": "highlights_contrast_mobile",
+        "label": "Highlights contrast",
+        "info": "Used for buttons labels"
+      },
+      {
+        "type": "image_picker",
+        "id": "logo_mobile",
+        "label": "Logo"
+      },
+      {
+        "type": "color",
+        "id": "logo_svg_color_mobile",
+        "label": "Logo SVG color",
+        "info": "If the original logo in the Header section is an SVG, and the image above this field is empty."
+      },
+      {
+        "type": "checkbox",
+        "id": "hide_border_mobile",
+        "label": "Hide border",
+        "info": "If the default header has a border"
+      },
+      {
+        "type": "checkbox",
+        "id": "hide_shadow_mobile",
+        "label": "Hide shadow",
+        "info": "If the default header has a shadow"
+      }
+    ]
+  }
+{% endschema %}

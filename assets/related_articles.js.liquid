@@ -1,0 +1,103 @@
+if(!customElements.get('related-articles')) {
+  class RelatedArticles extends HTMLElement {
+    constructor() {
+      super();
+      this.blogUrl = this.dataset.blogUrl;
+      this.articleTags = JSON.parse(this.dataset.articleTags);
+      this.articleTags = this.articleTags.map(function(tag) {return $s.handleize(tag);});
+      if (this.dataset.tagsAllowed) {
+        this.tagsAllowed = JSON.parse(this.dataset.tagsAllowed);
+        if (this.tagsAllowed.length > 0) {
+          //array intersection
+          let tags = this.tagsAllowed.map(function(tag) {return $s.handleize(tag);});
+          this.articleTags = this.articleTags.filter(function(n) {return tags.indexOf(n) !== -1;});        
+        }
+      }
+      this.articleId = this.dataset.articleId;
+      this.itemsLimit = parseInt(this.dataset.itemsLimit);
+      this.templateContent = this.querySelector('template').content.cloneNode(true);
+      this.templateRootElement = this.templateContent.querySelector('.articles-carousel-root');
+      this.itemsContent = this.templateRootElement.querySelector('.items-wrapper');
+      this.loadItems();
+    }
+
+    loadItems() {
+      var articleId = this.articleId;
+      var self = this;
+      var url = this.blogUrl;
+      var articlesIds = [];
+      var articles = [];
+      var waiting = 0;
+      var itemsLimit = this.itemsLimit;
+      var articleTags = this.articleTags;
+      var tagsQueries = [];
+      var parser = new DOMParser();
+      for (var i=0; i<articleTags.length; i++) {
+        tagsQueries.push(articleTags.slice(0, articleTags.length - i));
+      }
+      if (tagsQueries.length>3) {
+        tagsQueries.splice(2, tagsQueries.length-3);
+      }
+      for (var i=0; i<tagsQueries.length; i++) {
+        var tags = tagsQueries[i].join('+');
+        waiting++;
+        $s.get({
+          url: url + '/tagged/'+tags+'?view=related_articles',
+          cache: false,
+          success: function(data){
+            if (self.itemsContent.classList.contains('grid')) {
+              data = data.replaceAll('keen-slider-slide', 'grid-item');
+            }
+            var doc = parser.parseFromString(data, 'text/html');
+            var elements = doc.querySelectorAll('.keen-slider-slide, .grid-item');
+            elements.forEach(element=>{articles.push(element);})
+          },
+          always: function() {
+            waiting--;
+            if(waiting == 0){
+              
+              articles.sort(function(obj1, obj2) {
+                var obj1TagsFilter = obj1.dataset.tagsfilter.split(',');
+                var obj2TagsFilter = obj2.dataset.tagsfilter.split(',');
+                if (obj1TagsFilter.length==obj2TagsFilter.length)
+                  return obj2.dataset.publishedDate > obj1.dataset.publishedDate ? 1 : -1;
+                else
+                  return obj2TagsFilter.length > obj1TagsFilter.length ? 1 : -1;
+              });
+              var idsShown = {};
+              var shown = 0;
+              articles.forEach(function(item,i ) {
+                if(shown < itemsLimit && item.dataset.articleId != articleId){
+                  if (!(idsShown[item.dataset.articleId])) {
+                    self.itemsContent.insertAdjacentElement('beforeend', item);
+                    idsShown[item.dataset.articleId] = item;
+                    shown++;
+                  }
+                }
+              });
+              if (shown>0) {
+                self.style.display = '';
+                self.insertAdjacentElement('beforeend', self.templateRootElement);
+                self.itemsContent.querySelectorAll('.article-card').forEach(card => {
+                  if (self.dataset.cardsColorScheme) {
+                    card.classList.add('scheme', ...self.dataset.cardsColorScheme.split(' '));
+                  }
+                  if (self.dataset.cardsColorScheme==self.dataset.contentColorScheme) {
+                    card.classList.add('same-scheme-true');
+                    card.classList.remove('same-scheme-false');
+                  } else {
+                    card.classList.add('same-scheme-false');
+                    card.classList.remove('same-scheme-true');
+                  }
+                });
+      
+              }
+            }
+          }
+        }) //end $s.get
+      } //end for loop
+    }
+
+  }
+  customElements.define('related-articles', RelatedArticles);
+}

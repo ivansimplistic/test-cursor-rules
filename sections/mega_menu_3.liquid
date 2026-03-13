@@ -1,0 +1,421 @@
+{%- render 'mega_menu_content' -%}
+
+{% schema %}
+
+{
+  "name": "Mega Menu 3",
+  "class": "mega-menu-section type-mega-menu-3",
+  "settings": [
+    {
+      "type": "range",
+      "id": "columns_padding",
+      "min": 0.5,
+      "max": 3,
+      "step": 0.5,
+      "unit": "em",
+      "label": "Columns padding",
+      "default": 1.5
+    },
+    {
+      "type": "select",
+      "id": "title_style",
+      "label": "Title style",
+      "options": [
+        {"value": "normal","label": "Body"},
+        {"value": "heading-font","label": "Heading"},
+        {"value": "subheading","label": "Subheading"},
+        {"value": "small-label","label": "Small label"}
+      ],
+      "default": "heading-font"
+    },
+    {
+      "type": "range",
+      "id": "title_size",
+      "min": 80,
+      "max": 180,
+      "step": 1,
+      "unit": "%",
+      "label": "Titles size",
+      "default": 100
+    },
+    {
+      "type": "range",
+      "id": "text_size",
+      "min": 1,
+      "max": 5,
+      "step": 1,
+      "unit": "p",
+      "label": "Text size",
+      "default": 3
+    }
+  ],
+  "blocks": [
+    {
+      "type": "column",
+      "name": "Column",
+      "settings": [
+        {
+          "type": "range",
+          "id": "width",
+          "min": 1,
+          "max": 100,
+          "step": 1,
+          "unit": "%",
+          "label": "Column Width",
+          "default": 25
+        },
+        {
+          "type": "select",
+          "id": "text_align",
+          "label": "Alignment (Desktop)",
+          "options": [
+            {"value": "left", "label": "Left"},
+            {"value": "center", "label": "Center"},
+            {"value": "right", "label": "Right"}
+          ],
+          "default": "left"
+        },
+        {
+          "type": "range",
+          "id": "images_border_radius",
+          "min": 0,
+          "max": 10,
+          "step": 0.2,
+          "unit": "em",
+          "label": "Images border radius",
+          "default": 0
+        },
+        {
+          "type": "header",
+          "content": "Top content"
+        },
+        {
+          "type": "text",
+          "id": "title1",
+          "label": "Title"
+        },
+        {
+          "type": "richtext",
+          "id": "text1",
+          "label": "Text"
+        },
+        {
+          "type": "text",
+          "id": "button1",
+          "label": "Button"
+        },
+        {
+          "visible_if": "{{ block.settings.button1 != blank }}",
+          "type": "url",
+          "id": "button_link1",
+          "label": "Button url"
+        },
+        {
+          "visible_if": "{{ block.settings.button1 != blank }}",
+          "type": "select",
+          "id": "cta_style1",
+          "label": "Button style",
+          "options": [
+              {"value": "link", "label": "Link"},
+              {"value": "btn", "label": "Button"},
+              {"value": "btn v2", "label": "Button V2"}
+          ],
+          "default": "btn"
+        },
+        {
+          "type": "image_picker",
+          "id": "image1",
+          "label": "Image"
+        },
+        {
+          "visible_if": "{{ block.settings.image1 != blank }}",
+          "type": "paragraph",
+          "content": "******************************************* Image Settings *******************************************"
+        },
+        {
+          "visible_if": "{{ block.settings.image1 != blank }}",
+          "type": "url",
+          "id": "image_link1",
+          "label": "Image link"
+        },
+        {
+          "visible_if": "{{ block.settings.image1 != blank }}",
+          "type": "richtext",
+          "id": "image_text1",
+          "label": "Image caption",
+          "default": "<p><em>Eyebrow</em></p><p><strong>Title here</strong></p><p>This is a text lorem ipsum.</p>",
+          "info": "Use italic for the eyebrow and bold for the title."
+        },
+        {
+          "visible_if": "{{ block.settings.image1 != blank }}",
+          "type": "color_scheme",
+          "id": "image_text_color1",
+          "label": "Image caption color",
+          "default": "scheme-1"
+        },
+        {
+          "visible_if": "{{ block.settings.image1 != blank }}",
+          "type": "text",
+          "id": "image_cta1",
+          "label": "Image caption CTA"
+        },
+        {
+          "visible_if": "{{ block.settings.image1 != blank }}",
+          "type": "select",
+          "id": "image_cta_style1",
+          "label": "Imagee caption CTA style",
+          "options": [
+              {"value": "link", "label": "Link"},
+              {"value": "btn", "label": "Button"},
+              {"value": "btn v2", "label": "Button V2"}
+          ],
+          "default": "btn"
+        },
+        {
+          "visible_if": "{{ block.settings.image1 != blank }}",
+          "type": "select",
+          "id": "image_text_position1",
+          "label": "Caption position",
+          "options": [
+              {"value": "inside", "label": "Inside"},
+              {"value": "outside", "label": "Outside"}
+          ],
+          "default": "inside"
+        },
+        {
+          "visible_if": "{{ block.settings.image1 != blank }}",
+          "type": "select",
+          "id": "image_text_align1",
+          "label": "Caption align",
+          "options": [
+              {"value": "left", "label": "Left"},
+              {"value": "center", "label": "Center"},
+              {"value": "right", "label": "Right"}
+          ],
+          "default": "center"
+        },
+        {
+          "visible_if": "{{ block.settings.image1 != blank }}",
+          "type": "checkbox",
+          "id": "image_text_shadow1",
+          "label": "Shadow behind caption"
+        },
+        {
+          "visible_if": "{{ block.settings.image1 != blank }}",
+          "type": "paragraph",
+          "content": "******************************************* End of Image Settings *******************************************"
+        },
+        {
+          "type": "link_list",
+          "id": "linklist1",
+          "label": "Menu"
+        },
+        {
+          "visible_if": "{{ block.settings.linklist1 != blank }}",
+          "type": "text",
+          "id": "linklist_filter1",
+          "label": "Menu filter",
+          "info": "Filter the above menu by writing the title of a specific link (first level). Only the sub-links (second level) of this link will be displayed here, instead of the whole menu."
+        },
+        {
+          "visible_if": "{{ block.settings.linklist1 != blank }}",
+          "type": "checkbox",
+          "id": "linklist_filter_show_parent1",
+          "label": "Display filter link as title",
+          "default": true
+        },
+        {
+          "type": "product",
+          "id": "featured_product1",
+          "label": "Choose Featured Product"
+        },
+        {
+          "visible_if": "{{ block.settings.featured_product1 != blank }}",
+          "type": "checkbox",
+          "id": "featured_product_inline1",
+          "label": "Featured product inline"
+        },
+        {
+          "type": "header",
+          "content": "Bottom content"
+        },
+        {
+          "type": "text",
+          "id": "title2",
+          "label": "Title"
+        },
+        {
+          "type": "richtext",
+          "id": "text2",
+          "label": "Text"
+        },
+        {
+          "type": "text",
+          "id": "button2",
+          "label": "Button"
+        },
+        {
+          "visible_if": "{{ block.settings.button2 != blank }}",
+          "type": "url",
+          "id": "button_link2",
+          "label": "Button url"
+        },
+        {
+          "visible_if": "{{ block.settings.button2 != blank }}",
+          "type": "select",
+          "id": "cta_style2",
+          "label": "Button style",
+          "options": [
+              {"value": "link", "label": "Link"},
+              {"value": "btn", "label": "Button"},
+              {"value": "btn v2", "label": "Button V2"}
+          ],
+          "default": "btn"
+        },
+        {
+          "type": "image_picker",
+          "id": "image2",
+          "label": "Image"
+        },
+        {
+          "visible_if": "{{ block.settings.image2 != blank }}",
+          "type": "paragraph",
+          "content": "******************************************* Image Settings *******************************************"
+        },
+        {
+          "visible_if": "{{ block.settings.image2 != blank }}",
+          "type": "url",
+          "id": "image_link2",
+          "label": "Image link"
+        },
+        {
+          "visible_if": "{{ block.settings.image2 != blank }}",
+          "type": "richtext",
+          "id": "image_text2",
+          "label": "Image caption",
+          "default": "<p><em>Eyebrow</em></p><p><strong>Title here</strong></p><p>This is a text lorem ipsum.</p>",
+          "info": "Use italic for the eyebrow and bold for the title."
+        },
+        {
+          "visible_if": "{{ block.settings.image2 != blank }}",
+          "type": "color_scheme",
+          "id": "image_text_color2",
+          "label": "Image caption color",
+          "default": "scheme-1"
+        },
+        {
+          "visible_if": "{{ block.settings.image2 != blank }}",
+          "type": "text",
+          "id": "image_cta2",
+          "label": "Image caption CTA"
+        },
+        {
+          "visible_if": "{{ block.settings.image2 != blank }}",
+          "type": "select",
+          "id": "image_cta_style2",
+          "label": "Imagee caption CTA style",
+          "options": [
+              {"value": "link", "label": "Link"},
+              {"value": "btn", "label": "Button"},
+              {"value": "btn v2", "label": "Button V2"}
+          ],
+          "default": "btn"
+        },
+        {
+          "visible_if": "{{ block.settings.image2 != blank }}",
+          "type": "select",
+          "id": "image_text_position2",
+          "label": "Caption position",
+          "options": [
+              {"value": "inside", "label": "Inside"},
+              {"value": "outside", "label": "Outside"}
+          ],
+          "default": "inside"
+        },
+        {
+          "visible_if": "{{ block.settings.image2 != blank }}",
+          "type": "select",
+          "id": "image_text_align2",
+          "label": "Caption align",
+          "options": [
+              {"value": "left", "label": "Left"},
+              {"value": "center", "label": "Center"},
+              {"value": "right", "label": "Right"}
+          ],
+          "default": "center"
+        },
+        {
+          "visible_if": "{{ block.settings.image2 != blank }}",
+          "type": "checkbox",
+          "id": "image_text_shadow2",
+          "label": "Shadow behind caption"
+        },
+        {
+          "visible_if": "{{ block.settings.image2 != blank }}",
+          "type": "paragraph",
+          "content": "******************************************* End of Image Settings *******************************************"
+        },
+        {
+          "type": "link_list",
+          "id": "linklist2",
+          "label": "Menu"
+        },
+        {
+          "visible_if": "{{ block.settings.linklist2 != blank }}",
+          "type": "text",
+          "id": "linklist_filter2",
+          "label": "Menu filter",
+          "info": "Filter the above menu by writing the title of a specific link (first level). Only the sub-links (second level) of this link will be displayed here, instead of the whole menu."
+        },
+        {
+          "visible_if": "{{ block.settings.linklist2 != blank }}",
+          "type": "checkbox",
+          "id": "linklist_filter_show_parent2",
+          "label": "Display filter link as title",
+          "default": true
+        },
+        {
+          "type": "product",
+          "id": "featured_product2",
+          "label": "Choose Featured Product"
+        },
+        {
+          "visible_if": "{{ block.settings.featured_product2 != blank }}",
+          "type": "checkbox",
+          "id": "featured_product_inline2",
+          "label": "Featured product inline"
+        }
+      ]
+    },
+    {
+      "type": "space",
+      "name": "Space/Border",
+      "settings": [
+        {
+          "type": "range",
+          "id": "width",
+          "min": 1,
+          "max": 100,
+          "step": 1,
+          "unit": "%",
+          "label": "Column Width",
+          "default": 5
+        },
+        {
+          "type": "checkbox",
+          "id": "stretch",
+          "label": "Stretch",
+          "default": false
+        },
+        {
+          "type": "checkbox",
+          "id": "border",
+          "label": "Border",
+          "default": true
+        }
+      ]
+    }
+  ]
+}
+
+{% endschema %}

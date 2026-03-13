@@ -1,0 +1,640 @@
+{%- assign block = section.blocks.first -%}{%- comment -%}Workaround for Theme check UndefinedObject block in "visibile_if"{%- endcomment -%}
+<style type="text/css">
+  #mobile-menu {
+    --font-size: {{section.settings.font_size}}%;
+    --font-weight: {{section.settings.font_weight}};
+    --text-transform: {{section.settings.text_transform}};
+    --letter-spacing: {{section.settings.letter_spacing | divided_by: 10.00}}em;
+  }
+</style>
+{{ 'mobile_menu.css' | asset_url | stylesheet_tag }}
+
+<mobile-menu id="mobile-menu" class="ease-animation from-{{section.settings.mobile_menu_position}} slide-in-modal" {% if section.settings.top_position == 'below-header' %} data-top-position="{{section.settings.top_position}}"{% endif %} role="dialog" aria-modal="true">
+  <div class="wrapper flex direction-column">
+    <div class="head scheme color-{{section.settings.heading_color_scheme}} {% if section.settings.heading_border %}scheme-border-bottom{% endif %}">
+      <div class="title">{{ 'mobile_menu.title' | t }}</div>
+      <button class="close" aria-label="{{ 'mobile_menu.close_caption' | t | escape }}">
+        {% render 'icons', icon: 'close' %}
+      </button>
+    </div>
+    <div class="content scheme color-{{section.settings.main_color_scheme}} flex direction-column flex-1">
+      <nav class="menu-links flex-1 flex direction-column" role="navigation">
+        {%- if section.settings.show_search -%}
+          <div class="extras top scheme color-{{section.settings.extras_color_scheme}} {% if section.settings.extras_border %}scheme-border-bottom{% endif %}">
+            <div class="item search">
+              <div class="item-inner">
+                <div class="item-padding">
+                  {%- render 'search_form', color_scheme: section.settings.main_color_scheme -%}
+                </div>
+              </div>
+            </div>
+          </div>
+        {%- endif -%}
+        <div class="middle-content flex-1">
+          <div class="main-list {{section.settings.font_style}} borders-{{section.settings.borders}}">
+            {%- for first_link in linklists[section.settings.main_menu_mobile].links -%}
+              {%- if section.settings.mobile_menu_submenu_animation == 'slide' -%}
+                {%- assign submenuClass = 'slide ease-animation' -%}
+                {%- assign arrowIcon = 'chevron-right' -%}
+              {%- else -%}
+                {%- assign submenuClass = 'expandable' -%}
+                {%- assign arrowIcon = 'chevron-down' -%}
+              {%- endif -%}
+              {%- assign hasBlock = false -%}
+              {%- if section.blocks.size > 0 -%}
+                {%- capture blocksContent -%}
+                  {%- for block in section.blocks -%}
+                    {%- assign customIcon = false -%}
+                    {%- if block.settings.parent_link == first_link.title -%}
+                      {%- if block.type == 'icon' -%}
+                        {%- assign customIcon = true -%}
+                        {%- render 'icons', icon: block.settings.icon -%}
+                        {%- break -%}
+                      {%- else -%}
+                        {%- assign hasBlock = true -%}
+                      {%- endif -%}
+                      {%- if block.type == 'featured_banner' -%}
+                        <div class="grid-item {{block.settings.width}} block-{{block.id}}">
+                          <style>#mobile-menu .block-{{block.id}} {--img-simple-border-radius: {{block.settings.image_border_radius}}em;}</style>
+                          {% render 'img_simple_overlay', imageLink: block.settings.image_link, image: block.settings.image, text: block.settings.image_text, textShadow: block.settings.image_text_shadow, colorScheme: block.settings.image_text_color, textPosition: block.settings.image_text_position, textAlign: block.settings.image_text_align, cta: block.settings.image_cta, ctaStyle: block.settings.image_cta_style %}
+                        </div>
+                      {%- endif -%}
+                      {%- if block.type == 'button' -%}
+                        <div class="grid-item {{block.settings.width}} block-{{block.id}} flex align-items-center">
+                          <a href="{{block.settings.button_link}}" class="{{block.settings.cta_style}} {% if block.settings.cta_style contains 'btn' %}{{section.settings.cta_size}}{% endif %}">{{block.settings.button}}</a>
+                        </div>
+                      {%- endif -%}
+                    {%- endif -%}
+                  {%- endfor -%}
+                {%- endcapture -%}
+              {%- endif -%}
+              <div class="item{% if first_link.links != blank or hasBlock %} has-dropdown{% endif %}">
+                <div class="item-inner flex align-items-center justify-content-between">
+                  {%- assign linkUrlLastChar = first_link.url | slice: -1 -%}
+                  <a class="flex item-padding" href="{{ first_link.url }}" {% if linkUrlLastChar == '#' %}aria-hidden="true" role="button" tabindex="-1" data-notab="1" onclick="this.parentNode.querySelector('button').click(); return false;"{% endif %}>
+                    {%- assign titlePart = first_link.title | split: '**' -%}
+                    <div class="flex flex-wrap align-items-center">
+                      <span class="title">{{ titlePart[0] | strip }}</span> {%- if titlePart.size > 1 -%}<div class="badge">{{titlePart[1] | strip}}</div>{%- endif -%}
+                    </div>
+                  </a>
+                  {%- if first_link.links != blank or hasBlock -%}
+                    <button aria-expanded="false" aria-label="{{ 'mobile_menu.toggle_submenu_caption' | t: submenu_title: titlePart[0] | escape }}">{% render 'icons', icon: arrowIcon %}</button>
+                  {%- elsif customIcon -%}
+                    {{blocksContent}}
+                  {%- endif -%}
+                </div>
+                {%- if first_link.links != blank or hasBlock -%}
+                  <div class="submenu {{submenuClass}} scheme color-{{section.settings.main_color_scheme}}">
+                    <div class="submenu-inner">
+                      {%- render 'mobile_menu_level', parent_link: first_link, submenuClass: submenuClass, arrowIcon: arrowIcon, section: section -%}
+                      {%- if hasBlock -%}
+                        <div class="featured-banners">
+                          <div class="grid">
+                            {{blocksContent}}
+                          </div>
+                        </div>
+                      {%- endif -%}
+                    </div>
+                  </div>
+                {%- endif -%}
+              </div>
+            {%- endfor -%}
+            {%- assign hasBlock = false -%}
+            {%- if section.blocks.size > 0 -%}
+              {%- capture blocksContent -%}
+                {%- for block in section.blocks -%}
+                  {%- if block.settings.parent_link == blank or block.settings.parent_link == '' -%}
+                    {%- assign hasBlock = true -%}
+                    {%- if block.type == 'featured_banner' -%}
+                      <div class="grid-item {{block.settings.width}} block-{{block.id}}">
+                        <style>#mobile-menu .block-{{block.id}} {--img-simple-border-radius: {{block.settings.image_border_radius}}em;}</style>
+                        {% render 'img_simple_overlay', imageLink: block.settings.image_link, image: block.settings.image, text: block.settings.image_text, textShadow: block.settings.image_text_shadow, textPosition: block.settings.image_text_position, textAlign: block.settings.image_text_align, cta: block.settings.image_cta, ctaStyle: block.settings.image_cta_style %}
+                      </div>
+                    {%- elsif block.type == 'button' -%}
+                      <div class="grid-item {{block.settings.width}} block-{{block.id}} flex align-items-center">
+                        <a href="{{block.settings.button_link}}" class="{{block.settings.cta_style}} {% if block.settings.cta_style contains 'btn' %}{{section.settings.cta_size}}{% endif %}">{{block.settings.button}}</a>
+                      </div>
+                    {%- endif -%}
+                  {%- endif -%}
+                {%- endfor -%}
+              {%- endcapture -%}
+              {%- if hasBlock -%}
+                <div class="featured-banners">
+                  <div class="grid">
+                    {{blocksContent}}
+                  </div>
+                </div>
+              {%- endif -%}
+            {%- endif -%}
+          </div>
+          <div class="secondary-list">
+            {%- for first_link in linklists[section.settings.secondary_menu_mobile].links -%}
+              <div class="item{% if first_link.links != blank or hasBlock %} has-dropdown{% endif %}">
+                <div class="item-inner flex align-items-center justify-content-between">
+                  {%- assign linkUrlLastChar = first_link.url | slice: -1 -%}
+                  <a class="flex item-padding" href="{{ first_link.url }}" {% if linkUrlLastChar == '#' %}aria-hidden="true" role="button" tabindex="-1" data-notab="1" onclick="this.parentNode.querySelector('button').click(); return false;"{% endif %}>
+                    {%- assign titlePart = first_link.title | split: '**' -%}
+                    <div class="flex flex-wrap align-items-center">
+                      <span>{{ titlePart[0] | strip }}</span> {%- if titlePart.size > 1 -%}<div class="badge">{{titlePart[1] | strip}}</div>{%- endif -%}
+                    </div>
+                  </a>
+                  {%- if first_link.links != blank or hasBlock -%}
+                    <button aria-expanded="false" aria-label="{{ 'mobile_menu.toggle_submenu_caption' | t: submenu_title: titlePart[0] | escape }}">{% render 'icons', icon: arrowIcon %}</button>
+                  {%- endif -%}
+                </div>
+                {%- if first_link.links != blank or hasBlock -%}
+                  <div class="submenu {{submenuClass}} scheme color-{{section.settings.main_color_scheme}}">
+                    <div class="submenu-inner">
+                      {%- render 'mobile_menu_level', parent_link: first_link, submenuClass: submenuClass, arrowIcon: arrowIcon, section: section -%}
+                      {%- if hasBlock -%}
+                        <div class="featured-banners">
+                          <div class="grid">
+                            {{blocksContent}}
+                          </div>
+                        </div>
+                      {%- endif -%}
+                    </div>
+                  </div>
+                {%- endif -%}
+              </div>
+            {%- endfor -%}
+          </div>
+        </div>
+        <div class="extras bottom scheme color-{{section.settings.extras_color_scheme}} {% if section.settings.extras_border %}scheme-border-top{% endif %}">
+          {%- if section.settings.show_login -%}
+            <div class="item">
+              <div class="item-inner">
+                <a class="item-padding flex align-items-center" {% if customer %}href="/account"{% else %}href="/account/login"{% endif %}>
+                  {%- render 'icons', icon: 'user' -%}
+                  {%- if customer -%}
+                    <span>{{ 'mobile_menu.my_account_link' | t }}</span>
+                  {%- else -%}
+                    <span>{{ 'mobile_menu.login_link' | t }}</span>
+                  {%- endif -%}
+                </a>
+              </div>
+            </div>
+          {%- endif -%}
+          {%- if settings.show_currency_selector_header -%}
+            <div class="item">
+              <div class="item-inner">
+                <div class="item-padding flex align-items-center">
+                  {%- render 'currency_selector' -%}
+                </div>
+              </div>
+            </div>
+          {%- endif -%}
+          {%- if settings.show_language_selector_header -%}
+            <div class="item">
+              <div class="item-inner">
+                <div class="item-padding flex align-items-center">
+                  {%- render 'language_selector' -%}
+                  <span>{{ 'mobile_menu.language_label' | t}}</span>
+                </div>
+              </div>
+            </div>
+          {%- endif -%}
+          {%- if section.settings.show_social_links -%}
+            <div class="item">
+              <div class="item-inner">
+                <div class="item-padding flex align-items-center">
+                  {%- render 'social_links' -%}
+                </div>
+              </div>
+            </div>
+          {%- endif -%}
+        </div>
+      </nav>
+    </div>
+  </div>
+</mobile-menu>
+
+<script src="{{ 'mobile_menu.js' | asset_url }}" defer="defer"></script>
+{% if request.design_mode %}
+<script type="module">
+  var section = document.getElementById('shopify-section-{{section.id}}');
+  section.addEventListener('shopify:section:select', (e)=>{
+    section.querySelector('mobile-menu').open();
+  });
+  section.addEventListener('shopify:section:deselect', (e)=>{
+    section.querySelector('mobile-menu').close();
+  });
+</script>
+{% endif %}
+
+{% schema %}
+  {
+    "name": "Menu Mobile",
+    "class": "type-menu-mobile",
+    "settings": [
+      {
+        "type": "link_list",
+        "id": "main_menu_mobile",
+        "label": "Menu",
+        "default": "main-menu"
+      },
+      {
+        "type": "link_list",
+        "id": "secondary_menu_mobile",
+        "label": "Secondary Menu"
+      },
+      {
+        "type": "header",
+        "content": "Layout"
+      },
+      {
+        "type": "radio",
+        "id": "mobile_menu_position",
+        "label": "Open style",
+        "options": [
+          {"value": "left", "label": "Slides in from the left"},
+          {"value": "right", "label": "Slides in from the right"},
+          {"value": "fade", "label": "Fades in"}
+        ],
+        "default": "left"
+      },
+      {
+        "type": "radio",
+        "id": "top_position",
+        "label": "Starting Position",
+        "options": [
+          {"value": "page", "label": "Beginning of page"},
+          {"value": "below-header", "label": "Under header"}
+        ],
+        "default": "page"
+      },
+      {
+        "type": "select",
+        "id": "mobile_menu_submenu_animation",
+        "label": "Submenu open mode",
+        "options": [
+          {"value": "slide", "label": "Slide-in"},
+          {"value": "dropdown", "label": "Drop-down"}
+        ],
+        "default": "slide"
+      },
+      {
+        "type": "select",
+        "id": "borders",
+        "label": "Border between links",
+        "options": [
+          {"value": "false", "label": "No"},
+          {"value": "main", "label": "Main links"},
+          {"value": "true", "label": "All links"}
+        ],
+        "default": "true"
+      },
+      {
+        "type": "color_scheme",
+        "id": "main_color_scheme",
+        "label": "Color scheme",
+        "default": "scheme-1"
+      },
+      {
+        "type": "header",
+        "content": "Header"
+      },
+      {
+        "type": "color_scheme",
+        "id": "heading_color_scheme",
+        "label": "Color scheme",
+        "default": "scheme-3"
+      },
+      {
+        "type": "checkbox",
+        "id": "heading_border",
+        "label": "Border bottom"
+      },
+      {
+        "type": "header",
+        "content": "Main links style"
+      },
+      {
+        "type": "select",
+        "id": "font_style",
+        "label": "Font family",
+        "options": [
+          {"value": "body-font", "label": "Body"},
+          {"value": "heading-font", "label": "Headings"}
+        ],
+        "default": "body-font"
+      },
+      {
+        "type": "range",
+        "id": "font_weight",
+        "min": 100,
+        "max": 900,
+        "step": 100,
+        "unit": "%",
+        "label": "Font weight",
+        "default": 400
+      },
+      {
+        "type": "select",
+        "id": "text_transform",
+        "label": "Capitalization",
+        "options": [
+          {
+            "value": "none",
+            "label": "Natural"
+          },
+          {
+            "value": "uppercase",
+            "label": "Uppercase"
+          }
+        ],
+        "default": "none"
+      },
+      {
+        "type": "range",
+        "id": "font_size",
+        "min": 80,
+        "max": 250,
+        "step": 2,
+        "unit": "%",
+        "label": "Font size",
+        "default": 100
+      },
+      {
+        "type": "range",
+        "id": "letter_spacing",
+        "min": -0.5,
+        "max": 2,
+        "step": 0.1,
+        "unit": "em",
+        "label": "Letter spacing",
+        "default": 0,
+        "info": "This value will be divided by 10, so 0.5 is 0.05em."
+      },
+      {
+        "type": "header",
+        "content": "Extras"
+      },
+      {
+        "type": "checkbox",
+        "id": "show_search",
+        "label": "Search bar (top)",
+        "default": false
+      },
+      {
+        "type": "checkbox",
+        "id": "show_login",
+        "label": "Login/Account (bottom)",
+        "default": true
+      },
+      {
+        "type": "checkbox",
+        "id": "show_social_links",
+        "label": "Social links (bottom)",
+        "default": true
+      },
+      {
+        "type": "color_scheme",
+        "id": "extras_color_scheme",
+        "label": "Color scheme",
+        "default": "scheme-2"
+      },
+      {
+        "type": "checkbox",
+        "id": "extras_border",
+        "label": "Border",
+        "default": true
+      }
+    ],
+    "blocks": [
+      {
+        "type": "icon",
+        "name": "Icon",
+        "settings": [
+          {
+            "type": "text",
+            "id": "parent_link",
+            "label": "Parent link title",
+            "info": "Write the name of the parent link that this icon belongs to."
+          },
+          {
+            "type": "select",
+            "id": "icon",
+            "label": "Icon",
+            "options": [
+              {"value": "none", "label": "None"},
+              {"value": "arrow-left", "label": "Arrow left"},
+              {"value": "arrow-right", "label": "Arrow right"},
+              {"value": "chevron-left", "label": "Chevron left"},
+              {"value": "chevron-right", "label": "Chevron right"},
+              {"value": "bag", "label": "Bag"},
+              {"value": "bell", "label": "Bell"},
+              {"value": "bubble", "label": "Bubble"},
+              {"value": "calendar", "label": "Calendar"},
+              {"value": "cart", "label": "Cart"},
+              {"value": "carrot", "label": "Carrot"},
+              {"value": "checkmark", "label": "Checkmark"},
+              {"value": "clock", "label": "Clock"},
+              {"value": "close", "label": "Cross"},
+              {"value": "eye", "label": "Eye"},
+              {"value": "filters", "label": "Filters"},
+              {"value": "fullscreen", "label": "Fullscreen"},
+              {"value": "gift", "label": "Gift"},
+              {"value": "hamburger", "label": "Menu"},
+              {"value": "hand", "label": "Hand"},
+              {"value": "heart", "label": "Heart"},
+              {"value": "help", "label": "Help"},
+              {"value": "email", "label": "Envelope"},
+              {"value": "map", "label": "Map pointer"},
+              {"value": "minus", "label": "Minus"},
+              {"value": "plus", "label": "Plus"},
+              {"value": "tag", "label": "Product tag"},
+              {"value": "edit", "label": "Pencil"},
+              {"value": "edit-paper", "label": "Edit paper"},
+              {"value": "piggybank", "label": "Piggybank"},
+              {"value": "play", "label": "Play"},
+              {"value": "pause", "label": "Pause"},
+              {"value": "search", "label": "Search"},
+              {"value": "share", "label": "Share"},
+              {"value": "shipping", "label": "Shipping truck"},
+              {"value": "shipping-fast", "label": "Shipping truck - fast"},
+              {"value": "star", "label": "Star"},
+              {"value": "store", "label": "Store"},
+              {"value": "delete", "label": "Trash"},
+              {"value": "user", "label": "User"},
+              {"value": "zoom", "label": "Zoom"}
+            ],
+            "default": "heart"
+          }
+        ]
+      },
+      {
+        "type": "button",
+        "name": "Button",
+        "settings": [
+          {
+            "type": "text",
+            "id": "parent_link",
+            "label": "Parent link title",
+            "info": "Write the name of the parent link where this button should be placed. If the parent link has a submenu, the button will be placed inside, under all the child links. If the parent link doesn't have a submenu, one will be generated with this button inside. Leave blank to display it on the first level of the mobile menu."
+          },
+          {
+            "type": "select",
+            "id": "width",
+            "label": "Width",
+            "options": [
+              {
+                "value": "one-third",
+                "label": "33%"
+              },
+              {
+                "value": "one-half",
+                "label": "50%"
+              },
+              {
+                "value": "one-whole",
+                "label": "100%"
+              }
+            ],
+            "default": "one-whole"
+          },
+          {
+            "type": "text",
+            "id": "button",
+            "label": "Button"
+          },
+          {
+            "visible_if": "{{ block.settings.button != blank }}",
+            "type": "url",
+            "id": "button_link",
+            "label": "Button url"
+          },
+          {
+            "visible_if": "{{ block.settings.button != blank }}",
+            "type": "select",
+            "id": "cta_style",
+            "label": "Button style",
+            "options": [
+              {"value": "link", "label": "Link"},
+              {"value": "btn", "label": "Button"},
+              {"value": "btn v2", "label": "Button V2"}
+            ],
+            "default": "btn v2"
+          },
+          {
+            "visible_if": "{{ block.settings.button != blank }}",
+            "type": "select",
+            "id": "cta_size",
+            "label": "Button size",
+            "options": [
+              {"value": "smaller", "label": "Smaller"},
+              {"value": "normal", "label": "Normal"},
+              {"value": "larger", "label": "Larger"}
+            ],
+            "default": "normal"
+          }
+        ]
+      },
+      {
+        "type": "featured_banner",
+        "name": "Banner",
+        "settings": [
+          {
+            "type": "text",
+            "id": "parent_link",
+            "label": "Parent link title",
+            "info": "Write the name of the parent link where this banner should be placed. If the parent link has a submenu, the banner will be placed inside, below all the child links. If the parent link doesn't have a submenu, one will be generated with this banner inside. Leave blank to display it on the first level of the mobile menu."
+          },
+          {
+            "type": "select",
+            "id": "width",
+            "label": "Width",
+            "options": [
+              {
+                "value": "one-third",
+                "label": "33%"
+              },
+              {
+                "value": "one-half",
+                "label": "50%"
+              },
+              {
+                "value": "one-whole",
+                "label": "100%"
+              }
+            ],
+            "default": "one-half"
+          },
+          {
+            "type": "image_picker",
+            "id": "image",
+            "label": "Image"
+          },
+          {
+            "visible_if": "{{ block.settings.image != blank }}",
+            "type": "url",
+            "id": "image_link",
+            "label": "Image link"
+          },
+          {
+            "visible_if": "{{ block.settings.image != blank }}",
+            "type": "richtext",
+            "id": "image_text",
+            "label": "Image caption",
+            "default": "<p><em>Eyebrow</em></p><p><strong>Title here</strong></p><p>This is a text lorem ipsum.</p>",
+            "info": "Use italic for the eyebrow and bold for the title."
+          },
+          {
+            "visible_if": "{{ block.settings.image != blank }}",
+            "type": "color_scheme",
+            "id": "image_text_color",
+            "label": "Image caption color",
+            "default": "scheme-1"
+          },
+          {
+            "visible_if": "{{ block.settings.image != blank }}",
+            "type": "text",
+            "id": "image_cta",
+            "label": "Image caption CTA"
+          },
+          {
+            "visible_if": "{{ block.settings.image != blank }}",
+            "type": "select",
+            "id": "image_cta_style",
+            "label": "Imagee caption CTA style",
+            "options": [
+                {"value": "link", "label": "Link"},
+                {"value": "btn", "label": "Button"},
+                {"value": "btn v2", "label": "Button V2"}
+            ],
+            "default": "btn"
+          },
+          {
+            "visible_if": "{{ block.settings.image != blank }}",
+            "type": "select",
+            "id": "image_text_position",
+            "label": "Caption position",
+            "options": [
+                {"value": "inside", "label": "Inside"},
+                {"value": "outside", "label": "Outside"}
+            ],
+            "default": "inside"
+          },
+          {
+            "visible_if": "{{ block.settings.image != blank }}",
+            "type": "select",
+            "id": "image_text_align",
+            "label": "Caption align",
+            "options": [
+                {"value": "left", "label": "Left"},
+                {"value": "center", "label": "Center"},
+                {"value": "right", "label": "Right"}
+            ],
+            "default": "center"
+          },
+          {
+            "visible_if": "{{ block.settings.image != blank }}",
+            "type": "checkbox",
+            "id": "image_text_shadow",
+            "label": "Shadow behind caption"
+          }
+        ]
+      }
+    ]
+  }
+{% endschema %}

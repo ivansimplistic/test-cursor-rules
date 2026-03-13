@@ -1,0 +1,86 @@
+(function() {
+  var config = {
+    submitButton: {{ settings.shipping_calculator_submit_button_label | default: 'Calculate shipping' | json }}, 
+    submitButtonDisabled: {{ settings.shipping_calculator_submit_button_label_disabled | default: 'Calculating...' | json }}{% if customer %},
+    customerIsLoggedIn: true{% endif %},
+    moneyFormat: {{ shop.money_with_currency_format | json }}
+  };
+
+  var country = document.getElementById('sc_address_country');
+  country.value = country.dataset.default;
+  var province = document.getElementById('sc_address_province');
+  var provinceContainer = document.getElementById('address_province_container');
+  var zip = document.getElementById('sc_address_zip');
+  var form = document.querySelector('.form-rates');
+  function loadProvinces() {
+    if (!Countries[country.value]) {
+      return;
+    }
+    var provinces = Countries[country.value].provinces;
+    if (provinces) {
+      province.options.length = 0;
+      for (var i=0; i<provinces.length; i++) {
+        province.options.add(new Option(provinces[i], provinces[i]));
+      }
+      provinceContainer.style.display = 'block';
+    } else {
+      provinceContainer.style.display = 'none';
+    }
+  }
+  country.addEventListener('change', loadProvinces);
+  loadProvinces();
+
+  var shippingRatesFeedback = document.getElementById('shipping-rates-feedback');
+  var shippingRates = document.getElementById('shipping-rates');
+  var button = document.querySelector('.get-rates');
+  function fetchRates(evt) {
+    evt.preventDefault();
+    var url = routes.cart_url + '/shipping_rates.json?shipping_address[zip]='+encodeURIComponent(zip.value)+'&shipping_address[country]='+encodeURIComponent(country.value)+'&shipping_address[province]='+encodeURIComponent(province.value);
+    shippingRatesFeedback.innerHTML = '';
+    shippingRates.innerHTML = '';
+    button.setAttribute('disabled', true);
+    button.innerHTML = config.submitButtonDisabled;
+
+    function handleResult(data) {
+      button.removeAttribute('disabled');
+      button.innerHTML = config.submitButton;
+      var errorMsg = 'Unknown error';
+      var property = Object.keys(data)[0];
+      if (data.shipping_rates) {
+        if (data.shipping_rates.length>0) {
+          errorMsg = '';
+          var ratesHtml = '';
+          for(var i=0; i<data.shipping_rates.length; i++) {
+            let rate = data.shipping_rates[i];
+            ratesHtml += '<p>'+rate.name+': '+rate.price+'</p>';
+          }
+          shippingRates.innerHTML = ratesHtml;
+        } else {
+          errorMsg = 'We do not ship to this destination.'
+          property = '';
+        }
+      } else {
+        if (typeof(data[property])=='string') {
+          errorMsg = data[property];
+        } else if (data[property].length > 0) {
+          errorMsg = data[property][0];
+        }
+      }
+
+      if (errorMsg) {
+        shippingRatesFeedback.innerHTML = '<p>'+(property? property+': ': '')+errorMsg+'</p>';
+        shippingRatesFeedback.style.display = '';
+        shippingRates.style.display = 'none';
+      } else {
+        shippingRatesFeedback.style.display = 'none';
+        shippingRates.style.display = '';
+      }
+    }
+    $s.getJson({
+      "url": url, "success": handleResult, "error": handleResult
+    })
+  }
+
+  form.addEventListener('submit', fetchRates);
+
+})();

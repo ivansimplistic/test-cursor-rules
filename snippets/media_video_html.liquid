@@ -1,0 +1,20 @@
+{%- assign videoMp4 = videoMp4 | default: section.settings.video_mp4 -%}
+{%- assign videoIframe = videoIframe | default: section.settings.video_iframe -%}
+{%- assign autoplay = autoplay | default: section.settings.video_autoplay, allow_false: true -%}
+{%- if videoMp4 != blank -%}
+  {%- assign videoObject = videoMp4 -%}
+  <video class="media mp4 lazyload" playsinline {% if autoplay %}muted loop data-autoplay="autoplay"{% endif %} preload="none" data-poster="{{videoObject.preview_image | image_url: width: 4100}}" {% if videoObject.presentation.focal_point != blank %}style="object-position: left {{videoObject.presentation.focal_point | split: ' ' | last}};"{% endif %}>
+    {% for videoSource in videoObject.sources %}
+      <source src="{{videoSource.url}}" type="{{videoSource.mime_type}}" />
+    {% endfor %}
+  </video> 
+  <div class="controls"><button type="button" class="play keen-arrow {{settings.carousel_arrows_frame}} shadow" aria-label="{{ 'general.play_video' | t | escape }}">{%- render 'icons', icon: 'play' -%}</button><button class="pause keen-arrow {{settings.carousel_arrows_frame}} shadow" style="display: none !important;" aria-label="{{ 'general.pause_video' | t | escape }}">{%- render 'icons', icon: 'pause' -%}</button></div>
+  <video-buttons></video-buttons>
+{%- elsif videoIframe != blank -%}
+  {%- assign videoIframeType = videoIframeType | default: videoIframe.type -%}
+  {%- if videoIframeType == 'youtube' -%}
+    <iframe class="media js-youtube" data-type="youtube" data-video-id="{{videoIframe.external_id | default: videoIframe.id}}" frameborder="0" allowfullscreen allow="{%- if autoplay -%}autoplay; {% endif -%}accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture" title="{{ 'video.youtube_player_title' | t | escape }}" width="1280" height="720" src="//www.youtube.com/embed/{{videoIframe.external_id | default: videoIframe.id}}?autohide=1&cc_load_policy=0&controls=1{% if autoplay %}&autoplay=1&mute=1&loop=1&playlist={{videoIframe.external_id | default: videoIframe.id}}{% endif %}&fs=1&iv_load_policy=3&modestbranding=1&playsinline=1&rel=0&enablejsapi=1&origin={{shop.url | url_escape}}&widgetid=1" tabindex="-1"></iframe>
+  {%- else -%}
+    <iframe class="media js-vimeo" src="//player.vimeo.com/video/{{videoIframe.external_id | default: videoIframe.id}}?title=0&byline=0&controls=1{%- if autoplay -%}&autoplay=1&muted=1&loop=1{% endif -%}" width="480" height="270" frameborder="0" allow="{%- if autoplay -%}autoplay; {% endif -%}fullscreen; picture-in-picture" allowfullscreen title="{{ 'video.vimeo_player_title' | t | escape }}" data-ready="true" tabindex="-1"></iframe>
+  {%- endif -%}
+{%- endif -%}

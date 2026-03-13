@@ -1,0 +1,60 @@
+.custom-card {overflow: hidden; border-radius: var(--card-border-radius); position: relative; height: 100%; display: flex; align-items: flex-start; border-radius: var(--card-border-radius);}
+.custom-card.image-padding-true,
+.custom-card.image-padding-false .info {padding: var(--card-padding);}
+.custom-card.same-scheme-true {background: transparent;}
+.custom-card.same-scheme-true.border-false,
+.custom-card.same-scheme-true.border-false .info,
+.custom-card.same-scheme-true.border-false.image-padding-true {padding: 0;}
+
+.custom-card .image-container {position: relative; width: var(--image-width); overflow: hidden; flex-shrink: 0; display: inline-block; vertical-align: bottom; border-radius: var(--image-border-radius);}
+.custom-card .image-container .img {position: relative; width: 100%; padding-top: var(--image-height); border-radius: inherit; background-size: cover; background-position: center; background-repeat: no-repeat;}
+.custom-card .image-container .img:not(.video-wrap) {-webkit-transform: scale(1.001); transform: scale(1.001);}
+.not-mobile .custom-card:hover .image-container .img:not(.video-wrap) {-webkit-transform: scale(1.05); transform: scale(1.05);}
+.custom-card .image-container.shadow-true {box-shadow: var(--floating-box-shadow);}
+.custom-card .info {flex-grow: 1;}
+.custom-card .title {margin: 0; font-size: var(--card-title-font-size); font-weight: var(--card-title-weight); text-transform: var(--card-title-text-transform); letter-spacing: var(--card-title-letter-spacing);}
+.custom-card .rating svg {display: inline-block;}
+.custom-card .rating svg path {fill: inherit;}
+.custom-card .author {font-style: italic;}
+
+.custom-card .info, 
+.custom-card .info-bottom-inner {display: flex; flex-flow: column;}
+.custom-card .info > :not(:first-child):not(.info-bottom), 
+.custom-card .info-bottom-inner > :not(:first-child) {margin-top: 1.5rem;}
+ 
+/* different image layouts */
+.custom-card.image-position-top,
+.custom-card.image-position-bottom {display: block;}
+.custom-card.image-position-top .info,
+.custom-card.image-position-bottom .info {width: 100%;}
+.custom-card.image-position-top.image-padding-true .image-container {margin-bottom: var(--card-padding);}
+.custom-card.image-position-bottom.image-padding-true .image-container {margin-top: var(--card-padding);}
+.custom-card.image-position-left.image-padding-true .image-container {margin-right: var(--card-padding);}
+.custom-card.image-position-right.image-padding-true .image-container {margin-left: var(--card-padding);}
+
+/* image-offset */
+.image-offset .custom-card {overflow: visible;}
+.image-offset .custom-card.expandable-true .image-container {transform: scale(1) translate(0, 0); opacity: 1;}
+.image-offset .custom-card.expandable-true.open .image-container {transform: scale(0.5) translate(0, 0.5em); opacity: 0;}
+{%- for i in (1..4) -%}
+  {%- capture position -%}
+    {%- cycle 'top', 'right', 'bottom', 'left' -%}
+  {%- endcapture -%}
+  .image-offset.image-position-{{position}} {padding-{{position}}: var(--image-offset);}
+  .image-offset.image-position-{{position}} .custom-card.image-padding-false .image-container {margin-{{position}}: calc(var(--image-offset) * -1);}
+  .image-offset.image-position-{{position}} .custom-card.image-padding-true .image-container {margin-{{position}}: calc(calc(var(--image-offset) + var(--card-padding)) * -1);}
+{%- endfor -%}
+
+/* sliding panel specific styles */
+.custom-card.expandable-true .info-bottom-inner {padding: var(--card-padding); overflow: auto; background: var(--scheme-background-gradient); position: absolute; bottom: 0; left: 0; width: 100%; height: 100%; padding: var(--card-padding); display: flex; flex-flow: column; transition: all var(--animation-speed-medium) ease-out; z-index: 1;}
+.custom-card.expandable-true .text-overflow .info-bottom-inner .text {overflow: auto;}
+.custom-card.expandable-true:not(.open) .info-bottom-inner {transform: translateY(102%); visibility: hidden;}
+.custom-card.expandable-true .title {min-height: auto !important;} /* avoid matchHeight on this element */
+.custom-card.expandable-true .buttons {flex-grow: 1; display: flex; align-items: flex-end;}
+.custom-card.expandable-true .buttons > * {width: 100%;}
+.custom-card.expandable-false .info-bottom-inner {padding: 0;}
+.custom-card.expandable-false .info-bottom:not(:first-child) {margin-top: 1.5rem;}
+
+/* Media feed specific styles */
+.custom-card .controls {position: absolute; top: 0; right: 0; z-index: 3; padding: 1em;}
+.custom-card .media {position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover;}

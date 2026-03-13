@@ -1,0 +1,66 @@
+#search-bar {overflow: hidden;}
+#search-bar search-form {flex-grow: 1; width: 100%;}
+#search-bar.close {animation: closeTransformTop var(--animation-speed-fast);}
+#search-bar.open {animation: openTransformTop var(--animation-speed-fast); visibility: visible; transform: translateY(0%);}
+#search-bar .container {max-width: 60rem; padding-right: 3.5em; position: relative;}
+#search-bar .close-search-bar {font-size: 1.8rem; padding: 0.9em 0.8em; position: absolute; right: 0;}
+
+.search-results {position: relative; text-align: left;}
+.search-results .loader-wrap {min-height: 3rem;}
+.search-results .loader {--loader-color: var(--scheme-text-color); --loader-width: 4rem;}
+.search-results .result-item {margin: 0 0 1em;}
+.search-results .result-item img {width: 5rem; height: 5rem; margin-right: 0.75em; object-fit: cover; flex-shrink: 0;}
+.search-results .result-item .price {opacity: 0.7; font-size: 0.9em;}
+.search-results .no-results {margin-top: 1em;}
+.suggested-results,
+.search-results-items {padding: 1.5em 0;}
+.suggested-results:last-child,
+.search-results-items:last-child {padding-bottom: 0;}
+.suggested-results .suggested-item {margin-bottom: 0.5em;}
+.suggested-results .title {font-weight: 700; margin-bottom: 0.5em;}
+.suggested-results ul {list-style: none; padding: 0;}
+.search-results-items {position: relative; text-align: left; overflow: auto; max-height: calc(var(--100vh) - 12em - var(--header-height));}
+.result-group-title-wrapper {margin: 2em 0 0.75em; padding-top: 0.75em; border-top: 1px solid var(--scheme-borders-color);}
+.result-group-title-wrapper:first-child {margin-top: 0; border-top: 0; padding-top: 0;}
+{% comment %}
+HIDE GROUP TITLE IF ONLY ONE TYPE OF RESULT
+.search-results-items:not(.multi-category) .result-group-title {display: none;}
+{% endcomment %}
+
+.embedded-search .search-results {position: absolute; left: auto; right: 0.9em; width: 38em; max-width: 90vw; z-index: 2;}
+.embedded-search .search-results:not(:empty) {padding-left: 1em; padding-right: 1em; padding-bottom: 1em; box-shadow: 0 2px 4px 1px rgba(0,0,0,.2);}
+.embedded-search .search-results .no-results {margin-bottom: 1.7em;}
+.embedded-search .search-results .result-item {padding: 0;}
+.embedded-search .search-results .result-item img {width: 35px; height: 35px; margin-right: 0.5em;}
+.embedded-search .search-results .info {line-height: 1.2; margin-top: -0.15em;}
+.embedded-search .search-results .price {margin-top: 0.3em;}
+.embedded-search .search-results .btn {margin-top: 0;}
+.embedded-search .suggested-results .grid-item {width: 100%; flex-basis: unset;}
+.embedded-search .suggested-results .grid-item:not(:last-child) {margin-bottom: 1em;}
+
+{% assign horizontalBreakpoint = '500px' %}
+@media (min-height: {{horizontalBreakpoint | plus: 1}}px) {
+  .search-results-group {display: flex; flex-flow: column; row-gap: 1em;}
+  .search-results .result-item {width: 100%; width: fit-content; margin-bottom: 0;}
+}
+@media (min-height: {{horizontalBreakpoint | plus: 1}}px) and (min-width: {{settings.breakpoint_mobile | plus: 0.001}}em) {
+  .multi-category .search-results-group {flex-flow: row; flex-wrap: wrap;}
+  .search-results .multi-category .result-item {flex: 1 0 50%;}
+}
+@media (max-height: {{horizontalBreakpoint}}) {
+  .result-group-title-wrapper {margin: 0.5em 0; padding-bottom: 0.3em;}
+  .search-results:not(:empty) {padding: 1em 0;}
+  .search-results .btn {padding-top: 0.5em; padding-bottom: 0.5em; margin-top: 0.5em;}
+  .search-results-group {display: flex; width: 100%; overflow: auto;}
+  .search-results-items .result-item {--card-width: 5.75em; width: var(--card-width); flex-shrink: 0; flex-flow: column; margin: 0 0.75em 0.5em 0;}
+  .search-results-items .result-item img {margin-right: 0; width: calc(var(--card-width) - 0em); height: calc(var(--card-width) - 1em); margin-bottom: 0.25em;}
+  .search-results .result-item:last-child {margin-right: 0;}
+  .search-results-items .result-item .info {width: 100%;}
+  .search-results-items .result-item .title {white-space: nowrap; text-overflow: ellipsis; overflow: hidden;}
+  .search-results-items .result-item .title, .search-results .result-item .price {font-size: 0.75em; line-height: 1.3;}
+}
+
+@media (max-width: {{ settings.breakpoint_mobile}}) {
+  .suggested-results .grid-item {width: 50%; flex-basis: unset;} 
+  .suggested-results .grid-item:not(:last-child) {margin-bottom: 1em;}
+}

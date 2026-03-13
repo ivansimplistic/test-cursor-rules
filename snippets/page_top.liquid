@@ -1,0 +1,112 @@
+{%- comment -%}
+    Renders the utils needed at the top of each page (collection/search)
+
+    Accepts:
+    - source: {String} indicating where it's been added from (plp / search)
+    - sticky: {Boolean} true / false
+    - filters_layout: {String} sidebar / button
+    
+    Usage:
+    {%- render 'page_top', source: 'plp', sticky: true -%}
+{%- endcomment -%}
+
+<div class="page-top-wrap {% if sticky %}scheme sticky sticky-below-header ease-animation{% endif %}">
+  <div class="collection-utils container flex align-items-center justify-content-between">
+    <div class="sort-filter flex align-items-center medium-down--flex-1">
+      {%- if source == 'plp' -%}
+        {%- assign sortBy = collection.sort_by | default: collection.default_sort_by | escape -%}
+        <collection-sort data-sort-by="{{sortBy}}" class="sort-select medium-down--flex-1">
+          <label class="visually-hidden" for="sort-by">{{ 'page_top.sort_by_label' | t }}</label> 
+          <div class="field small--one-whole">
+            {%- render 'icons', icon: 'chevron-down' -%}
+            <select id="sort-by">
+              <option value="manual" {% if sortBy == 'manual' %}selected{% endif %}>{{ 'page_top.sort_manual_label' | t }}</option>
+              <option value="price-ascending" {% if sortBy == 'price-ascending' %}selected{% endif %}>{{ 'page_top.sort_price_low_to_high_label' | t }}</option>
+              <option value="price-descending" {% if sortBy == 'price-descending' %}selected{% endif %}>{{ 'page_top.sort_price_high_to_low_label' | t }}</option>
+              <option value="title-ascending" {% if sortBy == 'title-ascending' %}selected{% endif %}>{{ 'page_top.sort_alphabetically_ascending_label' | t }}</option>
+              <option value="title-descending" {% if sortBy == 'title-descending' %}selected{% endif %}>{{ 'page_top.sort_alphabetically_descending_label' | t }}</option>
+              <option value="created-ascending" {% if sortBy == 'created-ascending' %}selected{% endif %}>{{ 'page_top.sort_oldest_to_newest_label' | t }}</option>
+              <option value="created-descending" {% if sortBy == 'created-descending' %}selected{% endif %}>{{ 'page_top.sort_newest_to_oldest_label' | t }}</option>
+              <option value="best-selling" {% if sortBy == 'best-selling' %}selected{% endif %}>{{ 'page_top.sort_best_selling_by_label' | t }}</option>
+            </select>
+          </div>
+        </collection-sort>
+      {%- elsif source == 'search' and search.results.size > 0 and search.types contains 'product' -%}
+        {%- assign sortBy = search.sort_by | default: search.default_sort_by | escape -%}
+        <collection-sort data-sort-by="{{sortBy}}" class="sort-select medium-down--flex-1">
+          <label class="visually-hidden" for="sort-by">{{ 'page_top.sort_by_label' | t }}</label> 
+          <div class="field small--one-whole">
+            {%- render 'icons', icon: 'chevron-down' -%}
+            <select id="sort-by">
+              <option value="relevance" {% if sortBy == 'relevance' %}selected{% endif %}>{{ 'page_top.sort_relevance_label' | t }}</option>
+              <option value="price-ascending" {% if sortBy == 'price-ascending' %}selected{% endif %}>{{ 'page_top.sort_price_low_to_high_label' | t }}</option>
+              <option value="price-descending" {% if sortBy == 'price-descending' %}selected{% endif %}>{{ 'page_top.sort_price_high_to_low_label' | t }}</option>
+            </select>
+          </div>
+        </collection-sort>
+      {%- endif -%}
+      {%- if section.settings.filters and search.types contains 'product' and search.types.size == 1 and search.filters.size > 0 -%}
+        {%- assign showFilters = true -%}
+      {%- elsif section.settings.filters and collection.all_products_count > 0 -%}
+        {%- assign showFilters = true -%}
+      {%- endif -%}
+      {%- if showFilters == true -%}
+        <div class="filters-button-wrapper field medium-down--flex-1 {% if filters_layout contains 'sidebar' %}hide medium-down--show{% endif %}">
+          <button class="open-filters one-whole flex align-items-center no-highlight-hover">{{ 'page_top.filters_button' | t }} {%- render 'icons', icon: 'filters' -%}</button>
+        </div>
+      {%- endif -%}
+    </div>
+    
+    <collection-layout class="layout flex">
+      {%- if section.settings.product_count_label == 'utils' -%}
+        <div class="layout-products-count flex align-items-center">
+          {%- if collection.products_count == 1 -%}
+            {{ 'collection_main.products_count_single' | t: products_quantity: collection.products_count }}
+          {%- else -%}
+            {{ 'collection_main.products_count' | t: products_quantity: collection.products_count }}
+          {%- endif -%}
+        </div>
+      {%- endif -%}
+
+      <div class="button hide small--show">
+        <input id="grid-class-one-whole" type="radio" name="grid-layout" value="1" data-value="1" disabled />
+        <label for="grid-class-one-whole">
+          <span class="visually-hidden">{{ 'page_top.grid_layout_size_one_per_row_caption' | t }}</span>
+          <svg aria-hidden="true" tabindex="-1" role="presentation" class="icon icon-one-whole" viewBox="0 0 32 32"><path class="fill" d="M32,32H0V0H32Z"/></svg> 
+        </label>
+      </div>
+      <div class="button small--hide">
+        <input id="grid-class-list" type="radio" name="grid-layout" value="list" data-value="1" disabled />
+        <label for="grid-class-list">
+          <span class="visually-hidden">{{ 'page_top.grid_layout_size_list_caption' | t }}</span>
+          <svg aria-hidden="true" tabindex="-1" role="presentation" class="icon icon-list" viewBox="0 0 32 32"><path class="fill" d="M12,12H0V0H12Zm0,8H0V32H12ZM27.5,1.9H15V4.1H27.5Zm4.4,6H15v2.2H31.9Zm-4.4,14H15v2.2H27.5Zm4.4,6H15v2.2H31.9Z"/></svg> 
+        </label>
+      </div>
+      <div class="button">
+        <input id="grid-class-one-half" type="radio" name="grid-layout" value="2" data-value="2" disabled />
+        <label for="grid-class-one-half">
+          <span class="visually-hidden">{{ 'page_top.grid_layout_size_two_per_row_caption' | t }}</span>
+          <svg aria-hidden="true" tabindex="-1" role="presentation" class="icon icon-one-half" viewBox="0 0 32 32"><path class="fill" d="M13.7,13.8H0V0H13.7ZM32,0H18.3V13.8H32ZM13.7,18.2H0V32H13.7Zm18.3,0H18.3V32H32Z"/></svg> 
+        </label>
+      </div>
+      <div class="button small--hide">
+        <input id="grid-class-one-third" type="radio" name="grid-layout" value="3" data-value="3" disabled />
+        <label for="grid-class-one-third">
+          <span class="visually-hidden">{{ 'page_top.grid_layout_size_three_per_row_caption' | t }}</span>
+          <svg aria-hidden="true" tabindex="-1" role="presentation" class="icon icon-one-third" viewBox="0 0 32 32"><path class="fill" d="M8.4,8.4H.1V0H8.4ZM20.2,0H11.8V8.4h8.4ZM31.9,0H23.6V8.4h8.3ZM8.4,11.8H.1v8.4H8.4Zm11.8,0H11.8v8.4h8.4Zm11.7,0H23.6v8.4h8.3ZM8.4,23.6H.1V32H8.4Zm11.8,0H11.8V32h8.4Zm11.7,0H23.6V32h8.3Z"/></svg> 
+        </label>
+      </div>
+      <div class="button medium-down--hide">
+        <input id="grid-class-one-quarter" type="radio" name="grid-layout" value="4" data-value="4" disabled />
+        <label for="grid-class-one-quarter">
+          <span class="visually-hidden">{{ 'page_top.grid_layout_size_four_per_row_caption' | t }}</span>
+          <svg aria-hidden="true" tabindex="-1" role="presentation" class="icon icon-one-quarter" viewBox="0 0 32 32"><path class="fill" d="M5.3,5.4H0V0H5.3ZM14.2,0H8.9V5.4h5.3Zm8.9,0H17.8V5.4h5.3ZM32,0H26.7V5.4H32ZM5.3,8.9H0v5.3H5.3Zm8.9,0H8.9v5.3h5.3Zm8.9,0H17.8v5.3h5.3Zm8.9,0H26.7v5.3H32ZM5.3,17.8H0v5.3H5.3Zm8.9,0H8.9v5.3h5.3Zm8.9,0H17.8v5.3h5.3Zm8.9,0H26.7v5.3H32ZM5.3,26.6H0V32H5.3Zm8.9,0H8.9V32h5.3Zm8.9,0H17.8V32h5.3Zm8.9,0H26.7V32H32Z"/></svg> 
+        </label>
+      </div>
+    </collection-layout>
+    
+  </div>
+</div>
+{%- if sticky -%}
+<div class="page-top-shadow ease-animation"></div>
+{%- endif -%}

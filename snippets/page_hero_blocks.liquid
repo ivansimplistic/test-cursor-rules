@@ -1,0 +1,187 @@
+{% capture newLine %}
+{% endcapture %}
+{%- if block.type == 'title' -%}
+  {%- assign headingCount = headingCount | plus: 1 -%}
+  {%- if template contains 'article' and block.settings.back_to_blog -%}
+    <div class="text subheading">
+      <a href="{{blog.url}}" class="back-link flex align-items-center justify-content-{{section.settings.text_align}}">{%- render 'icons', icon: 'chevron-left' -%}{{blog.title}}</a>
+    </div>
+  {% endif %}
+  {{ '<' }}{% if headingCount == 1 %}h1{% else %}h2{% endif %} class="title {{block.settings.title_size | replace: 0, '1-xl' | replace: -1, '1-xxl' | prepend: 'h' }}"{{ '>' }}
+    {{block.settings.title | replace: '[Collection Title]', collection.title | replace: '[Blog Title]', blog.title | replace: '[Article Title]', article.title | replace: '[Page Title]', page.title | replace: '[br]', '<br aria-hidden="true" />' | replace: '[hi]', '<span class="highlight">' | replace: '[/hi]', '</span>' |  replace: '[hi2]', '<span class="highlight2">' | replace: '[/hi2]', '</span>'}}
+  {{ '</' }}{% if headingCount == 1 %}h1{% else %}h2{% endif %}{{ '>' }}
+{%- elsif block.type == 'quantity' -%}
+  <div class="quantity {{block.settings.text_style}} {{block.settings.text_size | prepend: 'p'}}">
+    {%- if current_tags -%}
+      {{- current_tags | join: ' + ' -}}
+      <span class="bar">/</span>
+    {%- endif -%}
+    {%- if template contains 'collections' -%}
+      {{collections.size}} {{collections.size | pluralize: 'collection', 'collections'}}
+    {%- elsif template contains 'collection' -%}
+      {{collection.all_products_count}} {{collection.all_products_count | pluralize: 'product', 'products'}}
+    {%- elsif template contains 'blog' -%}
+      {{blog.articles_count}} {{blog.articles_count | pluralize: 'post', 'posts'}}
+    {%- endif -%}
+  </div>
+{%- elsif block.type == 'tags' -%}
+  {%- if article.tags.size > 0 -%}
+    <div class="tags flex flex-wrap">
+      {%- for tag in article.tags -%}
+        {%- if forloop.index <= block.settings.tags_limit -%}
+          <div class="badge smaller">{{tag}}</div>
+        {%- else -%}
+          {%- break -%}
+        {%- endif -%}
+      {%- endfor -%}
+    </div>
+  {%- endif -%}
+{%- elsif block.type == 'richtext' -%}
+  {%- liquid if block.settings.text contains '[Collection Description]' and collection.description != blank
+    assign richtextContent = collection.description
+  elsif block.settings.text contains '[Article Content]' and article.content != blank
+    assign richtextContent = article.content | truncatewords: 40
+  elsif block.settings.text contains '[Article Excerpt]' and article.excerpt != blank
+    assign richtextContent = article.excerpt
+  elsif block.settings.text contains '[Page Content]' and page.content != blank
+    assign richtextContent = page.content
+  elsif block.settings.text != blank and block.settings.text != '<p></p>'
+    assign richtextContent = block.settings.text | remove: '[Page Content]' | remove: '[Article Excerpt]' | remove: '[Collection Description]'
+  endif -%}
+  {%- if richtextContent != blank -%}
+    <div class="text {{block.settings.text_style}} {{block.settings.text_size | prepend: 'p'}}">
+      {{richtextContent}}
+    </div>
+  {%- endif -%}
+{%- elsif block.type == 'share' -%}
+  <div class="share">
+    {%- render 'social_share_article', article: article, section: section -%}
+  </div>
+{%- elsif block.type == 'author_date' -%}
+  {%- if block.settings.show_author -%}
+    {%- assign showAuthor = true -%}
+  {%- endif -%}
+  {%- if block.settings.date_style != 'no_date' -%}
+    {%- assign showDate = true -%}
+  {%- endif -%}
+  {%- if showAuthor or showDate -%}
+    <div class="author-date {{block.settings.text_style}}">
+      {%- if showAuthor -%}
+        <span class="author">
+          By {{ article.author }}
+        </span>
+      {%- endif -%}
+      {%- assign dateStyle = block.settings.date_style -%}
+      {%- if showAuthor and showDate and dateStyle == 'text' -%}
+        <span class="bar">/</span>
+      {%- endif -%}
+      {%- if showDate -%}
+        <span class="date {{ dateStyle }}">
+          {%- if dateStyle contains 'badge' -%}
+            <span>{{ article.published_at | date: "%d" }}</span>
+            <span>{{ article.published_at | date: "%b" }}</span>
+          {%- else -%}
+            {{ article.published_at | date: "%d" }}
+            {{ article.published_at | date: "%B" }}
+            {{ article.published_at | date: "%Y" }}
+          {%- endif -%}
+        </span>
+      {%- endif -%}
+    </div>
+  {%- endif -%}
+{%- elsif block.type == 'button' -%}
+  {%- if block.settings.button != blank or block.settings.button_2 != blank -%}
+    <div class="btn-wrap" {{ block.shopify_attributes }}>
+      {%- if block.settings.button != blank -%}
+        <a href="{{block.settings.link}}" class="{{block.settings.cta_style}}">{{block.settings.button}}</a>
+      {%- endif -%}
+      {%- if block.settings.button_2 != blank -%}
+        <a href="{{block.settings.link_2}}" class="{{block.settings.cta_style2}}">{{block.settings.button_2}}</a>
+      {%- endif -%}
+    </div>
+  {%- endif -%}
+{%- elsif block.type == 'separator' -%}
+  <div class="separator large--border-{{block.settings.border}} medium-down--border-{{block.settings.border_mobile}} block-{{block.id}}" {{ block.shopify_attributes }}>
+    <style>@media (min-width: {{settings.breakpoint_tablet | plus: 0.001}}em){.block-{{block.id}} {--padding: {{block.settings.padding}}rem;}} @media (max-width: {{settings.breakpoint_tablet}}){.block-{{block.id}} {--padding: {{block.settings.padding_mobile}}rem;}}</style>
+  </div>
+{%- elsif block.type == 'liquid' -%}
+  {{block.settings.liquid}}
+{%- elsif block.type == 'navbar' and blog.all_tags.size > 0 -%}
+  <div class="categories">
+    <div class="tabs-outer medium--hide small--hide {% if block.settings.tab_style == 'v2' %}full-width{% endif %}">
+      <div class="tabs-inner flex">
+        <div class="tabs-wrap flex" role="navigation" aria-label="{{ 'page_hero_blocks.navbar_blog_categories_caption' | t | escape }}">
+          {%- if block.settings.tags_check -%}
+            {% assign firstTag = article.tags | first %}
+            <a href="{{blog.url}}" class="util-tab {{block.settings.tab_style}} {% unless current_tags or template contains 'article' %}active{% endunless %}">{{ 'page_hero_blocks.navbar_all_articles_label' | t }}</a>
+            {%- for tag in blog.all_tags -%}
+              {%- if current_tags contains tag or tag == firstTag -%}
+                <span class="active util-tab {{block.settings.tab_style}}">{{ tag }}</span>
+              {%- else -%}
+                <a class="util-tab {{block.settings.tab_style}}" href="{{blog.url}}/tagged/{{tag | handle}}">{{tag}}</a>
+              {%- endif -%}
+            {%- endfor -%}
+          {%- elsif block.settings.custom_tags != blank -%}
+            {%- assign customTags = block.settings.custom_tags | split: newLine -%}
+            {%- assign firstTag = customTags | first -%}
+            {%- for customTag in customTags -%}
+              {%- assign tag = customTag | split: ":" | first | downcase -%}
+              {%- assign label = customTag | split: ":" | last -%}
+              {%- assign currentTagsLower = current_tags | downcase -%}
+              {%- if tag != blank and currentTagsLower contains tag -%}
+                <span class="active util-tab {{block.settings.tab_style}}">{{ label }}</span>
+              {%- elsif currentTagsLower == blank and customTag == firstTag -%}
+                <span class="active util-tab {{block.settings.tab_style}}">{{ label }}</span>
+              {%- else -%}
+                <a class="util-tab {{block.settings.tab_style}} " href="{{blog.url}}{% if tag != blank %}/tagged/{% endif %}{{tag | handle}}">{{label}}</a>
+              {%- endif -%}
+            {%- endfor -%}
+          {%- endif -%}
+        </div>
+      </div>
+    </div>
+    <div class="items-dropdown hide medium--show small--show medium-down--flex-1">
+      <div class="field">
+        <select id="medium-down-select">
+          {%- if block.settings.tags_check -%} 
+            <option {% unless current_tags %}selected="selected"{% endunless %} data-category-link="{{ blog.url }}">{{ 'page_hero_blocks.navbar_all_articles_label' | t}}</option>
+            {%- for tag in blog.all_tags -%}
+              {%- if current_tags contains tag -%}
+                <option selected="selected">{{ tag }}</option>
+              {%- else -%}
+                <option data-category-link="{{blog.url}}/tagged/{{tag | handle}}">{{ tag }}</option>
+              {%- endif -%}
+            {%- endfor -%}
+          {%- elsif block.settings.custom_tags != blank -%}
+            {%- assign customTags = block.settings.custom_tags | split: newLine -%}
+            {%- assign firstTag = customTags | first -%}
+            {%- for customTag in customTags -%}
+              {%- assign tag = customTag | split: ":" | first | downcase -%}
+              {%- assign label = customTag | split: ":" | last -%}
+              {%- assign currentTagsLower = current_tags | downcase -%}
+              {%- if tag != blank and currentTagsLower contains tag -%}
+                <option selected="selected">{{ label }}</option>
+              {%- elsif currentTagsLower == blank and customTag == firstTag -%}
+                <option selected="selected">{{ label }}</option>
+              {%- else -%}
+                <option data-category-link="{{blog.url}}{% if tag != blank %}/tagged/{% endif %}{{tag | handle}}">{{ label }}</option>
+              {%- endif -%}
+            {%- endfor -%}            
+          {%- endif -%}
+        </select>
+        {%- render 'icons', icon: 'chevron-down' -%}
+      </div>
+    </div>
+    <script>
+      var select = document.querySelector('#shopify-section-{{section.id}} .items-dropdown select');
+      select.addEventListener('change', (event) => {
+        var selectedIndex = event.target.options.selectedIndex;
+        var option = event.target.options[selectedIndex];
+        var url = option.getAttribute('data-category-link');
+        if (url) {
+          location.href = url;
+        }
+      });
+    </script>
+  </div>
+{%- endif -%}

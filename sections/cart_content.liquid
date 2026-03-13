@@ -1,0 +1,232 @@
+{% if settings.hide_cart_page %}
+  <style>
+    html,body,* {display: none !important; visibility: hidden !important;}
+  </style>
+  <script>location = routes.root_url + '?cart=1'</script>
+{% endif %}
+
+{{ 'cart_content.css' | asset_url | stylesheet_tag }}
+
+<style>
+  #cart {
+    --extras-border-radius: {{section.settings.extras_border_radius}}em;
+  }
+</style>
+<script>
+  if (window.CartCache) {
+    CartCache.newCart(); //may come from /cart/add?variant=...
+  }
+</script>
+
+<div id="cart" class="scheme color-{{section.settings.color_scheme}}">
+  {% render 'remove_invalid_items', items: cart.items %}
+
+  <div class="container">
+    <h1 class="flex align-items-center">{{ 'cart.title' | t }} {%- if cart.item_count > 0 -%}<span class="cart-count badge round body-font">{{cart.item_count}}</span>{%- endif -%}</h1>
+    <div class="grid main align-items-start">
+      <div class="grid-item items-column {% if cart.items == empty %}items-empty{% endif %} six-tenths medium--one-whole small--one-whole" data-dynamic-content="cart-items">
+        {%- if cart.items == empty -%} 
+          <div class="empty">
+            <div class="title p0">{{ 'cart.empty_message' | t }}</div>
+            <a href="{{ routes.all_products_collection_url }}" class="btn">{{ 'cart.start_shopping_link' | t }}</a>
+          </div>
+        {%- else -%}
+
+          <div class="cart-items">
+            {%- assign totalSaving = 0 -%}
+
+            {%- for item in cart.items -%}
+              {%- unless item.properties['_bundle_item'] contains 'related_' -%}
+                {% # theme-check-disable DeprecatedTag %}
+                {%- include 'cart_item', item: item -%}
+                {% # theme-check-enable DeprecatedTag %}
+              {%- endunless -%}
+            {%- endfor -%}
+          </div>
+        {%- endif -%}
+
+
+        {%- if settings.cart_featured_placement == 'below_items' or cart.items == empty -%}
+          {%- assign itemsDesktop = 3 -%}
+          {%- if cart.items == empty -%}
+            {%- assign itemsDesktop = 4 -%}
+          {%- endif -%}
+          {%- render 'cart_featured_products', section: section, itemsDesktop: itemsDesktop, itemsTablet: 3, itemsMobile: 2 -%}
+        {%- endif -%}
+      </div>
+
+      <div class="grid-item summary-column four-tenths medium--one-whole small--one-whole" {% if cart.items == empty %}style="display: none"{% endif %}>
+        <div class="summary-column-content scheme color-{{section.settings.extras_color_scheme}} {% if section.settings.extras_border %}scheme-border-box{% endif %}">
+          <div data-dynamic-content="free-shipping">
+            {%- render 'free_shipping_progress' -%}
+          </div>
+          <div class="summary">
+            <div data-dynamic-content="summary">
+              <div class="subtotals">
+                <div class="subtotal line flex justify-content-between">
+                  <span class="p0">{{ 'cart.subtotal_label' | t }} </span> <span><strong class="p0">{{ cart.total_price | money }}</strong> {% if totalSaving > 0 %}<span class="savings">({{ 'cart.savings_label' | t }} {{ totalSaving | money }})</span>{% endif %}</span>
+                </div>
+                <div class="shipping line flex align-items-center justify-content-between">
+                  <span class="p0">{{ 'cart.shipping_label' | t }} </span><span>{{ 'cart.shipping_text' | t }}</span>
+                </div>
+                {%- if section.settings.payment_terms -%}
+                  {%- form 'cart', cart -%}
+                    <div class="payment-terms">
+                      {{ form | payment_terms }}
+                    </div>
+                  {%- endform -%}
+                {%- endif -%}
+              </div>
+
+
+              {%- if settings.cart_note -%}      
+                <div class="cart-note-wrap cart-extra-module">
+                  <div>
+                    <input tabindex="-1" type="checkbox" id="checkbox-cart-note" class="checkbox-custom" {%- if cart.note != nil and cart.note != "" -%} checked="checked" {%- endif -%} />
+                    <label tabindex="0" for="checkbox-cart-note" class="checkbox-cart-note-label checkbox-custom-label">{{settings.cart_note_label}}</label>
+                  </div>
+                  <div id="cart-note" class="cart-note hide">
+                    <cart-property-field>
+                      <div class="field textarea">
+                        <textarea id="cart-note-textarea" name="note" maxlength="100" aria-label="{{settings.cart_note_label}}">{{ cart.note }}</textarea>
+                        <label for="cart-note-textarea">{{ 'cart.note_label' | t }}</label>
+                      </div>
+                    </cart-property-field>
+                  </div>
+                </div>
+              {%- endif -%}
+
+              {%- if settings.cart_disclaimer_text != "" -%}
+                <div class="cart-disclaimer cart-extra-module">{{ settings.cart_disclaimer_text }}</div>
+              {%- endif -%}
+
+              {%- if settings.custom_title1 != "" or settings.custom_title2 != "" -%}
+                {%- if settings.cart_custom_style == 'accordion' -%}
+                  {%- for i in (1..2) -%}
+                    {% assign customTitle = 'cart_custom_title' | append: i %}
+                    {% assign customText = 'cart_custom_text' | append: i %}
+                    {%- if settings[customTitle] != "" -%}
+                      <div class="cart-custom cart-extra-module">
+                        <button type="button" aria-expanded="false" class="cart-accordion-button one-whole flex align-items-center justify-content-between">
+                          <span>{{ settings[customTitle] }}</span>
+                          {% render 'icons', icon: 'chevron-down' %}
+                        </button>
+                        <div class="expandable">
+                          <div class="cart-accordion-text p4">{{ settings[customText] }}</div>
+                        </div>
+                      </div>
+                    {%- endif -%}
+                  {%- endfor -%}
+                {%- else -%}
+                  <div class="cart-extra-module flex">
+                    {%- for i in (1..2) -%}
+                      {% assign customTitle = 'cart_custom_title' | append: i %}
+                      {% assign customText = 'cart_custom_text' | append: i %}
+                      {%- if settings[customTitle] != "" -%}
+                        <div class="cart-custom flex-1 text-center">
+                          <button type="button" class="link cart-popup-button">
+                            <span>{{ settings[customTitle] }}</span>
+                          </button>
+                          <div class="hide">
+                            <div class="cart-popup-text scheme color-scheme-1"><h2 class="h3">{{ settings[customTitle] }}</h2>{{ settings[customText] }}</div>
+                          </div>
+                        </div>
+                      {%- endif -%}
+                    {%- endfor -%}
+                  </div>
+                {%- endif -%}
+              {%- endif -%}
+
+              {%- if settings.cart_popuplink_title1 != blank or settings.cart_popuplink_title2 != blank -%}
+                <div class="cart-extra-module flex">
+                  {%- for i in (1..2) -%}
+                    {% assign customTitle = 'cart_popuplink_title' | append: i %}
+                    {% assign customLink = 'cart_popuplink_link' | append: i %}
+                    {% assign customIcon = 'cart_popuplink_icon' | append: i %}
+                    {%- if settings[customTitle] != blank -%}
+                      <div class="cart-custom flex-1 text-center">
+                        <button type="button" data-url="{{ settings[customLink] }}" class="cart-popuplink-button">
+                          {{ settings[customIcon] }}
+                          <span>{{ settings[customTitle] }}</span>
+                        </button>
+                      </div>
+                    {%- endif -%}
+                  {%- endfor -%}
+                </div>
+              {%- endif -%}
+            </div>
+
+            <div class="buttons-wrapper">
+              <a href="{{ routes.all_products_collection_url }}" class="btn v2">{{ 'cart.continue_shopping_link' | t }}</a>
+              <button type="button" class="btn" name="checkout" onclick="$s.checkout(this)">{{ 'cart.checkout_link' | t }}</button>
+              {%- if additional_checkout_buttons -%}
+                <div class="additional-checkout-buttons" data-dynamic-content="cart-checkout-buttons">
+                  {%- if cart.items.size > 0  -%}
+                    {{ content_for_additional_checkout_buttons }}
+                  {%- endif -%}
+                </div>
+              {%- endif -%}
+            </div>
+          </div>
+        </div>
+        {%- if settings.cart_featured_placement == 'below_summary' and cart.items != empty -%}
+          {%- render 'cart_featured_products', section: section, itemsDesktop: 2, itemsTablet: 3, itemsMobile: 2 -%}
+        {%- endif -%}
+
+  
+      </div>
+    </div>
+    <script src="{{ 'cart_content.js' | asset_url }}" defer="defer"></script>
+
+  </div>
+</div>
+
+{% schema %}
+  {
+    "name": "Cart",
+    "class": "cart-content type-cart",
+    "settings": [
+      {
+        "type": "header",
+        "content": "Main"
+      },
+      {
+        "type": "color_scheme",
+        "id": "color_scheme",
+        "label": "Main color scheme",
+        "default": "scheme-1"
+      },
+      {
+        "type": "checkbox",
+        "id": "payment_terms",
+        "label": "Payment terms",
+        "info": "Shop Pay Installments will be displayed below the subtotal line if you have the feature enabled and this box checked."
+      },
+      {
+        "type": "header",
+        "content": "Extras"
+      },
+      {
+        "type": "color_scheme",
+        "id": "extras_color_scheme",
+        "label": "Extras color scheme",
+        "default": "scheme-2"
+      },
+      {
+        "type": "checkbox",
+        "id": "extras_border",
+        "label": "Border"
+      },
+      {
+        "type": "range",
+        "id": "extras_border_radius",
+        "min": 0,
+        "max": 3,
+        "step": 0.2,
+        "unit": "em",
+        "label": "Extras border radius",
+        "default": 0
+      }
+    ]
+  }
+{% endschema %}

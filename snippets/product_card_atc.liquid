@@ -1,0 +1,247 @@
+{%- comment -%}
+    Renders a product card
+
+    Accepts:
+    - productCard:* {Object} Product Liquid object
+    - imgMode: {String} "hover" (shows the last image on hover) or "static"
+    - colorSwatches: {Boolean} Make the color swatches always visible. Default: true
+    - quickView: {Boolean} Enables quick view. Default: true
+    - quickAdd: {Boolean} Enables quick add. Default: true
+    - quickAddStyle: {String} Default: "expand"
+      -- "normal" The form is always visible
+      -- "expand" The form is hidden and shows up when the user clicks the quickAdd button. 
+    - showQuantity: {Boolean} Only when QuickAdd is enabled. Default: false
+
+    Usage:
+    {%- render 'product_card_atc', productCard: product, showQuantity: true -%}
+
+    Rquirements:
+    {{ 'product_card_atc.css' | asset_url | stylesheet_tag }}
+    {%- render 'product_main_js_inc' -%}
+
+{%- endcomment -%}
+{%- liquid
+  assign imgMode = imgMode | default: settings.product_card_img_mode, allow_false: true
+  assign colorSwatches = colorSwatches | default: settings.product_card_swatches, allow_false: true
+  assign quickView = quickView | default: settings.product_card_quick_view, allow_false: true
+  assign quickAdd = quickAdd | default: settings.product_card_quick_add, allow_false: true | default: false, allow_false: true 
+  if settings.product_card_quick_add_disabled_homepage == true and template.name == 'index' and quickAdd 
+    assign quickAdd = false
+  endif
+  assign quickAddStyle = quickAddStyle | default: settings.product_card_atc_style | default: 'normal'
+  assign defaultVariant = defaultVariant | default: productCard.selected_or_first_available_variant
+  assign manualSelect = manualSelect | default: true, allow_false: true
+  assign border = border | default: settings.product_card_border, allow_false: true
+  assign colorSwatchesOptions = settings.product_color_swatches | replace: ', ', ',' | split: ','
+  assign labelSwatchesOptions = settings.product_label_swatches | replace: ', ', ',' | split: ','
+
+  assign contentColorScheme = contentColorScheme | append: '' | default: section.settings.content_color_scheme
+  assign cardsColorScheme = cardsColorScheme | append: '' | default: section.settings.cards_color_scheme
+-%}
+
+{%- capture quickViewBtn -%}
+  <button type="button" tabindex="0" class="cta {% if settings.product_card_cta_style == 'buttons' %}btn smaller flex align-items-center justify-content-center{% endif %} floating-btn quick-view-trigger" data-url="{{ productCard.url | within: collection }}" aria-label="{{ 'product_card_atc.quick_view_button' | t | escape }}">
+    <span class="circle flex align-items-center justify-content-center {% unless settings.product_card_cta_style == 'buttons' %}ease-animation{% endunless %}">{%- render 'icons', icon: 'eye' -%}</span>
+    <span class="tooltip {% unless settings.product_card_cta_style == 'buttons' %}ease-animation badge medium-down--visually-hidden{% endunless %}">{{ 'product_card_atc.quick_view_button' | t }}</span>
+  </button>
+{%- endcapture -%}
+{%- capture quickShopBtn -%}
+  {%- if settings.product_card_cta_style == 'bubbles add-cta' -%}
+    <button type="button" disabled="disabled" class="hide btn add-cta hover-fadeindown smaller atc-options" data-enabled-text="{{ 'product_card_atc.quick_shop_button' | t | escape }}" data-disabled-text="{{ 'product_card_atc.sold_out_message' | t | escape }}">
+      {{ 'product_card_atc.quick_shop_button' | t }}
+    </button>
+  {%- else -%}
+    <button type="button" class="cta {% if settings.product_card_cta_style == 'buttons' %}btn smaller flex align-items-center justify-content-center{% endif %} floating-btn atc-options" aria-label="{{ 'product_card_atc.quick_shop_button' | t | escape }}">
+      <span class="circle flex align-items-center justify-content-center {% unless settings.product_card_cta_style == 'buttons' %}ease-animation{% endunless %}">{%- render 'icons', icon: 'cart' -%}</span>
+      <span class="tooltip {% unless settings.product_card_cta_style == 'buttons' %}ease-animation badge medium-down--visually-hidden{% endunless %}">{{ 'product_card_atc.quick_shop_button' | t }}</span>
+    </button>
+  {%- endif -%}
+{%- endcapture -%}
+{%- capture badges -%}
+  {%- render 'product_badges', product: productCard, defaultVariant: defaultVariant, saleRound: settings.sale_round -%}
+{%- endcapture -%}
+{%- capture callouts -%}
+  {%- if settings.product_card_callouts_show -%}  
+    {%- render 'product_callouts', product: productCard -%}
+  {%- endif -%}
+{%- endcapture -%}
+
+{%- if quickAdd -%}
+  {%- liquid
+    if quickAddStyle == 'normal'
+      assign colorSwatches = false
+    endif
+  -%}
+<product-card-atc data-manual-select="{% if manualSelect != true %}{{ manualSelect }}{% else %}{% unless productCard.has_only_default_variant %}{{ productCard.options | join: ',' | escape }}{% endunless %}{% endif %}" data-section="{{section.id}}-{{ productCard.id }}" data-product-url="{{ productCard.url | split: '?' | first }}" data-product-id="{{ productCard.id }}" class="product-card common-card flex direction-column trigger-floating-buttons text-{{settings.product_card_text_align}} product-main-element atc {% if product.available %}available{% endif %} {{quickAddStyle}} {{colorSwatches | replace: true, 'colors-out'}} {% if settings.product_card_border %}scheme-border-box{% endif %} {% if settings.product_card_image_full_width %}image-full-width{% endif %} {% if cardsColorScheme != blank %}scheme color-{{cardsColorScheme}}{% endif %} same-scheme-{%- if cardsColorScheme == contentColorScheme -%}true{%- else -%}false{%- endif -%}">
+  <div class="image-container ease-animation">
+    {%- render 'product_card_img', productCard: productCard, imgMode: imgMode -%}
+    
+    <div class="product-badges">
+      {{ badges }}
+    </div>
+    
+    <div class="floating-buttons {{settings.product_card_cta_style}} flex flex-wrap {% if settings.product_card_cta_style == 'bubbles' %}direction-column{% endif %}">
+      {%- if quickView -%}
+        {{quickViewBtn}}
+      {%- endif -%}
+      {%- if settings.product_card_cta_style != 'bubbles add-cta' -%}
+        {{quickShopBtn}}
+      {%- endif -%}
+    </div>
+  </div>
+  <div class="info flex-1 flex direction-column">
+    <div class="info-inner flex-1 flex flex-wrap justify-content-between">
+      <a href="{{ productCard.url | within: collection }}" class="flex-1 product-card-url no-highlight-hover">
+        <span class="title {{settings.product_card_title_font_family}}">{{ productCard.title }}</span>
+      </a>
+      <product-price class="price flex">
+        <span class="compare {% unless defaultVariant.compare_at_price > defaultVariant.price %}hide{% endunless %}">
+          <span class="visually-hidden">. {{ 'product.original_price_label' | t }}: </span>
+          {{defaultVariant.compare_at_price | money_without_trailing_zeros}}
+        </span>
+        <span class="final price-field">
+          <span class="visually-hidden">. {{ 'product.final_price_label' | t }}: </span>
+          {{defaultVariant.price | money_without_trailing_zeros}}
+        </span>
+      </product-price>
+    </div>
+    {%- liquid
+      if productCard.metafields.reviews.rating.value != blank and settings.product_card_show_reviews_rating == true
+        render 'product_rating', rating: productCard.metafields.reviews.rating.value, productCard: productCard
+      endif
+    -%}
+    <add-to-cart-form>
+      <div class="atc-options-wrapper">
+        <form action="{{ routes.cart_url }}/add" method="post" autocomplete="off">
+          
+          
+          <button type="button" class="close" aria-label="{{ 'product_card_atc.close_quick_add_caption' | t | escape }}">
+            {%- render 'icons', icon: 'close' -%}
+          </button>
+          <product-variants>
+            {%- unless productCard.has_only_default_variant or productCard.variants.size == 1 -%}
+              {%- for option in productCard.options -%}
+                {%- if colorSwatchesOptions contains option -%}
+                  <product-swatch class="product-swatch color-swatches block" {% if settings.use_variant_images_as_swatches %} data-use-img="true"{% endif %} data-option="{{forloop.index}}" data-label="{{option}}"></product-swatch>
+                {%- elsif labelSwatchesOptions contains option -%}
+                  <product-swatch class="product-swatch block" data-option="{{forloop.index}}" data-label="{{option}}"></product-swatch>
+                {%- else -%}
+                  <product-dropdown data-option="{{forloop.index}}" data-label="{{option}}"></product-dropdown>
+                {%- endif -%}
+              {%- endfor -%}
+            {%- endunless -%}
+            <input class="single-option-selector" data-variant-id="true" type="hidden" name="id" value="{{defaultVariant.id}}" />
+
+          </product-variants>
+
+          {%- if showQuantity -%}
+          {%- render 'product_card_quantity', productCard: productCard, minValue: 1 -%}
+          {%- endif -%}
+
+          {%- comment -%}
+          REF: FEATURE SELLING PLANS
+          {%- endcomment -%}
+          {%- if productCard.selling_plan_groups.size > 0 and settings.subscriptions_enabled and settings.subscriptions_product_card_enabled -%}
+            <product-selling-plan data-text-onetime="{{ settings.subscriptions_text_onetime | escape }}" data-text-subscribe="{{ settings.subscriptions_text_subscribe | escape }}" data-text-subscribe-save="{{ settings.subscriptions_text_subscribe_and_save | escape }}" data-text-delivery-frequency="{{ settings.subscriptions_text_delivery_frequency | escape }}">
+              {%- if settings.subscriptions_default_option == 'onetime' and product.requires_selling_plan != true -%}
+                {%- assign defaultPlan = productCard.selected_selling_plan.id -%}
+              {%- else -%}
+                {%- assign defaultPlan = productCard.selected_or_first_available_selling_plan_allocation.selling_plan.id -%}
+              {%- endif -%}
+              <input type="hidden" name="selling_plan" value="{{ defaultPlan | default: '' }}">
+              <input type="hidden" name="selling_plan_frequency">
+              <label class="small-label option-name {% if settings.subscriptions_options_title == blank%}visually-hidden{% endif %}">{{settings.subscriptions_options_title | default: 'Purchase options'}}</label>
+              <div data-groups></div>
+            </product-selling-plan>
+          {%- endif -%}
+
+          <product-buttons>
+            <button type="submit" class="btn smaller add" style="display: none">
+              <span class="flex flex-wrap align-items-center justify-content-center">
+                {{ 'product_card_atc.add_to_cart_button' | t }}<span class="bar"></span>
+                <product-price class="flex">
+                  <span class="compare {% unless defaultVariant.compare_at_price > defaultVariant.price %}hide{% endunless %}">
+                    {{defaultVariant.compare_at_price | money}}
+                  </span>
+                  <span class="final price-field">{{defaultVariant.price | money}}</span>
+                </product-price>
+              </span>
+            </button>
+            <div class="sold-out-message" style="display: none">
+              <div class="btn smaller disabled">{{ 'product_card_atc.sold_out_message' | t }}</div>
+            </div>
+            <div class="btn smaller disabled selection-required" style="display: none">&nbsp;</div>
+          </product-buttons>
+
+          {%- if settings.subscriptions_product_card_enabled and settings.subscriptions_enabled -%}
+            {%- assign includeSellingPlans = true -%}
+          {%- else -%}
+            {%- assign includeSellingPlans = false -%}
+          {%- endif -%}
+          {%- render 'product_json_data', productObject: productCard, includeSellingPlans: includeSellingPlans -%}
+        </form>
+      </div>
+    </add-to-cart-form>
+    {%- if settings.product_card_cta_style == 'bubbles add-cta' -%}
+      {{quickShopBtn}}
+    {%- endif -%}
+    {{ callouts }}
+    <div class="description hide">
+      {{productCard.description | replace: '</h1>', ':||' | replace: '</h2>', ':||' | replace: '</h3>', ':||' | replace: '<p></p>', '' | replace: '</p>', '||' | replace: '<li>', '• ' | replace: '</li>', '||' | strip_html | truncatewords: 50 | replace: '||', '<br/>' }}
+    </div>
+  </div>
+</product-card-atc>
+{%- else -%}
+<product-card data-product-id="{{ productCard.id }}"  class="product-card common-card flex direction-column trigger-floating-buttons text-{{settings.product_card_text_align}} {% if settings.product_card_border %}scheme-border-box{% endif %} {% if settings.product_card_image_full_width %}image-full-width{% endif %} {% if cardsColorScheme != blank %}scheme color-{{cardsColorScheme}}{% endif %} same-scheme-{%- if cardsColorScheme == contentColorScheme -%}true{%- else -%}false{%- endif -%}">
+  <div class="image-container ease-animation">
+    {%- render 'product_card_img', productCard: productCard, productImage: productCard.featured_image, imgMode: imgMode -%}
+    <div class="product-badges">
+      {{ badges }}
+    </div>
+    {%- if quickView -%}
+      <div class="floating-buttons flex flex-wrap {% if settings.product_card_cta_style == 'bubbles' %}direction-column{% endif %}">
+        {{quickViewBtn}}
+      </div>
+    {%- endif -%}
+  </div>
+  <div class="info flex-1 flex direction-column swatches-position-{{ settings.product_card_swatches_position }}">
+    {%- if colorSwatches and settings.product_card_quick_add == false and settings.product_card_swatches_position == 'top' -%}
+      {%- render 'product_card_swatches', productCard: productCard -%}
+    {%- endif -%}
+
+    <div class="info-inner flex-1 flex flex-wrap justify-content-between {% if settings.product_card_text_align == 'left' %}flex flex-wrap justify-content-between{% endif %}">
+      <a href="{{ productCard.url | within: collection }}" class="flex-1 product-card-url no-highlight-hover">
+        <span class="title {{settings.product_card_title_font_family}}">{{ productCard.title }}</span>
+      </a>
+      <div class="price flex">
+        {%- if productCard.price_min != productCard.price_max -%}
+          <span class="starts-at">{{'product_card_atc.starts_at_price' | t | escape}}<span class="visually-hidden">: </span></span>
+        {%- endif -%}
+        <span class="compare {% unless productCard.compare_at_price_min > productCard.price_min %}hide{% endunless %}">
+          <span class="visually-hidden">. {{ 'product.original_price_label' | t }}: </span>
+          {{ productCard.compare_at_price | money | remove: '.00' }}
+        </span>
+        <span class="final">
+          <span class="visually-hidden">. {{ 'product.final_price_label' | t }}: </span>
+          {{ productCard.price_min | money | remove: '.00' }}
+        </span>
+      </div>
+    </div>
+    {%- liquid
+      if productCard.metafields.reviews.rating.value != blank and settings.product_card_show_reviews_rating == true
+        render 'product_rating', rating: productCard.metafields.reviews.rating.value
+      endif
+    -%}    
+    {%- if colorSwatches and settings.product_card_quick_add or settings.product_card_swatches_position == 'bottom' -%}
+      {%- render 'product_card_swatches', productCard: productCard -%}
+    {%- endif -%}
+    {%- if settings.product_card_cta_style == 'bubbles add-cta' -%}
+      <div class="btn ignore-slide-tabindex shop-now" aria-hidden="true">{{ 'product_card.shop_now_button' | t }}</div>
+    {%- endif -%}
+    {{ callouts }}
+    <div class="description hide">
+      {{productCard.description | replace: '</h1>', ':||' | replace: '</h2>', ':||' | replace: '</h3>', ':||' | replace: '<p></p>', '' | replace: '</p>', '||' | replace: '<li>', '• ' | replace: '</li>', '||' | strip_html | truncatewords: 60 | replace: '||', '<br/>' }}
+    </div>
+  </div>
+</product-card>
+{%- endif -%}

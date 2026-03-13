@@ -1,0 +1,99 @@
+{%- comment -%}
+  Render HTML/CSS for a basic section structure (header on top or on the left side, and custom content below or next to it) with common settings.
+  All sections that use this snippet must contain the main settings that you can find in the Collage section
+  
+  Accepts:
+    - section: {Object} Required. Liquid object
+    - headContentHtml: {String} Optional. HTML content to be injected in the head of the section.
+    - contentHtml: {String} Required. The content 
+
+  Usage:  
+  {%- render 'section_custom_structure', section: section, contentHtml: contentHtml -%}
+
+  Note:
+  This snippet can be used to create a <template> without pulling products from a collection (collection parameter is nil).
+  Then the product items can be inserted dynamically with Javascript.
+  Sections Recommended Products and Recently viewed work this way.
+{%- endcomment -%}
+
+{%- liquid
+  assign fullWidth = section.settings.full_width | default: false
+  assign contentFullWidth = section.settings.content_full_width | default: false
+
+  assign headPosition = section.settings.head_position | default: 'top'
+
+  if section.settings.text != blank and section.settings.text != '<p></p>'
+    assign hasTextField = true
+  endif
+  if section.settings.eyebrow != blank or section.settings.title != blank or hasTextField or section.settings.button != blank or headContentHtml != blank
+    assign hasHeadContent = true
+  endif
+  if contentHtml != blank
+    assign hasMainContent = true
+  endif
+-%}
+
+{%- if hasHeadContent or hasMainContent -%}
+
+<style>
+  #shopify-section-{{ section.id }} {
+    --border-radius: {{section.settings.border_radius}}em;
+    --section-padding-top: calc(var(--global-sections-padding) * {{section.settings.section_padding_top | divided_by: 100.00}});
+    --section-padding-bottom: calc(var(--global-sections-padding) * {{section.settings.section_padding_bottom | divided_by: 100.00}});
+    --text-padding: calc(var(--global-sections-padding) * {{section.settings.text_padding | divided_by: 100.00}});
+    --text-width: {{section.settings.text_width | default: 55 | append: 'em' | replace: '100em', '100%' }}em;
+    {%- if headPosition == 'left' -%}
+      --head-width: {{section.settings.head_width}}%;
+    {%- endif -%}
+  }
+  @media (max-width: {{settings.breakpoint_mobile}}) {
+    #shopify-section-{{section.id}} {
+      --section-padding-top: calc(var(--global-sections-padding) * {{section.settings.section_padding_top_mobile | divided_by: 100.00}});
+      --section-padding-bottom: calc(var(--global-sections-padding) * {{section.settings.section_padding_bottom_mobile | divided_by: 100.00}});
+      --text-padding: calc(var(--global-sections-padding) * {{section.settings.text_padding_mobile | divided_by: 100.00}});
+    }
+  }
+</style>
+{{ 'custom_section_structure.css' | asset_url | stylesheet_tag }}
+
+<div class="custom-section-structure head-position-{{headPosition}} {% if fullWidth %}full-width{% endif %} {% if contentFullWidth %}content-full-width{% endif %} scheme color-{{section.settings.section_color_scheme}} {% if section.settings.section_padding_top > 0 %}padding-top{% endif %} {% if section.settings.section_padding_bottom > 0 %}padding-bottom{% endif %} {% if section.settings.section_color_scheme == section.settings.content_color_scheme %}same-scheme{% endif %} ">
+  {% unless fullWidth %}<div class="container">{% endunless %}
+    <div class="content scheme color-{{section.settings.content_color_scheme}} text-{{section.settings.text_align}}">
+      <div class="{% if headPosition == 'left' %}large--flex align-items-start {% if fullWidth %}large--container-left {% if contentFullWidth == false %}large--container-right{% endif %}{% endif %}{% endif %}">
+        {%- if hasHeadContent -%}
+          <div class="head {% if fullWidth and headPosition == 'top' %}container{% endif %} {% if fullWidth and headPosition == 'left' %}medium-down--container{% endif %} large--flex {% if headPosition == 'left' %}direction-column {{section.settings.text_align | replace: 'left', 'align-items-start' | replace: 'right', 'align-items-end' | replace: 'center', 'align-items-center'}}{% else %} {{section.settings.text_align | replace: 'left', 'align-items-end justify-content-between' | replace: 'right', 'row-reverse align-items-end justify-content-between' | replace: 'center', 'direction-column align-items-center'}}{% endif %}">
+            <div class="richtext-wrap text-{{section.settings.text_align}}">
+              {%- if section.settings.eyebrow != blank -%}
+                <div class="subheading {{section.settings.eyebrow_size | prepend: 'p'}}">{{ section.settings.eyebrow }}</div>
+              {%- endif -%}
+              {%- if section.settings.title != blank -%}
+                {{ '<' }}{%- if section.settings.is_h1 -%}h1{%- else -%}h2{%- endif %} class="title {{section.settings.title_size | replace: 0, '1-xl' | replace: -1, '1-xxl' | prepend: 'h' }}"{{ '>' }}
+                  {{section.settings.title | replace: '[br]', '<br aria-hidden="true" />' | replace: '[hi]', '<span class="highlight">' | replace: '[/hi]', '</span>' |  replace: '[hi2]', '<span class="highlight2">' | replace: '[/hi2]', '</span>'}}
+                {{ '</' }}{%- if section.settings.is_h1 -%}h1{%- else -%}h2{%- endif %}{{ '>' }}
+              {%- endif -%}
+              {%- if hasTextField -%}
+                <div class="text {{section.settings.text_size | prepend: 'p'}}">{{ section.settings.text }}</div>
+              {%- endif -%}
+              {{headContentHtml}}
+            </div>
+            {%- if section.settings.button != blank -%}
+              <div class="btn-wrap">
+                <a href="{{ section.settings.link }}" class="btn">
+                  {{ section.settings.button }}
+                </a>
+              </div>
+            {%- endif -%}
+          </div>
+        {%- endif -%}
+
+        {%- if hasMainContent -%}
+          <div class="main-content {% if headPosition == 'left' %}right-content flex-1{% endif %} {% if fullWidth and contentFullWidth == false and headPosition == 'top' %}container{% endif %} {% if fullWidth and contentFullWidth == false %}medium-down--container{% endif %}">
+            {{contentHtml}}
+          </div>
+        {%- endif -%}
+      </div>
+    </div>
+  {% unless fullWidth %}</div>{% endunless %}
+</div>
+
+{%- endif -%}

@@ -1,0 +1,168 @@
+{%- liquid
+  if section.blocks.first.type == 'slide'
+    assign firstBlock = section.blocks.first | default: section
+  else
+    assign firstBlock = section
+  endif 
+  assign fullWidthDesktop = section.settings.full_width
+  assign fullWidthMobile = section.settings.full_width_mobile | default: section.settings.full_width, allow_false: true
+-%}
+
+{{ 'hero_banner.css' | asset_url | stylesheet_tag }}
+
+<style>
+  @media (min-width: {{settings.breakpoint_tablet | plus: 0.001}}em){
+    #shopify-section-{{ section.id }} {
+      --section-padding-top: calc(var(--global-sections-padding) * {{section.settings.section_padding_top | divided_by: 100.00}});
+      --section-padding-bottom: calc(var(--global-sections-padding) * {{section.settings.section_padding_bottom | divided_by: 100.00}});
+      {%- liquid 
+        if firstBlock.settings.image_desktop != blank
+          assign firstImage = firstBlock.settings.image_desktop
+        elsif firstBlock.settings.video_mp4_desktop != blank
+          assign firstImage = firstBlock.settings.video_mp4_desktop
+        endif
+        if section.settings.section_height == 'first_image' and firstImage != blank
+          assign desktopFirstImageHeight = 'desktop-first-image-height'
+          assign height = 100.0 | divided_by: firstImage.aspect_ratio | append: '%'
+        else
+          assign height = section.settings.section_height | replace: 'small', '40rem' | replace: 'medium', '55rem' | replace: 'large', '70rem' | replace: 'window_height', 'var(--visible-height)'
+        endif
+      -%}
+      --height: max({{height}}, var(--required-height, 0px));
+      --section-border-radius: {{section.settings.border_radius}}em;
+    }
+  }
+  @media (max-width: {{settings.breakpoint_tablet}}) {
+    #shopify-section-{{ section.id }} {
+      --section-padding-top: calc(var(--global-sections-padding) * {{section.settings.section_padding_top_mobile | divided_by: 100.00}});
+      --section-padding-bottom: calc(var(--global-sections-padding) * {{section.settings.section_padding_bottom_mobile | divided_by: 100.00}});
+      {%- liquid 
+        assign firstImage = nil
+        if firstBlock.settings.image_mobile != blank
+          assign firstImage = firstBlock.settings.image_mobile
+        elsif firstBlock.settings.video_mp4_mobile != blank
+          assign firstImage = firstBlock.settings.video_mp4_mobile
+        elsif firstBlock.settings.image_desktop != blank
+          assign firstImage = firstBlock.settings.image_desktop
+        endif
+        if section.settings.section_height_mobile == 'first_image' and firstImage != blank
+          assign mobileFirstImageHeight = 'mobile-first-image-height'
+          assign height = 100.0 | divided_by: firstImage.aspect_ratio | append: '%'
+        else
+          assign height = section.settings.section_height_mobile | replace: 'small', '30rem' | replace: 'medium', '45rem' | replace: 'large', '60rem' | replace: 'window_height', 'var(--visible-height)'
+        endif
+        if section.settings.layout_mobile == 'background'
+          assign height = 'max(' | append: height | append: ', var(--required-height, 0px));'
+        endif
+      -%}
+      --height: {{height}};
+      --section-border-radius: {{section.settings.border_radius_mobile}}em;
+    }
+  }
+</style>
+{%- assign spv = section.settings.slides_per_view -%}
+<div class="hero-banner-container scheme {% if section.blocks.size > 1 %}multiple-slides{% endif %} color-{{section.settings.section_color_scheme}} {% if section.settings.section_padding_top > 0 %}padding-top{% endif %} {% if section.settings.section_padding_bottom > 0 %}padding-bottom{% endif %}  {% if section.settings.show_dots %}dots-desktop{% endif %} {% if section.settings.show_dots_mobile %}dots-mobile{% endif %} dots-{{section.settings.dots_position}}-desktop dots-{{section.settings.dots_position_mobile}}-mobile arrows-{{section.settings.arrows_position}} mobile-image-{{section.settings.layout_mobile}}">
+  <div class="{% unless fullWidthDesktop %}large--container{% endunless %} {% unless fullWidthMobile %}medium-down--container{% endunless %}">
+    <hero-banner class="hero-banner mobile-image-{{section.settings.layout_mobile}} {{desktopFirstImageHeight}} {{mobileFirstImageHeight}} {% if fullWidthDesktop %}full-width{% endif %} {% if spv == '2' or spv == '2-1' or spv == '1-2' %}multi{% endif %}" 
+      data-transition="{{section.settings.transition}}" 
+      data-dots="{% if section.settings.show_dots or section.settings.show_dots_mobile %}true{% endif %}" 
+      data-arrows="{{section.settings.show_arrows}}" 
+      data-autoplay="{{section.settings.autoplay}}" 
+      data-automove="{%- if section.settings.autoplay == 0 -%}{{section.settings.automove}}{%- endif -%}" 
+      data-pause-on-hover="{{section.settings.pause_on_hover}}"
+    >
+      <div class="keen">
+        <div class="keen-slider">
+          {%- capture itemsHtml -%}
+          {%- if mode == 'banner' -%}
+            {%- render 'hero_banner_item', section: section, block: section, textColumnHtml: textColumnHtml -%}
+          {%- else -%}
+            {%- for block in section.blocks -%}
+
+              {%- liquid
+              assign open = '<div class="keen-slider-slide flex medium-down--direction-column">'
+              if spv == '2'
+                cycle open, '' 
+              elsif spv == '2-1'
+                cycle open, '', open
+              elsif spv == '1-2'
+                cycle open, open, ''
+              endif
+              if spv == '1' or spv == '1-2'
+                if section.blocks.size > 1
+                  assign showNav = true
+                endif
+              elsif section.blocks.size > 2
+                assign showNav = true
+              endif -%}
+
+              {%- render 'hero_banner_item', section: section, block: block, spv: spv, forloop: forloop -%}
+
+              {%- liquid if forloop.last
+                assign conditionalClose = '</div>'
+              endif
+              if spv == '2'
+                cycle conditionalClose, '</div>'
+              elsif spv == '2-1'
+                cycle conditionalClose, '</div>', '</div>'
+              elsif spv == '1-2'
+                cycle '</div>', conditionalClose, '</div>'
+              endif -%}
+
+            {%- endfor -%}
+          {%- endif -%}
+          {%- endcapture -%}
+          {{itemsHtml}}
+        </div>
+        {%- if showNav -%}
+          {%- if section.settings.show_arrows or section.settings.show_dots or section.settings.show_dots_mobile -%}
+            <div class="nav large--color-{{section.settings.nav_color_desktop}} medium-down--color-{{section.settings.nav_color_mobile}} flex align-items-center large--justify-content-{{section.settings.dots_align | replace: 'end', 'start large--row-reverse'}} medium-down--justify-content-{{section.settings.dots_align_mobile}}">
+              {%- if section.settings.show_arrows -%}
+                <div class="keen-arrows medium-down--hide {{section.settings.arrows_position}} inside {{ settings.carousel_arrows_effect }}">
+                  {% render 'carousel_arrow', type: 'prev' %}
+                  {% render 'carousel_arrow', type: 'next' %}
+                </div>
+              {%- endif -%}
+              {%- if section.settings.show_dots or section.settings.show_dots_mobile -%}
+                <div class="keen-dots {{settings.carousel_dots_shape}} {{settings.carousel_dots_border | replace: true, 'border'}} shadow {% if section.settings.show_dots == false %}large--hide{% endif %} {% if section.settings.show_dots_mobile == false %}medium-down--hide{% endif %} large--text-{{section.settings.dots_align | replace: 'start', 'left' | replace: 'end', 'right'}} medium-down--text-{{section.settings.dots_align_mobile | replace: 'start', 'left' | replace: 'end', 'right'}}">
+                  {% if settings.carousel_show_slider_pages and settings.carousel_dots_shape == 'line' %}
+                    <div class="keen-slider-page brand-font"></div>
+                  {% endif %}  
+                </div>
+              {%- endif -%}
+            </div>
+          {%- endif -%}
+        {%- endif -%}
+      </div>
+    </hero-banner>
+  </div>
+</div>
+
+<script type="module">
+  var section = document.querySelector('#shopify-section-{{ section.id }}');
+  var sp = (px)=>{section.style.setProperty('--required-height', px+'px')};
+  $s.resizeWidthHandle(()=>{
+    sp('0');
+    var mh = 0;
+    section.querySelectorAll('.overlay > .container').forEach(x=>{
+      mh = Math.max(mh, x.offsetHeight);
+    });
+    sp(mh);
+  }, 500);
+</script>
+
+{%- if itemsHtml contains 'js-youtube' -%}
+  <script src="https://www.youtube.com/iframe_api" id="youtube-sdk" defer></script>
+{%- endif -%}
+{%- if itemsHtml contains 'video-element' or showNav -%}
+  <script src="{{ 'hero_banner.js' | asset_url }}" defer="defer"></script>
+  <style>
+    #shopify-section-{{section.id}} .keen-slider {opacity: 1;}
+    #shopify-section-{{section.id}} .hero-banner:not(.prepared) .keen-slider-slide:nth-child(n+{% if spv == '2-1' or spv == '2' %}3{% else %}2{% endif %}) {display: none;}
+  </style>
+{%- else -%}
+<style>
+  #shopify-section-{{section.id}} .keen-slider {opacity: 1;}
+  #shopify-section-{{section.id}} .media-wrap > * {-webkit-transform: scale(1); transform: scale(1); transition-duration: 0s;}
+</style>
+{%- endif -%}

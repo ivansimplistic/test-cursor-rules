@@ -1,0 +1,54 @@
+{%- comment -%}
+    Renders a carousel arrow
+
+    Required:
+    - type: {String} 'prev' or 'next'
+
+    Accepts:
+    - icon: {String} 'chevron' or 'arrow'. Default is settings.carousel_arrows_icon
+    - frame: {String} 'frame circle' or 'frame square' or 'normal'. Default is settings.carousel_arrows_frame
+    - vertical: {Boolean} Default is false
+    - showByDefault: {Boolean} Default is false
+    
+    Usage:
+    {%- render 'carousel_arrow', type: 'prev' -%}
+{%- endcomment -%}
+
+{%- assign icon = icon | default: settings.carousel_arrows_icon -%}
+{%- assign frame = frame | default: settings.carousel_arrows_frame -%}
+{%- assign shadow = shadow | default: settings.carousel_arrows_shadow, allow_false: true | remove: false | replace: true, 'shadow' -%}
+{%- assign showByDefault = showByDefault | default: false -%}
+
+{%- if type == 'prev' -%}
+  <button type="button" class="keen-arrow {% unless showByDefault %}hide{% endunless %} prev {{frame}} {{shadow}}" aria-label="{{ 'carousel.previous_slide_caption' | t | escape }}">
+    {%- if vertical -%}
+      {%- if icon == 'chevron' -%}
+        {% render 'icons', icon: 'chevron-up' %}
+      {%- else -%}
+        {% render 'icons', icon: 'arrow-up' %}
+      {%- endif -%}
+    {%- else -%}
+      {%- if icon == 'chevron' -%}
+        {% render 'icons', icon: 'chevron-left' %}
+      {%- else -%}
+        {% render 'icons', icon: 'arrow-left' %}
+      {%- endif -%}
+    {%- endif -%}
+  </button>
+{%- elsif type == 'next' -%}
+  <button type="button" class="keen-arrow {% unless showByDefault %}hide{% endunless %} next {{frame}} {{shadow}}" aria-label="{{ 'carousel.next_slide_caption' | t | escape }}">
+    {%- if vertical -%}
+      {%- if icon == 'chevron' -%}
+        {% render 'icons', icon: 'chevron-down' %}
+      {%- else -%}
+        {% render 'icons', icon: 'arrow-down' %}
+      {%- endif -%}
+    {%- else -%}
+      {%- if icon == 'chevron' -%}
+        {% render 'icons', icon: 'chevron-right' %}
+      {%- else -%}
+        {% render 'icons', icon: 'arrow-right' %}
+      {%- endif -%}
+    {%- endif -%}
+  </button>
+{%- endif -%}

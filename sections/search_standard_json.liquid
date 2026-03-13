@@ -1,0 +1,42 @@
+{% assign products = search.results | where: 'object_type', 'product' %}
+{% assign articles = search.results | where: 'object_type', 'article' %}
+{% assign pages = search.results | where: 'object_type', 'page' %}
+{%- capture results -%}
+  {%- for product in products limit:6 -%}
+        {%- assign image = product.selected_or_first_available_variant.image | default: product.featured_image -%}
+        { 
+          "title"    : {{ product.title | json }},
+          "url"      : {{ product.url | json }},
+          "thumbnail": {% if image != blank %}{{ image | image_url: width: 180 | json }}{% else %}{{ 'placeholder_image.svg' | asset_url | json}}{% endif %},
+          "price": {{ product.selected_or_first_available_variant.price | default: product.price_min }}
+        }
+    {%- unless forloop.last %},{%- endunless -%}
+  {%- endfor -%}
+{%- endcapture -%}
+{%- capture resultsArticles -%}
+  {%- for item in articles limit:6 -%}
+    {%- assign image = item.image -%}
+    { 
+      "title"    : {{ item.title | json }},
+      "url"      : {{ item.url | json }},
+      "thumbnail": {% if image != blank %}{{ image | image_url: width: 180 | json }}{% else %}{{ 'placeholder_image.svg' | asset_url | json}}{% endif %}
+    }
+    {%- unless forloop.last %},{%- endunless -%}
+  {%- endfor -%}
+{%- endcapture -%}
+{%- capture resultsPages -%}
+  {%- for item in pages limit:6 -%}
+      { 
+        "title"    : {{ item.title | json }},
+        "url"      : {{ item.url | json }}
+      }
+    {%- unless forloop.last %},{%- endunless -%}
+  {%- endfor -%}
+{%- endcapture -%}
+
+{
+  "results_count": {{ search.results_count }},
+  "results": [{{ results }}],
+  "articles": [{{ resultsArticles }}],
+  "pages": [{{ resultsPages }}]
+}

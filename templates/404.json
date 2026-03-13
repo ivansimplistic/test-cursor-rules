@@ -1,0 +1,28 @@
+{
+  "sections": {
+    "404": {
+      "type": "404",
+      "settings": {
+        "color_scheme": "scheme-2"
+      }
+    },
+    "search_main": {
+      "type": "search_main",
+      "settings": {
+      }
+    },
+    "featured_products": {
+      "type": "featured_products",
+      "settings": {
+        "collection": "all",
+        "title": "Need some inspiration?",
+        "title_size": 2
+      }
+    }
+  },
+  "order": [
+    "404",
+    "search_main",
+    "featured_products"
+  ]
+}

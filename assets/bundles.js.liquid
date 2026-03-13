@@ -1,0 +1,101 @@
+(function() {
+  /* bundles management */
+  /*
+  * function getItemsToUpdate
+  * sourceItem: is an item from the cart page or side cart
+  * newQuantity: is the new quantity of the item for custom related logic, or use 0 to get all related items
+  */
+  $s.getItemsToUpdate = function(sourceItem, newQuantity) {
+    var items = [sourceItem];
+    if (sourceItem.dataset.bundleId && sourceItem.dataset.bundleItem!='individual') {
+      if (newQuantity==0) {
+        items = sourceItem.parentNode.querySelectorAll('[data-bundle-id="'+ sourceItem.dataset.bundleId +'"]');
+      } else {
+        items = sourceItem.parentNode.querySelectorAll('[data-bundle-id="'+ sourceItem.dataset.bundleId +'"][data-bundle-item="main"], [data-bundle-id="'+ sourceItem.dataset.bundleId +'"][data-bundle-item="related_multiple"]');
+      }
+      items = Array.from(items);
+    }
+
+    return items;
+  }
+
+  /*
+  items: is an array of cart items from the cart page or side cart
+  mustFixItems: is a boolean, default is true
+  callback: function to be called after validation and fixing items if required. The callback first argument receives the result of the validation (true, or false if there was a problem), default callback triggers a location.reload() when the cart had to be fixed;
+  */
+  $s.validateBundlesInJson = function(items, mustFixItems, callback) {
+    var data = {items: items};
+    validateBundles(data, mustFixItems, callback);
+  }
+
+  async function validateBundles(data, mustFixItems, callback) {
+    var bundles = {};
+    if (typeof(mustFixItems)=='undefined') {
+      mustFixItems = true;
+    }
+    var dataUpdate = {updates: {}};
+    data.items.forEach(function(item) {
+      var id = item.properties._bundle_id;
+      if (id && item.properties._bundle_item != 'individual') {
+        if (!bundles[id]) {
+          bundles[id] = []
+        }
+        bundles[id].push(item);
+      }
+    });
+    for (var id in bundles) {
+      var items = bundles[id];
+      //reduce quantity of items limited to 1
+      items.forEach(function(item) {
+        if (item.properties._bundle_item=='related_single' && item.quantity > 1) {
+          dataUpdate.updates[item.key] = 1
+        }
+      })
+      //delete the items without main or missing childs
+      const mainItem = items.find((x)=>x.properties._bundle_item=='main');
+      if (!mainItem || (mainItem.properties._bundle_positions && mainItem.properties._bundle_positions/1!=items.length )) {
+        items.forEach((item)=>dataUpdate.updates[item.key] = 0);
+      }
+      
+    }
+
+    if (Object.keys(dataUpdate.updates).length) {
+      if (mustFixItems) {
+        $s.showLoadingOverlay();
+        $s.updateCartItemsQuantity(dataUpdate).then(function() {
+          if (callback) {
+            $s.hideLoadingOverlay();
+            callback(false);
+          } else {
+            location.reload();
+          }
+        }).catch($s.addToCartFail);
+      } else {
+        if (callback) {
+          callback(false);
+        }
+      }
+      
+    } else {
+      if (callback) {
+        callback(true);
+      }
+    }
+
+  }
+
+  {% if settings.subscriptions_cart_item_enabled and settings.subscriptions_enabled %}
+    $s.validateSellingPlanCompatibility = function(items, sellingPlanId) {
+      let ok = true;
+      items.forEach(function(item) {
+        if (!item.dataset.sellingPlans || item.dataset.sellingPlans.split(',').indexOf(sellingPlanId)==-1) {
+          ok = false;
+        }
+      });
+      return ok;
+    }
+  {% endif %}
+
+
+})();

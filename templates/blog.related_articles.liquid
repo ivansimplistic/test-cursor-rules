@@ -1,0 +1,8 @@
+{% layout none %}
+<div class="related-view">
+  {%- for article in blog.articles limit: 10 -%}
+    <div class="keen-slider-slide" data-article-id="{{article.id}}" data-published-date="{{article.published_at | date: '%Y-%m-%d %H:%M'}}" data-tagsfilter="{{current_tags | join: ','}}">
+      {%- render 'article_card', article: article -%}
+    </div>
+  {%- endfor -%}
+</div>

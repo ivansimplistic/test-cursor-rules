@@ -1,0 +1,46 @@
+<div class="grid-item">
+  {%- render 'richtext_blocks', blockType: 'content_text', block: block -%}
+</div>
+{% schema %}
+{
+  "name": "Text",
+  "tag": null,
+  "presets": [
+    {
+      "name": "Text",
+      "category": "Content",
+      "blocks": [
+      ]
+    }
+  ],
+  "settings": [
+    {
+      "type": "richtext",
+      "id": "text",
+      "label": "Text",
+      "default": "<p>Lorem ipsum dolor sit amet, consectur adipiscing elit. Nunc eu eros augue. Cras tempus finibus mi, at aliquet orci vestibulum sit amet.</p>"
+    },
+    {
+      "type": "select",
+      "id": "text_style",
+      "label": "Text style",
+      "options": [
+        {"value": "normal","label": "Body"},
+        {"value": "subheading","label": "Subheading"},
+        {"value": "small-label","label": "Small label"}
+      ],
+      "default": "normal"
+    },
+    {
+      "type": "range",
+      "id": "text_size",
+      "min": 1,
+      "max": 5,
+      "step": 1,
+      "unit": "p",
+      "label": "Text size",
+      "default": 3
+    }
+  ]  
+}
+{% endschema %}

@@ -1,0 +1,762 @@
+<style>
+  #shopify-section-{{ section.id }} {
+    --main-block-width: {{section.settings.main_block_width}}%;
+    
+    --secondary-blocks-width:
+    {%- if section.settings.main_block_position == 'center' -%}
+      {%- if section.blocks.size <= 5 -%}
+        100%
+      {%- elsif section.blocks.size <= 7 -%}
+        50%
+      {%- elsif section.blocks.size <= 9 -%}
+        50%
+      {%- elsif section.blocks.size <= 14 -%}
+        33.33%
+      {%- endif -%}
+    {%- else -%}
+      {%- if section.blocks.size <= 5 -%}
+        50%
+      {%- elsif section.blocks.size <= 7 -%}
+        33.33%
+      {%- elsif section.blocks.size <= 9 -%}
+        25%
+      {%- elsif section.blocks.size <= 14 -%}
+        25%
+      {%- endif -%}
+    {%- endif -%};
+  }
+  @media (min-width: {{settings.breakpoint_tablet | plus: 0.001}}em){
+    #shopify-section-{{ section.id }} {
+      --items-spacing: calc(var(--grid-gap) * {{section.settings.items_spacing_desktop | divided_by: 100.00}});
+    }
+    {%- for block in section.blocks -%}
+      {%- if block.settings.min_height == 0 -%}
+        {%- assign minHeightDesktop = section.settings.min_height -%}
+      {%- else -%}
+        {%- assign minHeightDesktop = block.settings.min_height -%}
+      {%- endif -%}
+      .block-{{block.id}} {--min-height: {{minHeightDesktop}}{%- if section.settings.height_vw -%}vw{%- else -%}em{%- endif -%};}
+    {%- endfor -%}
+  }
+  @media (max-width: {{settings.breakpoint_tablet}}){
+    #shopify-section-{{ section.id }} {
+      --items-spacing: calc(var(--grid-gap) * {{section.settings.items_spacing_mobile | divided_by: 100.00}});
+    }
+  }
+  @media (max-width: {{settings.breakpoint_tablet}}) and (min-width: {{settings.breakpoint_mobile | plus: 0.001}}em){
+    {%- for block in section.blocks -%}
+      {%- if block.settings.min_height_tablet == 0 -%}
+        {%- assign minHeightTablet = section.settings.min_height_tablet -%}
+      {%- else -%}
+        {%- assign minHeightTablet = block.settings.min_height_tablet -%}
+      {%- endif -%}
+      .block-{{block.id}} {--min-height: {{minHeightTablet}}{%- if section.settings.height_vw -%}vw{%- else -%}em{%- endif -%};}
+    {%- endfor -%}
+  }
+  @media (max-width: {{settings.breakpoint_mobile}}){
+    #shopify-section-{{ section.id }} {
+      --secondary-blocks-width: 50%;
+    }
+    {%- for block in section.blocks -%}
+      {%- if block.settings.min_height_mobile == 0 -%}
+        {%- assign minHeightMobile = section.settings.min_height_mobile -%}
+      {%- else -%}
+        {%- assign minHeightMobile = block.settings.min_height_mobile -%}
+      {%- endif -%}
+      .block-{{block.id}} {--min-height: {{minHeightMobile}}{%- if section.settings.height_vw -%}vw{%- else -%}em{%- endif -%};}
+    {%- endfor -%}
+  }
+</style>
+{{ 'collage.css' | asset_url | stylesheet_tag }}
+
+{%- capture contentHtml -%}
+  {%- if section.blocks.size > 0 -%}
+    <div class="collage-section collage-grid flex flex-wrap {{section.settings.main_block_position}}">
+      {%- assign secondaryBlocksQty = section.blocks.size | minus: 1 -%}
+      {%- assign blockLimit = 1 -%} 
+      {%- assign blockOffset = 1 -%}
+      
+      {%- if section.settings.main_block_position == 'center' -%}
+        {%- assign secondaryBlocksHalf = secondaryBlocksQty | divided_by: 2.0 | floor -%}
+        {%- assign blockLimit = secondaryBlocksHalf -%}
+        {%- assign blockOffset = blockLimit | plus: 1 -%}
+        <div class="wrapper flex-1">
+          <div class="flex flex-wrap collage-grid secondary-grid">
+            {%- for block in section.blocks offset: 1 limit: blockLimit -%}
+              {%- render 'collage_item', block: block, blockClass: 'secondary-block' -%}
+            {%- endfor -%}
+          </div>
+        </div>
+      {%- endif -%}
+
+      {%- render 'collage_item', block: section.blocks.first, blockClass: 'main-block' -%}
+
+      {%- if section.blocks.size > 1 and secondaryBlocksQty >= blockOffset -%}
+        <div class="wrapper flex-1">
+          <div class="flex flex-wrap collage-grid secondary-grid">
+            {%- for block in section.blocks offset: blockOffset -%}
+              {%- render 'collage_item', block: block, blockClass: 'secondary-block' -%}
+            {%- endfor -%}
+          </div>
+        </div>
+      {%- endif -%}
+    </div>
+  {%- endif -%}
+{%- endcapture -%}
+
+{%- render 'section_custom_structure', section: section, contentHtml: contentHtml -%}
+
+{% schema %}
+  {
+    "name": "Collage",
+    "class": "type-collage",
+    "tag": "section",
+    "max_blocks": 13,
+    "presets": [
+      {
+        "name": "Collage",
+        "blocks": [
+          {
+            "type": "item",
+            "settings": {
+              "title_size": 2,
+              "text_size": 3,
+              "cta_size": "normal"
+            }
+          },
+          {
+            "type": "item",
+            "settings": {
+            }
+          },
+          {
+            "type": "item",
+            "settings": {
+            }
+          },
+          {
+            "type": "item",
+            "settings": {
+            }
+          }
+        ]
+      }
+    ],
+    "settings": [
+      {
+        "type": "range",
+        "id": "min_height",
+        "min": 0,
+        "max": 100,
+        "step": 1,
+        "unit": "em",
+        "label": "Global items min height (Desktop)",
+        "default": 15
+      },
+      {
+        "type": "range",
+        "id": "min_height_tablet",
+        "min": 0,
+        "max": 100,
+        "step": 1,
+        "unit": "em",
+        "label": "Global items min height (Tablet)",
+        "default": 15
+      },
+      {
+        "type": "range",
+        "id": "min_height_mobile",
+        "min": 0,
+        "max": 100,
+        "step": 1,
+        "unit": "em",
+        "label": "Global items min height (Mobile)",
+        "default": 15
+      },
+      {
+        "type": "checkbox",
+        "id": "height_vw",
+        "label": "Make it relative to the window's width"
+      },
+      {
+        "type": "header",
+        "content": "Head"
+      },
+      {
+        "type": "text",
+        "id": "eyebrow",
+        "label": "Eyebrow"
+      },
+      {
+        "visible_if": "{{ section.settings.eyebrow != blank }}",
+        "type": "range",
+        "id": "eyebrow_size",
+        "min": 1,
+        "max": 5,
+        "step": 1,
+        "unit": "p",
+        "label": "Eyebrow size",
+        "default": 3
+      },
+      {
+        "type": "text",
+        "id": "title",
+        "label": "Title"
+      },
+      {
+        "type": "checkbox",
+        "id": "is_h1",
+        "label": "This is the first title of the page (H1)"
+      },
+      {
+        "type": "range",
+        "id": "title_size",
+        "min": -1,
+        "max": 6,
+        "step": 1,
+        "unit": "h",
+        "label": "Title size",
+        "default": 1,
+        "info": "Equivalent to the heading tags."
+      },
+      {
+        "type": "richtext",
+        "id": "text",
+        "label": "Text"
+      },
+      {
+        "type": "range",
+        "id": "text_size",
+        "min": 1,
+        "max": 5,
+        "step": 1,
+        "unit": "p",
+        "label": "Text size",
+        "default": 3
+      },
+      {
+        "type": "range",
+        "id": "text_width",
+        "min": 0,
+        "max": 100,
+        "step": 1,
+        "unit": "em",
+        "label": "Text Width",
+        "default": 40
+      },
+      {
+        "type": "text",
+        "id": "button",
+        "label": "Button label"
+      },
+      {
+        "type": "url",
+        "id": "link",
+        "label": "Button link"
+      },
+      {
+        "type": "header",
+        "content": "Collage settings"
+      },
+      {
+        "type": "select",
+        "id": "main_block_position",
+        "label": "Main block position (Desktop)",
+        "options": [
+          {"value": "normal","label": "Left"},
+          {"value": "center","label": "Center"},
+          {"value": "row-reverse","label": "Right"}
+        ],
+        "default": "normal"
+      },
+      {
+        "type": "range",
+        "id": "main_block_width",
+        "min": 0,
+        "max": 100,
+        "step": 1,
+        "unit": "%",
+        "label": "Main block width",
+        "default": 50
+      },
+      {
+        "type": "range",
+        "id": "items_spacing_desktop",
+        "min": 0,
+        "max": 500,
+        "step": 10,
+        "unit": "%",
+        "label": "Items spacing (Desktop)",
+        "default": 100
+      },
+      {
+        "type": "range",
+        "id": "items_spacing_mobile",
+        "min": 0,
+        "max": 500,
+        "step": 10,
+        "unit": "%",
+        "label": "Items spacing (Mobile)",
+        "default": 100
+      },
+      {
+        "type": "range",
+        "id": "items_border_radius",
+        "min": 0,
+        "max": 10,
+        "step": 0.2,
+        "unit": "em",
+        "label": "Border radius",
+        "default": 0
+      },
+      {
+        "type": "header",
+        "content": "Section settings"
+      },
+      {
+        "type": "checkbox",
+        "id": "content_full_width",
+        "label": "Content full width",
+        "default": false
+      },
+      {
+        "type": "checkbox",
+        "id": "full_width",
+        "label": "Section Full width",
+        "default": true
+      },
+      {
+        "type": "select",
+        "id": "head_position",
+        "label": "Header position (Desktop)",
+        "options": [
+          {"value": "top","label": "Top"},
+          {"value": "left","label": "Left"}
+        ],
+        "default": "top"
+      },
+      {
+        "type": "range",
+        "id": "head_width",
+        "min": 10,
+        "max": 50,
+        "step": 1,
+        "unit": "%",
+        "label": "Header width (Desktop)",
+        "default": 20,
+        "info": "When the head is on the left."
+      },
+      {
+        "type": "select",
+        "id": "text_align",
+        "label": "Text Align",
+        "options": [
+          {"value": "left","label": "Left"},
+          {"value": "center","label": "Center"},
+          {"value": "right","label": "Right"}
+        ],
+        "default": "left"
+      },
+      {
+        "type": "color_scheme",
+        "id": "section_color_scheme",
+        "label": "Section Color scheme",
+        "default": "scheme-1"
+      },
+      {
+        "type": "color_scheme",
+        "id": "content_color_scheme",
+        "label": "Content Color scheme",
+        "default": "scheme-1"
+      },
+      {
+        "type": "range",
+        "id": "border_radius",
+        "min": 0,
+        "max": 10,
+        "step": 0.2,
+        "unit": "em",
+        "label": "Border radius",
+        "default": 0
+      },
+      {
+        "type": "header",
+        "content": "Padding Desktop"
+      },
+      {
+        "type": "range",
+        "id": "text_padding",
+        "min": 0,
+        "max": 100,
+        "step": 10,
+        "unit": "%",
+        "label": "Inner padding (Desktop)",
+        "default": 100
+      },
+      {
+        "type": "range",
+        "id": "section_padding_top",
+        "min": 0,
+        "max": 100,
+        "step": 10,
+        "unit": "%",
+        "label": "Outer padding top (Desktop)",
+        "default": 0
+      },
+      {
+        "type": "range",
+        "id": "section_padding_bottom",
+        "min": 0,
+        "max": 100,
+        "step": 10,
+        "unit": "%",
+        "label": "Outer padding bottom (Desktop)",
+        "default": 0
+      },
+      {
+        "type": "header",
+        "content": "Padding Mobile"
+      },
+      {
+        "type": "range",
+        "id": "text_padding_mobile",
+        "min": 0,
+        "max": 100,
+        "step": 10,
+        "unit": "%",
+        "label": "Inner padding (Mobile)",
+        "default": 100
+      },
+      {
+        "type": "range",
+        "id": "section_padding_top_mobile",
+        "min": 0,
+        "max": 100,
+        "step": 10,
+        "unit": "%",
+        "label": "Outer padding top (Mobile)",
+        "default": 0
+      },
+      {
+        "type": "range",
+        "id": "section_padding_bottom_mobile",
+        "min": 0,
+        "max": 100,
+        "step": 10,
+        "unit": "%",
+        "label": "Outer padding bottom (Mobile)",
+        "default": 0
+      }
+    ],
+    "blocks": [
+      {
+        "type": "item",
+        "name": "Item",
+        "settings": [
+          {
+            "type": "paragraph",
+            "content": "Height specific for this item. Use 0 to use the global value set on the section settings."
+          },
+          {
+            "type": "range",
+            "id": "min_height",
+            "min": 0,
+            "max": 100,
+            "step": 1,
+            "unit": "em",
+            "label": "Min height (Desktop)",
+            "default": 0
+          },
+          {
+            "type": "range",
+            "id": "min_height_tablet",
+            "min": 0,
+            "max": 100,
+            "step": 1,
+            "unit": "em",
+            "label": "Min height (Tablet)",
+            "default": 0
+          },
+          {
+            "type": "range",
+            "id": "min_height_mobile",
+            "min": 0,
+            "max": 100,
+            "step": 1,
+            "unit": "em",
+            "label": "Min height (Mobile)",
+            "default": 0
+          }, 
+          {
+            "type": "header",
+            "content": "Media"
+          },
+          {
+            "type": "select",
+            "id": "media_type",
+            "label": "Media type",
+            "options": [
+              {"value": "image", "label": "Image"},
+              {"value": "video", "label": "Video"}
+            ],
+            "default": "image"
+          },
+          {
+            "visible_if": "{{ block.settings.media_type == 'image' }}",
+            "type": "image_picker",
+            "id": "image",
+            "label": "Image"
+          },
+          {
+            "visible_if": "{{ block.settings.media_type == 'video' }}",
+            "type": "video",
+            "id": "video_mp4",
+            "label": "Video (MP4)"
+          },
+          {
+            "visible_if": "{{ block.settings.media_type == 'video' }}",
+            "type": "video_url",
+            "id": "video_iframe",
+            "label": "Video (Youtube/Vimeo)",
+            "accept": ["youtube", "vimeo"]
+          },
+          {
+            "type": "header",
+            "content": "Content"
+          },
+          {
+            "type": "url",
+            "id": "link",
+            "label": "Link"
+          },
+          {
+            "type": "text",
+            "id": "title",
+            "label": "Title",
+            "default": "Lorem Ipsum",
+            "info": "Leave blank to show the object title."
+          },
+          {
+            "type": "checkbox",
+            "id": "show_object_title",
+            "label": "Show link-object title"
+          },
+          {
+            "type": "richtext",
+            "id": "text",
+            "label": "Text"
+          },
+          {
+            "type": "checkbox",
+            "id": "show_object_info",
+            "label": "Show link-object info",
+            "info": "Product: price. Collection: qty of products. Blog: qty of articles. Article: date."
+          },
+          {
+            "type": "text",
+            "id": "button",
+            "label": "Button Text",
+            "default": "Shop Now"
+          },
+          {
+            "type": "select",
+            "id": "cta_style",
+            "label": "Button style",
+            "options": [
+                {"value": "link", "label": "Link"},
+                {"value": "btn", "label": "Button"},
+                {"value": "floating_button", "label": "Bubble"}
+            ],
+            "default": "btn"
+          },
+          {
+            "type": "header",
+            "content": "Text settings"
+          },
+          {
+            "type": "select",
+            "id": "text_position",
+            "label": "Text position",
+            "options": [
+                {"value": "justify-content-start align-items-start", "label": "Top left"},
+                {"value": "justify-content-center align-items-start", "label": "Top center"},
+                {"value": "justify-content-end align-items-start", "label": "Top right"},
+                {"value": "justify-content-start align-items-center", "label": "Center left"},
+                {"value": "justify-content-center align-items-center", "label": "Center"},
+                {"value": "justify-content-end align-items-center", "label": "Center right"},
+                {"value": "justify-content-start align-items-end", "label": "Bottom left"},
+                {"value": "justify-content-center align-items-end", "label": "Bottom center"},
+                {"value": "justify-content-end align-items-end", "label": "Bottom right"}
+            ],
+            "default": "justify-content-start align-items-end"
+          },
+          {
+            "type": "select",
+            "id": "text_align",
+            "label": "Text alignment",
+            "options": [
+                {"value": "left", "label": "Left"},
+                {"value": "center", "label": "Center"},
+                {"value": "right", "label": "Right"}
+            ],
+            "default": "left"
+          },
+          {
+            "type": "range",
+            "id": "title_size",
+            "min": -1,
+            "max": 6,
+            "step": 1,
+            "unit": "h",
+            "label": "Title size",
+            "default": 3,
+            "info": "Equivalent to the heading tags."
+          },
+          {
+            "type": "range",
+            "id": "text_size",
+            "min": 1,
+            "max": 5,
+            "step": 1,
+            "unit": "p",
+            "label": "Text size",
+            "default": 3
+          },
+          {
+            "type": "select",
+            "id": "cta_size",
+            "label": "CTA size",
+            "options": [
+              {"value": "normal", "label": "Normal"},
+              {"value": "smaller", "label": "Smaller"}
+            ],
+            "default": "smaller"
+          },
+          {
+            "type": "range",
+            "id": "cta_spacing",
+            "min": 0,
+            "max": 3,
+            "step": 0.5,
+            "unit": "rem",
+            "label": "CTA spacing",
+            "default": 0
+          },
+          {
+            "type": "range",
+            "id": "text_padding",
+            "min": 0,
+            "max": 100,
+            "step": 1,
+            "unit": "%",
+            "label": "Text padding (Desktop)",
+            "default": 25
+          },
+          {
+            "type": "range",
+            "id": "text_padding_mobile",
+            "min": 0,
+            "max": 100,
+            "step": 1,
+            "unit": "%",
+            "label": "Text padding (Mobile)",
+            "default": 25
+          },
+          {
+            "type": "header",
+            "content": "Colors"
+          },
+          {
+            "type": "color_scheme",
+            "id": "content_color_scheme",
+            "label": "Color scheme",
+            "default": "scheme-3"
+          },
+          {
+            "type": "color",
+            "id": "custom_background",
+            "label": "Custom background",
+            "default": "#999999",
+            "info": "Optional"
+          },
+          {
+            "type": "header",
+            "content": "Text protection"
+          },
+          {
+            "type": "paragraph",
+            "content": "Helps your text be more readable."
+          },
+          {
+            "type": "select",
+            "id": "tint_type",
+            "label": "Type",
+            "options": [
+              {"value": "full", "label": "Full"},
+              {"value": "box", "label": "Box"},
+              {"value": "shadow", "label": "Shadow"}
+            ],
+            "default": "box"
+          },
+          {
+            "type": "color",
+            "id": "tint_color",
+            "label": "Color",
+            "default": "#000"
+          },
+          {
+            "type": "range",
+            "id": "tint_opacity",
+            "min": 0,
+            "max": 100,
+            "step": 1,
+            "unit": "%",
+            "label": "Opacity",
+            "default": 20
+          },
+          {
+            "type": "range",
+            "id": "tint_blur",
+            "min": 0,
+            "max": 50,
+            "step": 1,
+            "unit": "px",
+            "label": "Blur effect size",
+            "default": 24
+          },
+          {
+            "type": "header",
+            "content": "Newsletter form"
+          },
+          {
+            "type": "checkbox",
+            "id": "newsletter",
+            "label": "Display newsletter form"
+          },
+          {
+            "type": "richtext",
+            "id": "success_message",
+            "label": "Success message",
+            "default": "<p>Thanks for subscribing!</p>"
+          },
+          {
+            "type": "select",
+            "id": "submit_style",
+            "label": "Submit style",
+            "options": [
+              {"value": "btn","label": "Button"},
+              {"value": "arrow","label": "Arrow"}
+            ],
+            "default": "arrow"
+          },
+          {
+            "type": "text",
+            "id": "submit_label",
+            "label": "Submit label",
+            "default": "Subscribe"
+          }
+        ]
+      }
+    ]
+  }
+{% endschema %}

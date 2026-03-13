@@ -1,0 +1,100 @@
+{%- comment -%}
+    Renders customer address form
+
+    Accepts:
+    - customer: {Object} Customer Liquid object
+    - address: {Object} Customer Address Liquid object
+
+    Usage:
+    {% render 'customer_address_form', customer: customer, address: customer.new_address %}
+{%- endcomment -%}
+
+<customer-address-form class="block">
+  {%- form 'customer_address', address -%}
+    <div class="grid address-grid">
+      <div class="grid-item one-half small--one-whole">
+        <div class="field required">
+          <input type="text" maxlength="255" autocomplete="shipping given-name" placeholder="{{ 'account.customer_address_form.first_name_label' | t | escape }}*" id="address_first_name_{{form.id}}" name="address[first_name]" value="{{form.first_name}}" aria-required="true" class="required" />
+          <label for="address_first_name_{{form.id}}">{{ 'account.customer_address_form.first_name_label' | t }}</label>
+        </div>
+      </div>
+      <div class="grid-item one-half small--one-whole">
+        <div class="field required">
+          <input type="text" maxlength="255" autocomplete="shipping family-name" placeholder="{{ 'account.customer_address_form.last_name_label' | t | escape }}*" id="address_last_name_{{form.id}}" name="address[last_name]" value="{{form.last_name}}" aria-required="true" class="required" />
+          <label for="address_last_name_{{form.id}}">{{ 'account.customer_address_form.last_name_label' | t }}</label>
+        </div>
+      </div>
+      <div class="grid-item one-half small--one-whole">
+        <div class="field">
+          <input type="text" maxlength="255" autocomplete="shipping organization" placeholder="{{ 'account.customer_address_form.company_label' | t | escape }}" id="address_company_{{form.id}}" name="address[company]" value="{{form.company}}" />
+          <label for="address_company_{{form.id}}">{{ 'account.customer_address_form.company_label' | t }}</label>
+        </div>
+      </div>
+      <div class="grid-item one-half small--one-whole">
+        <div class="field required">
+          <input type="text" maxlength="255" autocomplete="shipping address-line1" placeholder="{{ 'account.customer_address_form.address1_label' | t | escape }}*" id="address_address1_{{form.id}}" name="address[address1]" value="{{form.address1}}" aria-required="true" class="required" />
+          <label for="address_address1_{{form.id}}">{{ 'account.customer_address_form.address1_label' | t }}</label>
+        </div>
+      </div>
+      <div class="grid-item one-half small--one-whole">
+        <div class="field">
+          <input type="text" maxlength="255" autocomplete="shipping address-line2" placeholder="{{ 'account.customer_address_form.address2_label' | t | escape }}" id="address_address2_{{form.id}}" name="address[address2]" value="{{form.address2}}" />
+          <label for="address_address2_{{form.id}}">{{ 'account.customer_address_form.address2_label' | t }}</label>
+        </div>
+      </div>
+      <div class="grid-item one-half small--one-whole">
+        <div class="field required">
+          <input type="text" maxlength="255" autocomplete="shipping address-level2" placeholder="{{ 'account.customer_address_form.city_label' | t | escape }}" id="address_city_{{form.id}}" name="address[city]" value="{{form.city}}" class="required" />
+          <label for="address_city_{{form.id}}">{{ 'account.customer_address_form.city_label' | t }}</label>
+        </div>
+      </div>
+      <div class="grid-item one-half small--one-whole">
+        <div class="field select required">
+          {%- render 'icons', icon: 'chevron-down' -%}
+          {%- assign countryLabel = 'account.customer_address_form.country_label' | t -%}
+          {%- assign replaceText = '>- ' | append: countryLabel | append: ' -<' -%}
+          <select id="address_country_{{form.id}}" name="address[country]" placeholder="{{ countryLabel | escape }}" data-default="{{form.country}}" aria-required="true" class="country required">{{ country_option_tags | replace: '>---<', replaceText }}</select>
+          <label for="address_country_{{form.id}}">{{ countryLabel }}</label>
+        </div>
+      </div>
+      <div class="grid-item one-half small--one-whole">
+        <div id="address_province_container_{{form.id}}" style="display: none;">
+          <div class="field select">
+            {%- render 'icons', icon: 'chevron-down' -%}
+            <select id="address_province_{{form.id}}" name="address[province]" placeholder="{{ 'account.customer_address_form.state_province_label' | t | escape }}" data-default="{{form.province}}" class="province"></select>
+            <label for="address_province_{{form.id}}">{{ 'account.customer_address_form.state_province_label' | t }}</label>
+          </div>
+        </div>
+      </div>
+      <div class="grid-item one-half small--one-whole">
+        <div class="field required">
+          <input autocomplete="shipping postal-code" type="text" placeholder="{{ 'account.customer_address_form.zip_code_label' | t | escape }}*" id="address_zip_{{form.id}}" name="address[zip]" value="{{form.zip}}" aria-required="true" class="required" />
+          <label for="address_zip_{{form.id}}">{{ 'account.customer_address_form.zip_code_label' | t }}</label>
+        </div>
+      </div>
+      <div class="grid-item one-half small--one-whole">
+        <div class="field">
+          <input autocomplete="tel" type="text" placeholder="{{ 'account.customer_address_form.phone_label' | t | escape }}" id="address_phone_{{form.id}}" name="address[phone]" value="{{form.phone}}" />
+          <label for="address_phone_{{form.id}}">{{ 'account.customer_address_form.phone_label' | t }}</label>
+        </div>
+      </div>
+    </div>
+    <div class="default-address hide">
+      <input class="checkbox-custom" type="checkbox" id="address_default_address_{{form.id}}" name="address[default]" value="1" {% if address == customer.default_address %}checked{% endif %} />
+      <label for="address_default_address_{{form.id}}" class="checkbox-custom-label">{{ 'account.customer_address_form.set_default_address_label' | t }}</label>
+    </div>
+    <div class="flex align-items-center">
+      {%- if form.id == 'new' -%}
+        <button class="btn" type="submit">{{ 'account.customer_address_form.add_address_button' | t }}</button>
+        <div class="note" style="margin-left: 1em;">
+          {{ 'general.or_conjunction' | t }} <button class="link" type="button" onclick="Shopify.CustomerAddress.toggleNewForm(); return false;">{{ 'account.customer_address_form.cancel_button' | t }}</button>
+        </div>
+      {%- else -%}
+        <button class="btn" type="submit">{{ 'account.customer_address_form.update_address_button' | t }}</button>
+        <div class="note" style="margin-left: 1em;">
+          {{ 'general.or_conjunction' | t }} <button class="link" type="button" onclick="Shopify.CustomerAddress.toggleForm({{form.id}}); return false;">{{ 'account.customer_address_form.cancel_button' | t }}</button>
+        </div>   
+      {%- endif -%}
+    </div>   
+  {%- endform -%}
+</customer-address-form>

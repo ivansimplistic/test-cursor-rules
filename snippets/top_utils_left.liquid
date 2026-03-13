@@ -1,0 +1,12 @@
+<div class="top-utils left labels-{{section.settings.top_utils_show_labels}} labels-position-{{section.settings.top_utils_labels_position}} flex flex-1 badges-{{ section.settings.top_utils_badge_style }}">
+  <div class="top-utils-wrap flex">
+    {%- unless layout contains 'menu-right' -%}
+      {%- render 'mobile_menu_button' -%}
+    {%- endunless -%}
+    {%- if layout contains 'logo-center' and layout != 'logo-center menu-left' -%}
+      {%- render 'top_utils_search', form_style: section.settings.search_form_style -%}
+      {%- assign customUtils = section.blocks | where: 'type', 'custom_util' -%}
+      {%- render 'top_utils_custom_util' for customUtils as customUtil -%}
+    {%- endif -%}
+  </div>
+</div>

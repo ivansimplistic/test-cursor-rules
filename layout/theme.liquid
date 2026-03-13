@@ -1,0 +1,235 @@
+<!doctype html>
+<html class="no-js" lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="theme-color" content="">
+    <link rel="canonical" href="{{ canonical_url }}">
+    {%- liquid
+    assign domainLang = shop.url
+    if localization.language.primary == false
+      assign domainLang = domainLang | append: '/' | append: localization.language.iso_code
+    endif
+    -%}
+
+    {% for language in localization.available_languages %}
+      {%- liquid 
+        assign newDomainLang = shop.url
+        if language.primary == false
+          assign newDomainLang = newDomainLang | append: '/' | append: language.iso_code
+        endif
+        assign altUrl = canonical_url | replace: domainLang, newDomainLang
+      -%}
+      <link rel="alternate" hreflang="{% if language.primary %}x-default{% else %}{{ language.iso_code }}{% endif %}" href="{{ altUrl }}">
+    {% endfor %}
+    
+
+    {%- if settings.favicon != blank -%}
+      <link rel="icon" type="image/png" href="{{ settings.favicon | image_url: width: 100, height: 100 }}">
+    {%- endif -%}
+
+    {% if template == 'cart' and settings.allow_cart_page == false %}
+    <meta http-equiv="refresh" content="0;url=/?cart=1" />
+    <style>body {display: none !important; opacity: 0 !important;}</style>
+    <script>location='/?cart=1'</script>
+    <meta name="robots" content="noindex, nofollow" />
+    {% endif %}
+
+    <title>{{ page_title }}</title>
+
+    {% if page_description %}
+      <meta name="description" content="{{ page_description | escape }}">
+    {% endif %}
+
+    {%- render 'meta_tags' -%}
+    {%- render 'layout_common_scripts' -%}
+
+    <script src="{{ 'lazysizes.min.js' | asset_url }}" async="async"></script>
+    <script src="{{ 'tingle.js' | asset_url }}" defer="defer"></script>
+    <script src="{{ 'keen_slider.js' | asset_url }}" defer="defer"></script>
+    <script src="{{ 'global.js' | asset_url }}" defer="defer"></script>
+
+
+    {%- comment -%}content_for_header prints Shopify.currency with conversion rate{%- endcomment -%}
+    {{ content_for_header }}
+
+    {%- assign includeSnippet = false -%}
+
+
+
+    {% if includeSnippet %}
+      <script src="{{ 'bundles.js' | asset_url }}" defer="defer"></script>
+    {%- endif -%}
+
+
+    {%- if settings.fonts_link != "" -%}
+      {{ settings.fonts_link }}
+    {%- endif -%}
+
+    {%- if request.design_mode -%}
+      {%- assign cssNocache = "now" | date: "%Y/%m/%d %H:%M%S %Z" | prepend: '.css?ts=' -%}
+      {{- 'base.css' | asset_url | stylesheet_tag | replace: '.css?', '.css' | replace: '.css', cssNocache -}}
+    {%- else -%}
+      {{ 'base.css' | asset_url | stylesheet_tag }}
+    {%- endif -%}
+    {{ 'keen_slider.css' | asset_url | stylesheet_tag }}
+
+    {%- render 'structured_data', data: 'shop' -%}
+    {%- if product != blank -%}
+      {%- render 'structured_data', data: 'product' -%}
+    {%- elsif collection != blank -%}
+      {%- render 'structured_data', data: 'collection' -%}
+    {%- elsif article != blank -%}
+      {%- render 'structured_data', data: 'article' -%}
+    {%- elsif blog != blank -%}
+      {%- render 'structured_data', data: 'blog' -%}
+    {%- endif -%}
+
+
+  </head>
+  <body class="scheme color-scheme-1">
+    <a class="skip-to-content-link visually-hidden" href="#main-content" onclick="document.querySelector('main').focus()">
+      {{ 'general.skip_to_main_content_button' | t }}
+    </a>
+    <a class="skip-to-content-link visually-hidden" href="#footer" onclick="document.querySelector('footer').focus()">
+      {{ 'general.skip_to_footer_button' | t }}
+    </a>
+
+    {%- if settings.product_card_show_reviews_rating -%}
+    <svg width="0" height="0" style="position:absolute; overflow:hidden" aria-hidden="true">
+      <defs>
+        <path id="rsr-star-path" d="M16,1.3,20.8,11l10.6,1.5-7.7,7.6,1.8,10.6-9.5-5-9.5,5L8.3,20.1.6,12.5,11.2,11Z"></path>
+        <symbol id="rsr-full" viewBox="0 0 32 32">
+          <use href="#rsr-star-path" />
+        </symbol>
+        <symbol id="rsr-half" viewBox="0 0 32 32">
+          <use href="#rsr-star-path" />
+          <use href="#rsr-star-path" style="fill: currentColor; clip-path: inset(0 50% 0 0);" />
+        </symbol>
+        <symbol id="rsr-empty" viewBox="0 0 32 32">
+          <use href="#rsr-star-path" />
+        </symbol>
+      </defs>
+    </svg>
+    {%- endif -%}
+
+    {%- comment -%}MOBILE MENU LOADED THROUGH AJAX, look for loadMobileMenu() on global.js {%- endcomment -%}
+    {%- comment -%}SIDE CART LOADED THROUGH AJAX, look for loadSideCart() on global.js {%- endcomment -%}
+    {%- liquid
+      if request.design_mode
+        section 'mobile_menu'
+        section 'side_cart'
+      endif
+    -%}
+        
+    {%- sections 'announcement_group' -%} {%- comment -%}Announcement Bar can go above <header> or above {section 'header'}{%- endcomment -%}
+    <header id="header" class="header-outer" role="banner">
+      {% sections 'header_group' %}
+    </header>
+
+    {% comment %} {% sections 'top_sections_group' %} {% endcomment %}
+
+    {%- comment -%}MEGAMENUS LOADED THROUGH AJAX, look for loadMegaMenu() on global.js {%- endcomment -%}
+    {%- liquid
+    if request.design_mode
+      if settings.mega_menu_1_parent_link != blank
+        section 'mega_menu_1'
+      endif
+      if settings.mega_menu_2_parent_link != blank
+        section 'mega_menu_2'
+      endif
+      if settings.mega_menu_3_parent_link != blank
+        section 'mega_menu_3'
+      endif
+      if settings.mega_menu_4_parent_link != blank
+        section 'mega_menu_4'
+      endif
+      if settings.mega_menu_5_parent_link != blank
+        section 'mega_menu_5'
+      endif
+    endif
+    -%}
+
+    {%- if settings.product_card_quick_add -%}
+      {{ 'product_card_atc.css' | asset_url | stylesheet_tag }}
+      {%- render 'product_main_js_inc' -%}
+    {%- endif -%}
+
+    <main id="main-content" role="main" tabindex="-1">
+      {{ content_for_layout }}
+    </main>
+
+    {%- comment -%}GLOBAL SUBSCRIPTION POPUP LOADED THROUGH AJAX, look for loadSubscriptionPopup() on global.js {%- endcomment -%}
+    {%- liquid
+    if request.design_mode and settings.newsletter_popup_enabled
+      section 'newsletter_popup'
+    endif
+    -%}
+
+    {% comment %} {% sections 'bottom_sections_group' %} {% endcomment %}
+
+    <footer role="contentinfo" tabindex="-1">
+      {% sections 'footer_group' %}
+    </footer>
+    <div id="overlay" class="animation"></div>
+    <div id="loading-overlay"><div class="loader"></div></div>
+
+    <link rel="stylesheet" href="{{ 'side_cart.css' | asset_url }}" media="print" onload="this.media='all'">
+    <link rel="stylesheet" href="{{ 'component_search.css' | asset_url }}" media="print" onload="this.media='all'">
+    <link rel="stylesheet" href="{{ 'tingle.css' | asset_url }}" media="print" onload="this.media='all'">
+    <script type="module">
+      lngg.search_js__search_results_caption = {{ 'search_js.search_results_caption' | t | json }};
+      lngg.search_js__products_title = {{ 'search_js.products_title' | t | json }};
+      lngg.search_js__articles_title = {{ 'search_js.articles_title' | t | json }};
+      lngg.search_js__pages_title = {{ 'search_js.pages_title' | t | json }};
+      lngg.search_js__collections_title = {{ 'search_js.collections_title' | t | json }};
+      lngg.search_js__see_all_results_link = {{ 'search_js.see_all_results_link' | t | json }};
+      lngg.search_js__see_all_n_results_link = {{ 'search_js.see_all_n_results_link' | t | json }};
+      lngg.search_js__no_products_found_message = {{ 'search_js.no_products_found_message' | t | json }};
+      lngg.search_js__popular_searches_title = {{ 'search_js.popular_searches_title' | t | json }};
+      lngg.search_js__popular_search_terms_title = {{ 'search_js.popular_search_terms_title' | t | json }};
+      lngg.search_js__your_last_searches_title = {{ 'search_js.your_last_searches_title' | t | json }};
+      lngg.general__forms__complete_the_field_message = {{ 'general.forms.complete_the_field_message' | t | json }};
+      lngg.general__forms__complete_all_the_fields_message = {{ 'general.forms.complete_all_the_fields_message' | t | json }};
+      lngg.general__forms__enter_a_valid_email_message = {{ 'general.forms.enter_a_valid_email_message' | t | json }};
+    </script>
+    <script src="{{ 'component_search.js' | asset_url }}" defer="defer"></script>
+    <script src="{{ 'component_product_card.js' | asset_url }}" defer="defer"></script>
+    <script src="{{ 'contact_form.js' | asset_url }}" defer="defer"></script>
+
+    {%- if request.design_mode -%}
+      {%- if settings.enable_cookies_consent -%}
+        {%- section 'cookies_consent' -%}
+      {%- endif -%}
+      {%- section 'shipping_calculator' -%}
+    {%- endif -%}
+
+
+    {%- if request.design_mode -%}
+      {%- section 'color_swatches' -%}
+      {% comment %}Load all components for better customizer experience{% endcomment %}
+      <script src="{{ 'component_before_after.js' | asset_url }}" defer="defer"></script>
+      <script src="{{ 'component_product_card.js' | asset_url }}" defer="defer"></script>
+      <script src="{{ 'collection_main.js' | asset_url }}" defer="defer"></script>
+      <script src="{{ 'component_carousel.js' | asset_url }}" defer="defer"></script>
+      <script src="{{ 'component_search.js' | asset_url }}" defer="defer"></script>
+      <script src="{{ 'contact_form.js' | asset_url }}" defer="defer"></script>
+      <script src="{{ 'customer_forms.js' | asset_url }}" defer="defer"></script>
+      <script src="{{ 'customer_portal.js' | asset_url }}" defer="defer"></script>
+      <script src="{{ 'hero_banner.js' | asset_url }}" defer="defer"></script>
+      <script src="{{ 'pagination.js' | asset_url }}" defer="defer"></script>
+      {%- unless settings.product_card_quick_add -%}
+        {%- render 'product_main_js_inc' -%}
+      {%- endunless -%}
+      <script src="{{ 'recently_viewed.js' | asset_url }}" defer="defer"></script>
+      <script src="{{ 'related_articles.js' | asset_url }}" defer="defer"></script>
+      <script src="{{ 'social_share.js' | asset_url }}" defer="defer"></script>
+      <script src="{{ 'section_timeline.js' | asset_url }}" defer="defer"></script>
+      <script src="{{ 'util_accordion.js' | asset_url }}" defer="defer"></script>
+      <script src="{{ 'util_countdown.js' | asset_url }}" defer="defer"></script>
+      <script src="{{ 'util_tabs.js' | asset_url }}" defer="defer"></script>
+    {%- endif -%}
+
+  </body>
+</html>

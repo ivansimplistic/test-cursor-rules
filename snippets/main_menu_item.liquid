@@ -1,0 +1,65 @@
+<div class="item {% if link.active %}active{% endif %}{% if link.links != blank %} has-dropdown{% endif %}" data-parent="{{link.handle}}">
+  {%- assign linkUrlLastChar = link.url | slice: -1 -%}
+  {{ '<' }}{%- if linkUrlLastChar != '#' -%}a href="{{ link.url }}" {% if link.url contains 'http' %}target="_blank"{% endif %}{%- else -%}button type="button" {%- if link.links != blank -%}aria-expanded="false"{%- endif %}{%- endif %} class="nav-1 {{section.settings.menu_font_style}}"{{ '>' }}
+    {%- assign titlePart = link.title | split: '**' -%}
+    <div class="flex flex-wrap align-items-center">
+      <span>{{ titlePart[0] | strip }}</span> {%- if titlePart.size > 1 -%}<span class="badge smaller {{titlePart[1] | handle}}">{{titlePart[1] | strip}}</span>{%- endif -%}
+    </div>
+    {%- if linkUrlLastChar == '#' -%}
+      {%- if link.links != blank or megaMenuTriggers contains link.handle -%}
+        {% render 'icons', icon: 'chevron-down' %}
+      {%- endif -%}
+    {%- endif -%}
+  {{ '</' }}{%- if linkUrlLastChar != '#' -%}a{%- else -%}button{%- endif -%}{{ '>' }}
+  {%- if linkUrlLastChar != '#' -%}
+    {%- if link.links != blank or megaMenuTriggers contains link.handle -%}
+      <button type="button" class="submenu-trigger" aria-expanded="false" aria-label="{{ 'general.header_submenu_label' | t: title: titlePart[0] | strip | escape }}">{% render 'icons', icon: 'chevron-down' %}</button>
+    {%- endif -%}
+  {%- endif -%}
+    
+  {%- unless link.links == blank or megaMenuTriggers contains link.handle -%}
+    <div class="submenu scheme color-{{section.settings.submenu_color_scheme}} expandable">
+      <div class="submenu-inner">
+        {%- for level2_link in link.links -%}
+          {%- assign linkUrlLastChar2 = level2_link.url | slice: -1 -%}
+          <div class="item {% if level2_link.active %}active{% endif %} {% if level2_link.links != blank %}has-dropdown{% endif %}">
+            {{ '<' }}{%- if linkUrlLastChar2 != '#' -%}a href="{{ level2_link.url }}" {% if level2_link.url contains 'http' %}target="_blank"{% endif %}{%- else -%}button type="button" {%- if level2_link.links != blank -%}aria-expanded="false"{%- endif %}{%- endif %} {% if level2_link.links != blank %}aria-expanded="false"{% endif %} class="nav-2"{{ '>' }}
+              {%- assign titlePart = level2_link.title | split: '**' -%}
+              <div class="flex align-items-center">
+                <span>{{ titlePart[0] | strip }}</span> {%- if titlePart.size > 1 -%}<span class="badge smaller {{titlePart[1] | handle}}">{{titlePart[1] | strip}}</span>{%- endif -%}
+              </div>
+              {%- if linkUrlLastChar2 == '#' -%}
+                {%- if level2_link.links != blank -%}
+                  {% render 'icons', icon: 'chevron-right' %}
+                {%- endif -%}
+              {%- endif -%}
+            {{ '</' }}{%- if linkUrlLastChar2 != '#' -%}a{%- else -%}button{%- endif -%}{{ '>' }}
+            {%- if linkUrlLastChar2 != '#' -%}
+              {%- if level2_link.links != blank -%}
+                <button type="button" class="submenu-trigger" aria-expanded="false" aria-label="{{ 'general.header_submenu_label' | t: title: titlePart[0] | strip | escape }}">{% render 'icons', icon: 'chevron-right' %}</button>
+              {%- endif -%}
+            {%- endif -%}
+
+            {%- if level2_link.links != blank -%}
+              <div class="submenu scheme color-{{section.settings.submenu_color_scheme}} expandable">
+                <div class="submenu-inner">
+                  {%- for level3_link in level2_link.links -%}
+                    {%- assign linkUrlLastChar3 = level3_link.url | slice: -1 -%}
+                    <div class="item {% if level3_link.active %}active{% endif %}">
+                      {{ '<' }}{%- if linkUrlLastChar3 != '#' -%}a href="{{ level3_link.url }}" {% if level3_link.url contains 'http' %}target="_blank"{% endif %}{%- else -%}div{%- endif %} class="nav-3"{{ '>' }}
+                        {%- assign titlePart = level3_link.title | split: '**' -%}
+                        <div class="flex align-items-center">
+                          <span>{{ titlePart[0] | strip }}</span> {%- if titlePart.size > 1 -%}<span class="badge smaller {{titlePart[1] | handle}}">{{titlePart[1] | strip}}</span>{%- endif -%}
+                        </div>
+                      {{ '</' }}{%- if linkUrlLastChar3 != '#' -%}a{%- else -%}div{%- endif -%}{{ '>' }}
+                    </div>
+                  {%- endfor -%}
+                </div>
+              </div>
+            {%- endif -%}
+          </div>
+        {%- endfor -%}
+      </div>
+    </div>
+  {%- endunless -%}
+</div>

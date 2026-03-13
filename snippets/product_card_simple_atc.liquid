@@ -1,0 +1,64 @@
+{%- assign defaultVariant = defaultVariant | default: productCard.selected_or_first_available_variant -%}
+{%- assign imgMode = imgMode | default: settings.product_card_img_mode, allow_false: true -%}
+{%- capture quickViewBtn -%}
+  <button type="button" tabindex="0" class="cta {% if settings.product_card_cta_style == 'buttons' %}btn smaller flex align-items-center justify-content-center{% endif %} quick-view-trigger no-highlight-hover" data-url="{{ productCard.url | within: collection }}" aria-label="{{ 'product_card_atc.quick_view_button' | t | escape }}">
+    <span class="circle flex align-items-center justify-content-center {% unless settings.product_card_cta_style == 'buttons' %}ease-animation{% endunless %}">{%- render 'icons', icon: 'eye' -%}</span>
+  </button>
+{%- endcapture -%}
+{%- capture badges -%}
+  {%- render 'product_badges', product: productCard, defaultVariant: defaultVariant, saleRound: settings.sale_round -%}
+{%- endcapture -%}
+
+<product-card-simple-atc class="product-card simple-atc flex align-items-start common-card text-left trigger-floating-buttons {% if settings.product_card_border %}scheme-border-box{% endif %} {% if settings.product_card_image_full_width %}image-full-width{% endif %} {% if cardsColorScheme != blank %}scheme color-{{cardsColorScheme}}{% endif %} same-scheme-{%- if cardsColorScheme == contentColorScheme -%}true{%- else -%}false{%- endif -%}">
+  <div class="image-container ease-animation">
+    <div class="img-wrap mode-static">
+      <img class="img main lazyload" alt="" data-sizes="auto" data-srcset="{{productCard.featured_image | image_url: width: 200}}" width="{{ productCard.featured_image.width }}" height="{{ productCard.featured_image.height }}" />
+    </div>
+    <div class="product-badges">
+      {{ badges }}
+    </div>
+    {%- if settings.product_card_quick_view -%}
+      <div class="floating-buttons {{settings.product_card_cta_style}} flex flex-wrap {% if settings.product_card_cta_style == 'bubbles' %}direction-column{% endif %} hide-quickview">
+        {{quickViewBtn}}
+      </div>
+    {%- endif -%}
+  </div>
+  <div class="info flex-1">
+    <div class="info-inner direction-column">
+      <a href="{{ productCard.url | within: collection }}" class="flex-1 product-card-url">
+        <span class="title">{{ productCard.title }}</span>
+      </a>
+      <div class="price flex justify-content-center">
+        <span class="compare {% unless defaultVariant.compare_at_price > defaultVariant.price %}hide{% endunless %}">
+          <span class="visually-hidden">. {{ 'product.original_price_label' | t }}: </span>
+          <span class="compare-at-price">{{ defaultVariant.compare_at_price | money | remove: '.00' }}</span>
+        </span>
+        <span class="final">
+          <span class="visually-hidden">. {{ 'product.final_price_label' | t }}: </span>
+          <span class="final-price">{{ defaultVariant.price | money | remove: '.00' }}</span>
+        </span>
+      </div>
+      {%- if productCard.has_only_default_variant -%}
+        <input type="hidden" data-name="id" value="{{defaultVariant.id}}" />
+      {%- else -%}
+        <div class="field">
+          <select data-name="id" aria-label="Select a variant">
+            {%- for var in productCard.variants -%}
+              {%- if var.available -%}
+                {%- if var.image != blank -%}
+                  {%- assign variantImage = var.image -%}
+                {%-  else -%}
+                  {%- assign variantImage = productCard.featured_image -%}
+                {%-  endif -%}
+                <option value="{{var.id}}" data-final-price="{{var.price | money_without_currency}}" {% if var.compare_at_price > var.price %}data-compare-at-price="{{var.compare_at_price | money_without_currency}}"{% endif %} data-variant-image="{{variantImage | image_url: width: 200}}">{{var.title}}</option>
+              {%- endif -%}
+            {%- endfor -%}
+          </select>
+          {%- render 'icons', icon: 'chevron-down' -%}
+        </div>
+      {%- endif -%}
+      <button class="btn v2 smaller add" type="button">{{ 'product_card_atc.add_to_cart_button' | t }}</button>
+      
+    </div>
+  </div>
+</product-card-simple-atc>

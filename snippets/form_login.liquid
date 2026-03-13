@@ -1,0 +1,51 @@
+<div id="customer-login">
+  <h2 class="h1 title">{{ 'account.login.title' | t }}</h2>
+  {%- form 'customer_login' -%}
+    <div class="error-msg">{{ form.errors | default_errors }}</div>
+    <div class="field required">
+      <input placeholder="{{ 'account.login.email_label' | t }}" type="email" name="customer[email]" id="customer-email" class="email required" aria-required="true" autocomplete="email" />
+      <label for="customer-email">{{ 'account.login.email_label' | t }}</label>
+    </div>
+    {%- if form.password_needed -%}
+      <div class="field required">
+        <input placeholder="{{ 'account.login.password_label' | t }}" type="password" name="customer[password]" id="customer-password" class="password required" aria-required="true" autocomplete="password" />
+        <label for="customer-password">{{ 'account.login.password_label' | t }}</label>
+      </div>
+      <div class="note">
+        <button type="button" class="link" onclick="showRecoverPasswordForm(); return false;">{{ 'account.login.forgot_password_message' | t }}</button>
+      </div>
+    {%- endif -%}
+    {%- if section.settings.login_redirect_url != blank -%}
+      <input type="hidden" name="checkout_url" value="{{section.settings.login_redirect_url}}" />
+      <input type="hidden" name="return_to" value="{{section.settings.login_redirect_url}}" />
+    {%- endif -%}
+    <button type="submit" class="btn">{{ 'account.login.login_button' | t }}</button>
+  {%- endform -%}
+</div>
+
+<div id="customer-recover-password" style="display: none">
+  <h2 class="h1 title">{{ 'account.login.recover.title' | t }}</h2>
+  <p>{{ 'account.login.recover.message' | t }}</p>
+  {%- form 'recover_customer_password' -%}
+    {%- capture errors -%}
+      {{ form.errors | default_errors }}
+    {%- endcapture -%}
+    <div class="error-msg">{{ errors }}</div>
+    
+    <p class="success-msg" {% unless form.posted_successfully? %}style="display: none"{% endunless %}>{{ 'account.login.recover.submit_success_message' | t }}</p>
+    
+    {%- if form.posted_successfully? or errors != blank -%}
+    <script type="module">showRecoverPasswordForm();</script>
+    {%- endif -%}
+    <div class="field required">
+      <input placeholder="{{ 'account.login.recover.email_label' | t }}" type="email" name="email" id="recover-email" class="email required" aria-required="true" autocomplete="email" />
+      <label for="recover-email">{{ 'account.login.recover.email_label' | t }}</label>
+    </div>
+    <input type="hidden" name="checkout_url" value="{{ routes.account_login_url }}#recover" />
+    <input type="hidden" name="return_to" value="{{ routes.account_login_url }}#recover" />
+    <button class="btn" type="submit">{{ 'account.login.recover.submit_button' | t }}</button>
+    <div class="note side">
+      {{ 'general.or_conjunction' | t }} <button class="link" onclick="hideRecoverPasswordForm(); return false;">{{ 'account.login.recover.cancel_button' | t }}</button>
+    </div>
+  {%- endform -%}
+</div>

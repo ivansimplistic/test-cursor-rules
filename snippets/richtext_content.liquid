@@ -1,0 +1,57 @@
+{% comment %}Block settings and accordion items{% endcomment %}
+{%- capture contentHtml -%}
+  {%- for block in section.blocks -%}
+    {%- if block.type == 'accordion_item' -%}
+      {%- assign hasAccordion = true -%}
+    {%- endif -%}
+    {%- if block.type == 'flexbox_definition' -%}
+      {%- liquid
+        assign hasColumns = true
+        assign align = block.settings.text_align | replace: 'inherit', section.settings.text_align
+        assign alignMobile = block.settings.text_align_mobile | replace: 'inherit', section.settings.text_align_mobile
+      -%}
+      {%- if  forloop.index > 1 -%}
+        {% # theme-check-disable UnclosedHTMLElement %}
+          </div>
+        </div>
+        <div class="richtext-wrap grid-item flexbox-item block-{{ block.id }}" {{ block.shopify_attributes }} {% if block.type == 'flexbox_definition' %}style="--item-width-desktop: {{ block.settings.flexbox_width_desktop }}%; --item-width-tablet: {{ block.settings.flexbox_width_tablet }}%; --item-width-mobile: {{ block.settings.flexbox_width_mobile }}%; --item-padding-desktop: {{block.settings.padding_desktop | divided_by: 100.00}}; --item-padding-mobile: {{block.settings.padding_mobile | divided_by: 100.00}}; --align-self-desktop: {{block.settings.align_self_desktop}}; --align-self-mobile: {{block.settings.align_self_mobile}}; --item-border-radius: {{block.settings.border_radius}}em;"{% endif %}>
+          <div class="flexbox-inner {% if block.type == 'flexbox_definition' %}scheme color-{{block.settings.content_color_scheme}} {% if block.settings.content_color_scheme != section.settings.content_color_scheme %}same-scheme-false{% else %}same-scheme-true{% endif %} {% if block.settings.border %}scheme-border-box{% endif %} text-{{ align }} align-items-{{ align | replace: 'left', 'start' | replace: 'right', 'end' }} medium-down--text-{{ alignMobile }} medium-down--align-items-{{ alignMobile | replace: 'left', 'start' | replace: 'right', 'end' }}{% endif %}">
+        {% # theme-check-enable UnclosedHTMLElement %}
+      {%- endif -%}
+    {%- else -%}
+      {%- render 'richtext_blocks', block: block, section: section -%}
+    {%- endif -%}
+  {%- endfor -%}
+  {%- if contactForm != blank -%}{{contactForm}}{%- endif -%}
+{%- endcapture -%}
+
+{%- if hasColumns -%}
+  {%- liquid
+    assign block = section.blocks.first
+    assign align = block.settings.text_align | replace: 'inherit', section.settings.text_align
+    assign alignMobile = block.settings.text_align_mobile | replace: 'inherit', section.settings.text_align_mobile
+  -%}  
+  {%- capture contentHtml -%}
+    <div class="grid flexbox-grid justify-content-between">
+      <div class="richtext-wrap grid-item flexbox-item block-{{ block.id }}" {{ block.shopify_attributes }} {% if block.type == 'flexbox_definition' %}style="--item-width-desktop: {{ block.settings.flexbox_width_desktop }}%; --item-width-tablet: {{ block.settings.flexbox_width_tablet }}%; --item-width-mobile: {{ block.settings.flexbox_width_mobile }}%; --item-padding-desktop: {{block.settings.padding_desktop | divided_by: 100.00}}; --item-padding-mobile: {{block.settings.padding_mobile | divided_by: 100.00}}; --align-self-desktop: {{block.settings.align_self_desktop}}; --align-self-mobile: {{block.settings.align_self_mobile}}; --item-border-radius: {{block.settings.border_radius}}em;"{% endif %}>
+        <div class="flexbox-inner {% if block.type == 'flexbox_definition' %}scheme color-{{block.settings.content_color_scheme}} {% if block.settings.content_color_scheme != section.settings.content_color_scheme %}same-scheme-false{% else %}same-scheme-true{% endif %} {% if block.settings.border %}scheme-border-box{% endif %} text-{{ align }} align-items-{{ align | replace: 'left', 'start' | replace: 'right', 'end' }} medium-down--text-{{ alignMobile }} medium-down--align-items-{{ alignMobile | replace: 'left', 'start' | replace: 'right', 'end' }}{% endif %}">
+          {{ contentHtml }}
+        </div>
+      </div>
+    </div>
+  {%- endcapture -%}
+{%- endif -%}
+
+
+{%- if hasAccordion -%}
+  {% comment %}Everythings gets wrapped in <util-accodion> so all accordions can collapse automatically, and still can be mixed between other content{% endcomment %}
+  {%- capture contentHtml -%}
+    <util-accordion class="richtext-wrap" data-expand-multiple="false">
+      {{contentHtml}}
+    </util-accordion>
+    {{ 'util_accordion.css' | asset_url | stylesheet_tag }}
+    <script src="{{ 'util_accordion.js' | asset_url }}" defer="defer"></script>
+  {%- endcapture -%}
+{%- endif -%}
+
+{{contentHtml}}

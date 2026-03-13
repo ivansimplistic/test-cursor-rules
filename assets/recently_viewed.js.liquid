@@ -1,0 +1,108 @@
+if (!customElements.get('recently-viewed')) {
+  class RecentlyViewed extends HTMLElement {
+
+    /**
+      * This component stores the product handle in a cookie and also 
+      * handles the display of a widget that iterates through those product handles
+      * and calls the PDP via ajax to load those products in product cards
+      */
+    constructor() {
+      super();
+
+      this.productHandle = this.dataset.productHandle;
+      this.limit = this.dataset.limit;
+      this.html = document.createElement('div');
+      this.templateContent = this.querySelector('template').content.cloneNode(true);
+      this.templateRootElement = this.templateContent.querySelector('.products-carousel-root');
+      this.itemsContent = this.templateRootElement.querySelector('.keen-slider, .grid');
+      this.cookieName = 'shopify_recently_viewed';
+      this.recentlyViewed = this.getRecentlyViewed();
+      this.recordRecentlyViewed(this.productHandle);
+      if (this.dataset.mode.indexOf('display') > -1) {
+        this.showRecentlyViewed();
+      }
+    }
+
+    recordRecentlyViewed(handle) {
+      if (handle) {
+        var position = this.recentlyViewed.indexOf(handle);
+        if (position === -1) {
+          this.recentlyViewed.unshift(handle);
+        } else {
+          this.recentlyViewed.splice(position, 1);
+          this.recentlyViewed.unshift(handle);
+        }
+        this.recentlyViewed = this.recentlyViewed.splice(0, this.limit);
+        this.writeRecentlyViewed();
+      }
+    }
+
+    getRecentlyViewed() {
+      var cookieValue = Cookies.get(this.cookieName);
+      return cookieValue ? cookieValue.split(' ') : [];
+    }
+
+    removeHandle(handle) {
+      var position = this.recentlyViewed.indexOf(handle);
+      if (position !== -1) {
+        this.recentlyViewed.splice(position, 1);
+        this.writeRecentlyViewed();
+      }
+    }
+    
+    writeRecentlyViewed() {
+      Cookies.set(this.cookieName, this.recentlyViewed.join(" "), { expires: 7 });
+    }
+
+    showRecentlyViewed() {
+      var handles = this.recentlyViewed.filter(x=>x != this.productHandle);
+      var handlesUrls = handles.map(handle=>{return { handle, url: routes.products_url + '/' + handle + '?sections=product_card_ajax'}});
+      var urls = handlesUrls.map(x=>{ return x.url});
+
+      $s.getDataFromUrls(urls).then(data=> {
+        var html = '';
+        handlesUrls.forEach(x=>{
+          var handle = x.handle;
+          var url = x.url;
+          var parser = new DOMParser();
+          if (data[url]) {
+            try {
+              var ajaxHtml = JSON.parse(data[url]).product_card_ajax;
+              var itemDoc = parser.parseFromString(ajaxHtml, 'text/html');
+              var itemHTML = itemDoc.querySelector('.product-card-ajax').innerHTML;
+              if (itemHTML) {
+                html += itemHTML;
+              } else {
+                this.removeHandle(handle);  
+              }
+            } catch (e) {
+              console.error(e);
+            }
+          } else {
+            this.removeHandle(handle);
+          }
+        });
+        if (html != '') {
+          html = this.itemsContent.classList.contains('grid') ? html.replaceAll('keen-slider-slide', 'grid-item') : html;
+          this.style.display = ''; //removes 'display: none'
+          this.itemsContent.innerHTML = html;
+          this.itemsContent.querySelectorAll('.product-card').forEach(card => {
+            if (this.dataset.cardsColorScheme) {
+              card.classList.add('scheme', ...this.dataset.cardsColorScheme.split(' '));
+            }
+            if (this.dataset.cardsColorScheme==this.dataset.contentColorScheme) {
+              card.classList.add('same-scheme-true');
+              card.classList.remove('same-scheme-false');
+            } else {
+              card.classList.add('same-scheme-false');
+              card.classList.remove('same-scheme-true');
+            }
+          });
+          this.insertAdjacentElement('beforeend', this.templateRootElement);
+        }
+      });
+    }
+
+  }
+  customElements.define('recently-viewed', RecentlyViewed);
+}

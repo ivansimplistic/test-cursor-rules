@@ -1,0 +1,66 @@
+{%- if section.settings.title != blank -%}
+  {%- assign tabsTitleTag = 'h3' -%}
+  {%- assign tabsTitleSize = section.settings.title_size | plus: 1 | replace: 0, 1 | prepend: 'h' -%}
+{%- else -%}
+  {%- assign tabsTitleTag = 'h2' -%}
+  {%- assign tabsTitleSize = section.settings.title_size | replace: 0, '1-xl' | replace: -1, '1-xxl' | prepend: 'h' -%}
+{%- endif -%}
+
+{%- for block in section.blocks -%}
+  {%- capture tabButtons -%}
+    {%- if block.settings.title != blank -%}
+      {{tabButtons}}
+      <button class="util-tab {{section.settings.tab_style}} large--text-{{section.settings.text_align}} large--justify-content-{{section.settings.text_align | replace: 'left', 'start' | replace: 'right', 'end'}} medium-down--text-{{section.settings.text_align_mobile}} medium-down--justify-content-{{section.settings.text_align_mobile | replace: 'left', 'start' | replace: 'right', 'end'}}" type="button" role="tab" aria-selected="true" data-block="{{block.id}}" id="btn-block-{{block.id}}" aria-controls="content-block-{{block.id}}" {{ block.shopify_attributes }}>{{block.settings.title}}</button>
+      {%- assign showContent = true -%}
+    {%- endif -%}
+  {%- endcapture -%}
+  {%- capture tabPanels -%}
+    {{tabPanels}}
+    <div tabindex="0" role="tabpanel" id="content-block-{{block.id}}" aria-labelledby="btn-block-{{block.id}}" {% if forloop.index > 1 %} hidden="hidden"{% endif %} {{ block.shopify_attributes }}>
+      <div class="tab-content richtext-wrap">
+        {%- if block.settings.eyebrow != blank -%}
+          <div class="{% if section.settings.title_size < 3 %}subheading{% else %}small-label{% endif %}">{{block.settings.eyebrow}}</div>
+        {%- endif -%}
+        {%- if block.settings.content_title != blank -%}
+          <{{tabsTitleTag}} class="title {{tabsTitleSize}}">{{block.settings.content_title}}</{{tabsTitleTag}}>
+        {%- endif -%}
+        {%- if block.settings.text != blank and block.settings.text != '<p></p>' -%}
+          <div class="text {{section.settings.text_size | prepend: 'p'}}">{{block.settings.text}}</div>
+        {%- endif -%}
+        {%- if block.settings.button != blank -%}
+          <div class="btn-wrap">
+            <a href="{{block.settings.link}}" class="btn">{{block.settings.button}}</a>
+          </div>
+        {%- endif -%}
+      </div>
+    </div>
+  {%- endcapture -%}
+{%- endfor -%}
+
+{%- capture tabsHtml -%}
+  <util-tabs class="richtext-wrap" data-match-height="true">
+    <div class="tabs-outer {% if section.settings.tabs_one_line_desktop %}one-line-desktop{% endif %} {% if section.settings.tabs_one_line_mobile %}one-line-mobile{% endif %} {% if section.settings.tab_style == 'v2' %}full-width{% endif %}">
+      <div class="tabs-inner flex">
+        <div class="tabs-wrap flex flex-wrap {% unless section.settings.tabs_one_line_desktop %}large--justify-content-{{section.settings.text_align | replace: 'left', 'start' | replace: 'right', 'end'}}{% endunless %} {% unless section.settings.tabs_one_line_mobile %}medium-down--justify-content-{{section.settings.text_align_mobile | replace: 'left', 'start' | replace: 'right', 'end'}}{% endunless %}" role="tablist" aria-label="{{section.settings.tabs_title}}">
+          {{tabButtons}}
+        </div>
+      </div>
+    </div>
+    {{tabPanels}}
+  </util-tabs>
+  <script src="{{ 'util_tabs.js' | asset_url }}" defer="defer"></script>
+{%- endcapture -%}
+
+{{tabsHtml}}
+
+{%- if showContent -%}
+<!-- CONTENT: TRUE -->
+{%- endif -%}
+
+{% if request.design_mode %}
+  <script>
+    section.addEventListener('shopify:block:select', (e)=>{
+      e.target.closest('util-tabs').activateTab(e.target);
+    });
+  </script>
+{% endif %}

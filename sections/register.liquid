@@ -1,0 +1,20 @@
+{{ 'customer_forms.css' | asset_url | stylesheet_tag }}
+{%- render 'customer_forms_js_inc' -%}
+<div class="customer-form-page text-center scheme color-{{settings.customer_portal_color_scheme}}">
+  <div class="container">
+    
+    {%- render 'form_register' -%}
+
+    <div id="customer-login">
+      <h2>{{ 'account.register.already_have_account_title' | t }}</h2>
+      <a class="btn" href="{{ routes.account_login_url }}">{{ 'account.register.already_have_account_link' | t }}</a>
+    </div>
+  </div>
+</div>
+
+{% schema %}
+  {
+    "name": "Register",
+    "class": "type-register"
+  }
+{% endschema %}

@@ -1,0 +1,723 @@
+{%- render 'custom_items_content', section: section, cardType: 'testimonial' -%}
+
+{% schema %}
+  {
+    "name": "Testimonials",
+    "class": "type-testimonials",
+    "tag": "section",
+    "presets": [
+      {
+        "name": "Testimonials",
+        "blocks": [
+          {
+            "type": "item",
+            "settings": {
+              "author": "Loki Bright"
+            }
+          },
+          {
+            "type": "item",
+            "settings": {
+              "author": "Michelle Star"
+            }
+          },
+          {
+            "type": "item",
+            "settings": {
+              "author": "Paul Smith"
+            }
+          },
+          {
+            "type": "item",
+            "settings": {
+              "author": "Brandy Silver"
+            }
+          }
+        ]
+      }
+    ],
+    "settings": [
+      {
+        "type": "header",
+        "content": "Head"
+      },
+      {
+        "type": "text",
+        "id": "eyebrow",
+        "label": "Eyebrow"
+      },
+      {
+        "visible_if": "{{ section.settings.eyebrow != blank }}",
+        "type": "range",
+        "id": "eyebrow_size",
+        "min": 1,
+        "max": 5,
+        "step": 1,
+        "unit": "p",
+        "label": "Eyebrow size",
+        "default": 3
+      },
+      {
+        "type": "text",
+        "id": "title",
+        "label": "Title",
+        "default": "Testimonials"
+      },
+      {
+        "visible_if": "{{ section.settings.title != blank }}",
+        "type": "checkbox",
+        "id": "is_h1",
+        "label": "This is the first title of the page (H1)"
+      },
+      {
+        "visible_if": "{{ section.settings.title != blank }}",
+        "type": "range",
+        "id": "title_size",
+        "min": -1,
+        "max": 6,
+        "step": 1,
+        "unit": "h",
+        "label": "Title size",
+        "default": 1,
+        "info": "Equivalent to the heading tags."
+      },
+      {
+        "type": "richtext",
+        "id": "text",
+        "label": "Text"
+      },
+      {
+        "visible_if": "{{ section.settings.text != blank }}",
+        "type": "range",
+        "id": "text_size",
+        "min": 1,
+        "max": 5,
+        "step": 1,
+        "unit": "p",
+        "label": "Text size",
+        "default": 3
+      },
+      {
+        "visible_if": "{{ section.settings.text != blank }}",
+        "type": "range",
+        "id": "text_width",
+        "min": 0,
+        "max": 100,
+        "step": 1,
+        "unit": "em",
+        "label": "Text Width",
+        "default": 40
+      },
+      {
+        "type": "text",
+        "id": "button",
+        "label": "Button"
+      },
+      {
+        "visible_if": "{{ section.settings.button != blank }}",
+        "type": "url",
+        "id": "link",
+        "label": "Button link"
+      },
+      {
+        "visible_if": "{{ section.settings.button != blank }}",
+        "type": "select",
+        "id": "button_style",
+        "label": "Button style",
+        "options": [
+            {"value": "link", "label": "Link"},
+            {"value": "btn", "label": "Button"},
+            {"value": "btn v2", "label": "Button V2"}
+        ],
+        "default": "btn"
+      },
+      {
+        "visible_if": "{{ section.settings.button != blank }}",
+        "type": "select",
+        "id": "button_position",
+        "label": "Button position",
+        "options": [
+          {"value": "top","label": "Top"},
+          {"value": "bottom","label": "Bottom"},
+          {"value": "right","label": "Right"}
+        ],
+        "default": "top"
+      },
+      {
+        "type": "header",
+        "content": "Card settings"
+      },
+
+      {
+        "type": "checkbox",
+        "id": "card_expandable",
+        "label": "Expand text on hover",
+        "default": false
+      },
+
+      {
+        "type": "select",
+        "id": "card_text_align",
+        "label": "Text Align",
+        "options": [
+          {"value": "left","label": "Left"},
+          {"value": "center","label": "Center"},
+          {"value": "right","label": "Right"}
+        ],
+        "default": "center"
+      },
+      {
+        "type": "select",
+        "id": "card_title_font_family",
+        "label": "Title font style",
+        "options": [
+          {
+            "value": "body-font",
+            "label": "Match body"
+          },
+          {
+            "value": "heading-font",
+            "label": "Match headings"
+          }
+        ],
+        "default": "body-font"
+      },
+      {
+        "type": "select",
+        "id": "card_title_text_transform",
+        "label": "Title capitalization",
+        "options": [
+          {
+            "value": "none",
+            "label": "Natural"
+          },
+          {
+            "value": "uppercase",
+            "label": "Uppercase"
+          }
+        ],
+        "default": "none"
+      },
+      {
+        "type": "range",
+        "id": "card_title_font_size",
+        "min": 80,
+        "max": 180,
+        "step": 1,
+        "unit": "%",
+        "label": "Title size",
+        "default": 100
+      },
+      {
+        "type": "range",
+        "id": "card_title_weight",
+        "min": 100,
+        "max": 900,
+        "step": 100,
+        "unit": "%",
+        "label": "Title weight",
+        "default": 700
+      },
+      {
+        "type": "range",
+        "id": "card_title_letter_spacing",
+        "min": -0.5,
+        "max": 2,
+        "step": 0.1,
+        "unit": "em",
+        "label": "Title letter spacing",
+        "default": 0,
+        "info": "This value will be divided by 10, so 0.5 is 0.05em."
+      },
+      {
+        "type": "range",
+        "id": "card_text_size",
+        "min": 1,
+        "max": 5,
+        "step": 1,
+        "unit": "p",
+        "label": "Text size",
+        "default": 3
+      },
+      {
+        "type": "range",
+        "id": "card_border_radius",
+        "min": 0,
+        "max": 10,
+        "step": 0.2,
+        "unit": "em",
+        "label": "Border radius",
+        "default": 0
+      },
+      {
+        "type": "checkbox",
+        "id": "card_border",
+        "label": "Border",
+        "default": false
+      },
+      {
+        "type": "range",
+        "id": "card_padding_desktop",
+        "min": 0,
+        "max": 50,
+        "step": 1,
+        "unit": "%",
+        "label": "Padding (Desktop)",
+        "default": 10
+      },
+      {
+        "type": "range",
+        "id": "card_padding_mobile",
+        "min": 0,
+        "max": 50,
+        "step": 1,
+        "unit": "%",
+        "label": "Padding (Mobile)",
+        "default": 10
+      },
+      {
+        "type": "color",
+        "id": "card_rating_color",
+        "label": "Ratings/Stars color",
+        "info": "Default: text color."
+      },
+      {
+        "type": "header",
+        "content": "Image Settings"
+      },
+      {
+        "type": "select",
+        "id": "image_position",
+        "label": "Position",
+        "options": [
+            {"value": "top", "label": "Top"},
+            {"value": "bottom", "label": "Bottom"},
+            {"value": "left", "label": "Left"},
+            {"value": "right", "label": "Right"}
+        ],
+        "default": "top",
+        "info": "When switching to Left or Right, remember to reduce the image width to a small value in order to leave space for the content."
+      },
+      {
+        "type": "radio",
+        "id": "image_height",
+        "label": "Height",
+        "options": [
+            {"value": "auto", "label": "Auto (keep image aspect ratio)"},
+            {"value": "1.0", "label": "Square"}
+        ],
+        "default": "auto",
+        "info": "Auto: All items will use the aspect ratio of the first image."
+      },
+      {
+        "type": "range",
+        "id": "image_width",
+        "min": 0,
+        "max": 100,
+        "step": 1,
+        "unit": "%",
+        "label": "Width (Desktop)",
+        "default": 50
+      },
+      {
+        "type": "range",
+        "id": "image_width_mobile",
+        "min": 0,
+        "max": 100,
+        "step": 1,
+        "unit": "%",
+        "label": "Width (Mobile)",
+        "default": 50
+      },
+
+      {
+        "type": "range",
+        "id": "image_offset",
+        "min": 0,
+        "max": 20,
+        "step": 0.5,
+        "unit": "rem",
+        "label": "Offset",
+        "default": 0
+      },
+
+      {
+        "type": "range",
+        "id": "image_border_radius",
+        "min": 0,
+        "max": 10,
+        "step": 0.2,
+        "unit": "em",
+        "label": "Border radius",
+        "default": 10
+      },
+      {
+        "type": "checkbox",
+        "id": "image_padding",
+        "label": "Padding",
+        "default": true
+      },
+      {
+        "type": "checkbox",
+        "id": "image_border",
+        "label": "Border",
+        "default": false
+      },
+      {
+        "type": "checkbox",
+        "id": "image_shadow",
+        "label": "Shadow"
+      },
+      {
+        "type": "header",
+        "content": "Layout (Grid/Carousel)"
+      },
+      {
+        "type": "select",
+        "id": "layout",
+        "label": "Layout",
+        "options": [
+          {"value": "carousel","label": "Carousel"},
+          {"value": "grid","label": "Grid"}
+        ],
+        "default": "carousel"
+      },
+      {
+        "visible_if": "{{ section.settings.layout == 'grid' }}",
+        "type": "radio",
+        "id": "grid_collapsible",
+        "label": "Show 'View All' button in grid mode",
+        "options": [
+          {"value": "desktop","label": "Desktop only"},
+          {"value": "mobile","label": "Mobile only"},
+          {"value": "desktop_mobile","label": "Desktop and mobile"},
+          {"value": "none", "label": "No"}
+        ],
+        "default": "none"
+      },
+      {
+        "visible_if": "{{ section.settings.layout == 'carousel' }}",
+        "type": "checkbox",
+        "id": "show_dots",
+        "label": "Show Dots",
+        "default": true
+      },
+      {
+        "visible_if": "{{ section.settings.layout == 'carousel' }}",
+        "type": "checkbox",
+        "id": "show_arrows",
+        "label": "Show Arrows",
+        "default": true
+      },
+      {
+        "visible_if": "{{ section.settings.layout == 'carousel' }}",
+        "type": "select",
+        "id": "arrows_position",
+        "label": "Arrows",
+        "options": [
+          {"value": "sides","label": "Sides"},
+          {"value": "top","label": "Top"}
+        ],
+        "default": "top"
+      },
+      {
+        "type": "select",
+        "id": "carousel_width",
+        "label": "Width (Desktop)",
+        "options": [
+          {"value": "full","label": "Full"},
+          {"value": "container","label": "Container"},          
+          {"value": "left","label": "Left container"}
+        ],
+        "default": "container"
+      },
+      {
+        "type": "select",
+        "id": "carousel_width_mobile",
+        "label": "Width (Tablet/Mobile)",
+        "options": [
+          {"value": "full","label": "Full"},          
+          {"value": "left","label": "Left container"}
+        ],
+        "default": "left"
+      },
+      {
+        "visible_if": "{{ section.settings.layout == 'carousel' }}",
+        "type": "range",
+        "id": "carousel_autoplay",
+        "min": 0,
+        "max": 10,
+        "step": 1,
+        "unit": "s",
+        "label": "Autoplay interval",
+        "default": 0,
+        "info": "0 = off"
+      },
+      {
+        "visible_if": "{{ section.settings.layout == 'carousel' }}",
+        "type": "range",
+        "id": "carousel_automove",
+        "min": 0,
+        "max": 3,
+        "step": 0.1,
+        "unit": "%",
+        "label": "Automove speed",
+        "default": 0,
+        "info": "0 = off"
+      },
+      {
+        "type": "header",
+        "content": "Items per view"
+      },
+      {
+        "type": "paragraph",
+        "content": "If the layout is set to Carousel, it indicates the items per slider page (allows decimals). If it's set to Grid, it indicates the items per row (decimals will be rounded down)."
+      },
+      {
+        "type": "range",
+        "id": "items_per_view_desktop",
+        "min": 0,
+        "max": 9,
+        "step": 0.1,
+        "unit": "un",
+        "label": "Items per view (Desktop)",
+        "default": 4
+      },
+      {
+        "type": "range",
+        "id": "items_per_view_tablet",
+        "min": 0,
+        "max": 6,
+        "step": 0.1,
+        "unit": "un",
+        "label": "Items per view (Tablet)",
+        "default": 2.4
+      },
+      {
+        "type": "range",
+        "id": "items_per_view_mobile",
+        "min": 0,
+        "max": 5,
+        "step": 0.1,
+        "unit": "un",
+        "label": "Items per view (Mobile)",
+        "default": 1.4
+      },
+
+      {
+        "type": "header",
+        "content": "Section settings"
+      },
+      {
+        "type": "checkbox",
+        "id": "full_width",
+        "label": "Full width",
+        "default": true
+      },
+      {
+        "type": "select",
+        "id": "head_position",
+        "label": "Header position (Desktop)",
+        "options": [
+          {"value": "top","label": "Top"},
+          {"value": "left","label": "Left"}
+        ],
+        "default": "top"
+      },
+      {
+        "visible_if": "{{ section.settings.head_position == 'left' }}",
+        "type": "range",
+        "id": "head_width",
+        "min": 10,
+        "max": 50,
+        "step": 1,
+        "unit": "%",
+        "label": "Header width (Desktop)",
+        "default": 20,
+        "info": "When the head is on the left."
+      },
+      {
+        "type": "range",
+        "id": "items_spacing_desktop",
+        "min": 0,
+        "max": 500,
+        "step": 50,
+        "unit": "%",
+        "label": "Items spacing (Desktop)",
+        "default": 100
+      },
+      {
+        "type": "range",
+        "id": "items_spacing_mobile",
+        "min": 0,
+        "max": 500,
+        "step": 50,
+        "unit": "%",
+        "label": "Items spacing (Mobile)",
+        "default": 100
+      },
+      {
+        "type": "select",
+        "id": "text_align",
+        "label": "Text Align (title, text, button, dots) (Desktop)",
+        "options": [
+          {"value": "left","label": "Left"},
+          {"value": "center","label": "Center"},
+          {"value": "right","label": "Right"}
+        ],
+        "default": "left"
+      },
+      {
+        "type": "select",
+        "id": "text_align_mobile",
+        "label": "Text Align (title, text, button, dots) (Mobile)",
+        "options": [
+          {"value": "left","label": "Left"},
+          {"value": "center","label": "Center"},
+          {"value": "right","label": "Right"}
+        ],
+        "default": "left"
+      },
+      {
+        "type": "color_scheme",
+        "id": "section_color_scheme",
+        "label": "Section color scheme",
+        "default": "scheme-1"
+      },
+      {
+        "type": "color_scheme",
+        "id": "content_color_scheme",
+        "label": "Content color scheme",
+        "default": "scheme-1"
+      },
+      {
+        "type": "color_scheme",
+        "id": "cards_color_scheme",
+        "label": "Cards color scheme",
+        "default": "scheme-1"
+      },
+      {
+        "type": "range",
+        "id": "border_radius",
+        "min": 0,
+        "max": 10,
+        "step": 0.2,
+        "unit": "em",
+        "label": "Border radius",
+        "default": 0
+      },
+      {
+        "type": "header",
+        "content": "Padding Desktop"
+      },
+      {
+        "type": "range",
+        "id": "text_padding",
+        "min": 0,
+        "max": 100,
+        "step": 10,
+        "unit": "%",
+        "label": "Inner padding (Desktop)",
+        "default": 100
+      },
+      {
+        "type": "range",
+        "id": "section_padding_top",
+        "min": 0,
+        "max": 100,
+        "step": 10,
+        "unit": "%",
+        "label": "Outer padding top (Desktop)",
+        "default": 0
+      },
+      {
+        "type": "range",
+        "id": "section_padding_bottom",
+        "min": 0,
+        "max": 100,
+        "step": 10,
+        "unit": "%",
+        "label": "Outer padding bottom (Desktop)",
+        "default": 0
+      },
+      {
+        "type": "header",
+        "content": "Padding Mobile"
+      },
+      {
+        "type": "range",
+        "id": "text_padding_mobile",
+        "min": 0,
+        "max": 100,
+        "step": 10,
+        "unit": "%",
+        "label": "Inner padding (Mobile)",
+        "default": 100
+      },
+      {
+        "type": "range",
+        "id": "section_padding_top_mobile",
+        "min": 0,
+        "max": 100,
+        "step": 10,
+        "unit": "%",
+        "label": "Outer padding top (Mobile)",
+        "default": 0
+      },
+      {
+        "type": "range",
+        "id": "section_padding_bottom_mobile",
+        "min": 0,
+        "max": 100,
+        "step": 10,
+        "unit": "%",
+        "label": "Outer padding bottom (Mobile)",
+        "default": 0
+      }
+    ],
+    "blocks": [
+      {
+        "type": "item",
+        "name": "Item",
+        "settings": [
+          {
+            "type": "image_picker",
+            "id": "image",
+            "label": "Image"
+          },
+          {
+            "type": "range",
+            "id": "rating",
+            "min": 0,
+            "max": 5,
+            "step": 1,
+            "label": "Rating",
+            "default": 5,
+            "info": "0 = hide stars"
+          },
+          {
+            "type": "text",
+            "id": "title",
+            "label": "Title"
+          },
+          {
+            "type": "text",
+            "id": "subtitle",
+            "label": "Subtitle"
+          },
+          {
+            "type": "richtext",
+            "id": "text",
+            "label": "Text",
+            "default": "<p>Vivamus bibendum at erat quis porta. Vestibulum vel nisl ut orci tincidunt luctus. Nulla et leo aliquam, faucibus risus ac, pulvinar purus.</p>"
+          },
+          {
+            "type": "text",
+            "id": "author",
+            "label": "Author"
+          }
+        ]
+      }
+    ]
+  }
+{% endschema %}

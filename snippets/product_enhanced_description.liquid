@@ -1,0 +1,66 @@
+{%- if section.settings.description_layout == 'accordions' -%}
+
+  {%- capture accordionsHtml -%}
+    {{ 'util_accordion.css' | asset_url | stylesheet_tag }}
+    <script src="{{ 'util_accordion.js' | asset_url }}" defer="defer"></script>
+    {%- assign expandFirst = section.settings.accordions_first_expanded -%}
+    <util-accordion data-expand-multiple="{% if section.settings.accordions_expand_multiple %}true{% endif %}">
+      {%- for part in descriptionParts offset: 1 -%}
+        {%- assign itemParts = part | replace: '</h2>', '</h2><parts-sep>' | split: '<parts-sep>' -%}
+        {%- assign itemId = section.id | append: '_' | append: forloop.index -%}
+        <div class="accordion scheme-border-bottom {% if expandFirst %}open{% endif %}">
+          <button type="button" aria-expanded="{% if expandFirst %}true{% else %}false{% endif %}" class="accordion-trigger" aria-controls="panel-{{itemId}}" id="button-{{itemId}}">
+            <span class="accordion-title">
+              {{itemParts[0]}}
+            </span>
+            <span class="accordion-icon {{settings.accordions_icon}}"><i></i></span>
+          </button>
+          <div id="panel-{{itemId}}" role="region" aria-labelledby="button-{{itemId}}" class="accordion-panel expandable {% if expandFirst %}expandable-default-open{% endif %}">
+            {{itemParts[1]}}
+          </div>
+        </div>
+        {%- if expandFirst -%}
+          {%- assign expandFirst = false -%}
+        {%- endif -%}
+      {%- endfor -%}
+    </util-accordion>
+  {%- endcapture -%}
+
+  {{accordionsHtml}}
+
+{%- else -%}
+
+  {%- for part in descriptionParts offset: 1 -%}
+    {%- assign itemParts = part | replace: '</h2>', '</h2><parts-sep>' | split: '<parts-sep>' -%}
+    {%- assign itemId = section.id | append: '_' | append: forloop.index -%}
+    {%- capture tabButtons -%}
+      {{tabButtons}}
+      <button class="util-tab {{section.settings.tab_style}}" type="button" role="tab" aria-selected="true" id="btn-block-{{itemId}}" aria-controls="content-block-{{itemId}}">{{itemParts[0]}}</button>
+    {%- endcapture -%}
+    {%- capture tabPanels -%}
+      {{tabPanels}}
+      <div tabindex="0" role="tabpanel" id="content-block-{{itemId}}" aria-labelledby="btn-block-{{itemId}}"{% if forloop.index > 1 %} hidden="hidden"{% endif %} >
+        <div class="tab-content">
+          {{itemParts[1]}}
+        </div>
+      </div>
+    {%- endcapture -%}
+  {%- endfor -%}
+
+  {%- capture tabsHtml -%}
+    <util-tabs data-match-height="true">
+      <div class="tabs-outer {% if section.settings.tab_style == 'v2' %}full-width{% endif %} one-line-desktop one-line-mobile">
+        <div class="tabs-inner flex">
+          <div class="tabs-wrap flex flex-wrap" role="tablist" aria-label="{{ 'product_enhanced_description.tabs_caption' | t | escape }}">
+            {{tabButtons}}
+          </div>
+        </div>
+      </div>
+      {{tabPanels}}
+    </util-tabs>
+    <script src="{{ 'util_tabs.js' | asset_url }}" defer="defer"></script>
+  {%- endcapture -%}
+  
+  {{tabsHtml}}
+
+{%- endif -%}

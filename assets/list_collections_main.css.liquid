@@ -1,0 +1,36 @@
+.list-collections {padding-top: var(--section-padding-top); padding-bottom: var(--section-padding-bottom);}
+.list-collections.default .grid {--items-margin: 3em; margin-bottom: calc(var(--items-margin) * -1);}
+.list-collections.default .grid-item {margin-bottom: var(--items-margin);}
+.list-collections.default .grid-item {width: calc(100% / var(--items-per-row));}
+
+{% capture borderLeft %}content: ''; position: absolute; left: 0; top: 0; bottom: 0; border-left: 1px solid var(--scheme-borders-color);{% endcapture %}
+
+@media (min-width: {{settings.breakpoint_mobile | plus: 0.001}}em) {
+  .list-collections.custom {--grid-gap: 1em;}
+  .list-collections.custom .grid.border-left {margin-left: 0; position: relative;}
+  .list-collections.custom .grid.border-left:before { {{borderLeft}} bottom: 3em;}
+  .list-collections.custom .grid-item.sticky {position: sticky; top: calc(var(--header-offset) + 2em);}
+  .list-collections.custom .grid-item.margin-bottom {margin-bottom: 3em;}
+  .list-collections.custom .grid-item.has-children .collection-card:before {content: ''; position: absolute; top: 25%; left: 100%; width: var(--grid-gap); border-top: 1px solid var(--scheme-borders-color);}
+  .list-collections.custom .grid-item.has-children .collection-card.info-absolute:before {top: 30%;}
+}
+
+@media (max-width: {{settings.breakpoint_mobile}}) {
+  .list-collections.default .grid {--items-margin: 1.5em;}
+
+  .list-collections.custom {--grid-gap: 1.5em;}
+  .list-collections.custom .grid-item.margin-bottom {margin-bottom: 1.5em;}
+  .list-collections.custom .grid.border-left {margin-left: 15%; position: relative;}
+  .list-collections.custom .grid.border-left:before { {{borderLeft}} bottom: 1.5em;}
+}
+
+@media (min-width: {{settings.breakpoint_tablet | plus: 0.001}}em) and (max-width: {{settings.container_width}}px){
+  .list-collections.custom {font-size: 1.15vw;}
+}
+@media (min-width: {{settings.breakpoint_mobile | plus: 0.001}}em) and (max-width: {{settings.breakpoint_tablet}}){
+  .list-collections.custom {font-size: 1.4vw;}
+  .list-collections.custom .grid-item.has-children .collection-card:before {top: 40%;}
+  .list-collections.custom .grid-item.has-children .collection-card.info-absolute:before {top: 50%;}
+  .list-collections.custom .grid-item.margin-bottom {margin-bottom: 1.5em;}
+  .list-collections.custom .grid.border-left:before {bottom: 1.5em;}
+}

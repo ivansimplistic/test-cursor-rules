@@ -1,0 +1,17 @@
+if($s.media.isMediumDown){
+  if (navigator.share) {
+    document.querySelector('.custom-share-wrap').style.display = "none";
+    document.querySelector('.native-share-wrap').style.display = "block";
+    document.querySelector(".native-share").addEventListener("click", function() {
+      navigator.share({
+        title: document.title,
+        url: this.dataset.url
+      }).then(() => {
+        console.info('Thanks for sharing!');
+      })
+      .catch(console.error);
+    }, false);
+  } else {
+   document.querySelector('.native-share-wrap').style.display = "none";
+  }
+}

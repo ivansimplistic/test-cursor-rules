@@ -1,0 +1,12 @@
+{%- if product.metafields.custom.callouts.value != blank -%}
+  <div class="product-callouts-wrapper">
+    {%- for callout in product.metafields.custom.callouts.value -%}
+    <div class="product-callout {{ settings.product_card_callouts_font }} p{{ settings.product_card_callouts_size }}" style="--color: {{ callout.color | default: 'rgba(0,0,0,0)' }}">
+      {%- if callout.image != blank -%}
+        <img class="product-callout-image" alt="" aria-hidden="true" src="{{ callout.image | image_url: width: 100 | default: placeHolderUrl }}" loading="lazy" width="{{ callout.image.width  }}" height="{{ callout.image.height  }}">
+      {%- endif -%}
+      {{ callout.name }}
+    </div>
+    {%- endfor -%}
+  </div>
+{%- endif -%}

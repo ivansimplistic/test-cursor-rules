@@ -1,0 +1,63 @@
+<div class="comments scheme color-{{section.settings.comments_color_scheme}} {% if section.settings.comments_border %}scheme-border-box{% endif %} {% if section.settings.comments_color_scheme == 'scheme-1' %}same-scheme{% endif %}">
+{%- if article.comments_count > 0 -%}
+  <h2>Comments ({{ article.comments_count }})</h2>
+{%- endif -%}
+{%- paginate article.comments by 5 -%}
+  {%- if article.comments_count > 0 -%}
+    {%- for comment in article.comments -%}
+      <div id="{{ comment.id }}" class="comment scheme-border-bottom {% if forloop.first %} first{% endif %}{% if forloop.last %} last{% endif %}">
+        <span class="comment-author small-label">{{ comment.author }}_</span>
+        <time datetime="{{ comment.created_at | date: '%Y-%m-%d' }}" class="comment-date small-label">{{ comment.created_at | date: '%b %d, %Y' }}</time>
+        <div class="content">
+          {{ comment.content }}
+        </div>
+        <div class="sharing flex align-items-center">
+          <div class="small-label">{{ 'blog_comments.share_comment_label' | t }}</div>
+          <a class="facebook-share" target="_blank" aria-label="{{ 'blog_comments.share_on_facebook_caption' | t }}" href="https://www.facebook.com/sharer/sharer.php?u={{ shop.url }}{{ article.url }}&title={{ article.title }}&description=Comment by {{ comment.author }}: {{ comment.content | strip_html }}">{% render 'icons', icon: 'facebook' %}</a>
+          <a class="twitter-share" target="_blank" aria-label="{{ 'blog_comments.share_on_twitter_caption' | t }}" href="https://twitter.com/share?url={{ shop.url }}{{ article.url }}&text={{ article.title }}. Comment by {{ comment.author }}: {{ comment.content | strip_html }}">{% render 'icons', icon: 'twitter' %}</a>
+          <a class="pinterest-share" target="_blank" aria-label="{{ 'blog_comments.share_on_pinterest_caption' | t }}" href="//pinterest.com/pin/create/button/?url={{ shop.url }}{{ article.url }}&media={{ article.image.src | image_url }}&description={{ article.title }}. Comment by {{ comment.author }}: {{ comment.content | strip_html }}">{% render 'icons', icon: 'pinterest' %}</a>
+        </div>
+      </div>
+    {%- endfor -%}
+    {%- render 'pagination', paginate: paginate -%}
+  {%- endif -%}
+
+  <div class="new-comment">
+    <h3>{{ 'blog_comments.new_comment_title' | t }}</h3>
+    <div class="form">
+      {%- form 'new_comment', article -%}
+        {% if form.posted_successfully? %}
+          <p class="note form-success">
+            {%- if blog.moderated? -%}
+              {{ 'blog_comments.submitted_moderated_message' | t }}
+            {%- else -%}
+            {{ 'blog_comments.submitted_success_message' | t }}
+            {%- endif -%}
+          </p>
+        {% else %}
+            {{ form.errors | default_errors }}
+        {% endif %}
+        <div class="grid">
+          <div class="grid-item one-half small--one-whole">
+            <div class="field">
+              <input placeholder=" {{ 'blog_comments.author_name_label' | t | escape }}" class="input-full{% if form.errors contains 'author' %} error{% endif %}" type="text" name="comment[author]" id="CommentAuthor" value="{{ form.author }}" autocapitalize="words">
+              <label for="CommentAuthor"> {{ 'blog_comments.author_name_label' | t }}</label>
+            </div>
+          </div>
+          <div class="grid-item one-half small--one-whole">
+            <div class="field">
+              <input placeholder=" {{ 'blog_comments.author_email_label' | t | escape }}" class="input-full{% if form.errors contains 'email' %} error{% endif %}" type="email" name="comment[email]" id="CommentEmail" value="{{ form.email }}" autocapitalize="off" autocomplete="email" />
+              <label for="CommentEmail"> {{ 'blog_comments.author_email_label' | t }}</label>
+            </div>
+          </div>
+        </div>
+        <div class="field textarea">
+          <textarea placeholder=" {{ 'blog_comments.message_label' | t | escape }}" class="input-full{% if form.errors contains 'body' %} error{% endif %}" name="comment[body]" id="CommentBody">{{ form.body }}</textarea>
+          <label for="CommentBody"> {{ 'blog_comments.message_label' | t }}</label>
+        </div>
+        <button type="submit" class="btn"> {{ 'blog_comments.submit_button' | t }}</button>
+      {%- endform -%}
+    </div>
+  </div>
+{%- endpaginate -%}
+</div>

@@ -1,0 +1,159 @@
+{%- comment -%}
+  This section is injected ONLY if the cookie CookiesConsent doesn't exist. The conditional call can be found in global.js inside the function loadSectionsAsync() 
+{%- endcomment -%}
+<style>
+  consent-bar {position: fixed; z-index: 100; width: 100%; bottom: 0; left: 0; background: transparent !important;}
+  consent-bar:before {content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: var(--scheme-background-gradient); opacity: {{section.settings.bg_opacity}}%; border-radius: inherit;}
+  consent-bar .wrap {position: relative; z-index: 1; background: transparent; padding: 1em 0;}
+  consent-bar.border-true {border-top: 1px solid var(--scheme-borders-color);}
+  consent-bar.shadow-true {box-shadow: 0 0 6px rgba(0,0,0,.1);}
+  consent-bar .btn {white-space: nowrap;}
+  consent-bar .accept {cursor: pointer;}
+  consent-bar .close-btn {position: absolute; right: 1em; bottom: 0; height: 100%;}
+  {% unless section.settings.full_width %}
+  @media (min-width: {{settings.breakpoint_tablet | plus: 0.001}}em){
+    consent-bar {width: 50%; bottom: 5px; left: 5px; right: auto; border-radius: {{section.settings.border_radius}}em;}
+    consent-bar.full-width-false.border-true {border: 1px solid var(--scheme-borders-color);}
+  }
+  {% endunless %}
+  @media (max-width: {{settings.breakpoint_mobile}}){
+    consent-bar {padding: {{section.settings.section_padding_mobile}};}
+    consent-bar .btn {margin-top: 0.5em;}
+  }
+
+</style>
+
+<consent-bar class="scheme ease-animation color-{{section.settings.color_scheme}} border-{{section.settings.border}} shadow-{{section.settings.shadow}} full-width-{{section.settings.full_width}}">
+  <div class="container">
+    <div class="wrap main-content grid align-items-center ">
+      <div class="grid-item large--flex-1 medium--flex-1 small--one-whole">
+        <div class="text {{section.settings.text_size | prepend: 'p'}}">{{section.settings.text}}</div>
+      </div>
+      {%- if section.settings.button_text != blank -%}
+        <div class="grid-item small--one-whole">
+          <button type="button" class="btn accept small--one-whole">{{section.settings.button_text}}</button>
+        </div>
+      {%- else -%}
+        <div class="accept close-btn flex align-items-center" aria-label="{{ 'general.close_caption' | t | escape }}">{%- render 'icons', icon: 'close' -%}</div>
+      {%- endif -%}
+    </div>
+  </div>
+</consent-bar>
+
+<script type="module">
+  if(!customElements.get('consent-bar')) {
+    class ConsentBar extends HTMLElement {
+      constructor() {
+        super();
+        const saveConsent = (answer)=> {
+          Cookies.set('CookiesConsent', 'true', 365);
+          this.style.display = 'none';
+        }
+
+        this.querySelector('.accept').addEventListener('click', (e)=>{
+          saveConsent(true);
+        });
+      }
+    }
+    customElements.define('consent-bar', ConsentBar);
+  }
+</script>
+{% if request.design_mode %}
+<script>
+  (function(){
+    var section = document.getElementById('shopify-section-{{section.id}}');
+    var consentBar = section.querySelector('consent-bar');
+    consentBar.style.display = 'none';
+    section.addEventListener('shopify:section:select', (e)=>{
+      consentBar.style.display = '';
+    });
+    section.addEventListener('shopify:section:deselect', (e)=>{
+      consentBar.style.display = 'none';
+    });
+  })();
+</script>
+{% endif %}
+
+{% schema %}
+  {
+    "name": "Cookies Consent",
+    "class": "type-cookies-consent",
+    "settings": [
+      {
+        "type": "checkbox",
+        "id": "full_width",
+        "label": "Full width",
+        "default": true
+      },
+      {
+        "type": "richtext",
+        "id": "text",
+        "label": "Text",
+        "default": "<p>This site uses cookies to provide an optimized shopping experience. By using this site, you agree to the use of cookies.</p>"
+      },
+      {
+        "type": "range",
+        "id": "text_size",
+        "min": 1,
+        "max": 5,
+        "step": 1,
+        "unit": "p",
+        "label": "Text size",
+        "default": 3
+      },
+      {
+        "type": "text",
+        "id": "button_text",
+        "label": "'Accept' Button Text",
+        "default": "I Agree",
+        "info": "When empty, the close (X) button triggers the Accept action"
+      },
+      {
+        "type": "select",
+        "id": "button_size",
+        "label": "Button size",
+        "options": [
+          {"value": "normal", "label": "Normal"},
+          {"value": "smaller", "label": "Smaller"}
+        ],
+        "default": "normal"
+      },
+      {
+        "type": "color_scheme",
+        "id": "color_scheme",
+        "label": "Color scheme",
+        "default": "scheme-3"
+      },
+      {
+        "type": "range",
+        "id": "bg_opacity",
+        "min": 0,
+        "max": 100,
+        "step": 1,
+        "unit": "%",
+        "label": "Background opacity",
+        "default": 90
+      },
+      {
+        "type": "range",
+        "id": "border_radius",
+        "min": 0,
+        "max": 10,
+        "step": 0.2,
+        "unit": "em",
+        "label": "Border radius",
+        "default": 0
+      },
+      {
+        "type": "checkbox",
+        "id": "border",
+        "label": "Border"
+      },
+      {
+        "type": "checkbox",
+        "id": "shadow",
+        "label": "Shadow"
+      }
+    ]
+  }
+{% endschema %}

@@ -1,0 +1,91 @@
+.keen {display: block; position: relative;}
+.keen-slider {opacity: 0; overflow: hidden; position: relative; display: flex; -webkit-user-select: none; -moz-user-select: none; -ms-user-select: none; user-select: none; -webkit-touch-callout: none; -khtml-user-select: none; touch-action: pan-y; -webkit-tap-highlight-color: transparent;}
+.keen-slider.initialized {opacity: 1;}
+.keen-slider-slide {width: 100%;}
+.keen-slider.vertical {flex-direction: column;}
+.keen-slider.vertical .keen-slider-slide {width: 100%; height: 100%; overflow: hidden;}
+.keen-slider[data-keen-slider-moves] * {pointer-events: none;}
+
+.keen-arrow {font-size: var(--keen-arrows-size); width: var(--keen-arrows-width); height: var(--keen-arrows-width); color: var(--scheme-carousel-arrows-label); --scheme-icons-color: var(--scheme-carousel-arrows-label); position: relative; display: flex; align-items: center; justify-content: center; -webkit-transform: scale(1.001); transform: scale(1.001); -webkit-transition: all var(--animation-speed-fast) linear; -moz-transition: all var(--animation-speed-fast) linear; -o-transition: all var(--animation-speed-fast) linear; -ms-transition: all var(--animation-speed-fast) linear; transition: all var(--animation-speed-fast) linear; opacity: var(--arrow-opacity, 1)}
+.keen-arrow:not(.frame) {--scheme-carousel-arrows-label: var(--scheme-text-color);}
+.keen-arrow > * {position: relative;}
+.keen-arrow.hide {display: none;}
+.keen-arrow.disabled {opacity: 0.3;}
+.not-mobile .keen-arrow:hover {-webkit-transform: scale(1.4); transform: scale(1.4);}
+.keen-arrows.sides .keen-arrow {position: absolute; z-index: 2; top: 50%; left: auto; right: auto; margin-top: calc(calc(var(--keen-arrows-width) / 2) * -1); }
+.products-carousel .keen-arrows.sides .keen-arrow {top: calc(50% - calc(var(--product-card-info-height) / 2));}
+.keen-arrow.frame {background: var(--scheme-carousel-arrows-background); border: {{settings.carousel_arrows_border_thickness}}px solid var(--scheme-carousel-arrows-border); font-size: calc(var(--keen-arrows-size) *  0.66); width: calc(var(--keen-arrows-width) * 1.4); height: calc(var(--keen-arrows-width) * 1.4);}
+.not-mobile .keen-arrow.frame:hover {-webkit-transform: scale(1.15); transform: scale(1.15);}
+.keen-arrows:not(.sides) .keen-arrow.frame {margin: 0 0.5rem;}
+.keen-arrow.frame.shadow {box-shadow: 0 0 6px rgba(0,0,0,.1);}
+.keen-arrow:not(.frame).shadow {-webkit-filter: drop-shadow(0 0 3px rgba(0,0,0,.3)); filter: drop-shadow(0 0 3px rgba(0,0,0,.3));}
+.keen-arrow.circle {border-radius: 50%;}
+.keen-arrow.circle:before,
+.keen-arrow.circle:after {border-radius: 50%;}
+.keen-arrows.sides.outside .keen-arrow.prev {right: calc(100% + 0.5em);}
+.keen-arrows.sides.outside .keen-arrow.next {left: calc(100% + 0.5em);}
+.keen-arrows.sides.inside .keen-arrow.prev {left: 0.5em;}
+.keen-arrows.sides.inside .keen-arrow.next {right: 0.5em;}
+.keen-arrows.sides.animate:not(.allow-mobile) .keen-arrow,
+.not-mobile .keen-arrows.sides.animate .keen-arrow {--arrow-opacity: 0; visibility: hidden;}
+.not-mobile .keen:hover .keen-arrows.sides.animate .keen-arrow {--arrow-opacity: 1; visibility: visible;}
+.keen-arrows.sides.outside.animate .keen-arrow.prev {right: calc(100% - 0.5em);}
+.keen-arrows.sides.outside.animate .keen-arrow.next {left: calc(100% - 0.5em);}
+.not-mobile .keen:hover .keen-arrows.sides.outside.animate .keen-arrow.prev {right: 100%;}
+.not-mobile .keen:hover .keen-arrows.sides.outside.animate .keen-arrow.next {left: 100%;}
+.keen-arrows.sides.inside.animate .keen-arrow.prev {left: 0;}
+.keen-arrows.sides.inside.animate .keen-arrow.next {right: 0;}
+.not-mobile .keen:hover .keen-arrows.sides.inside.animate .keen-arrow.prev {left: 0.5em;}
+.not-mobile .keen:hover .keen-arrows.sides.inside.animate .keen-arrow.next {right: 0.5em;}
+
+.keen-dots {width: calc(100% + 8px); margin: 2em -5px 0; z-index: 2; text-align: center;}
+.keen-dots-dot {border-radius: 50%; color: var(--scheme-carousel-dots-off); position: relative; display: inline-block; padding: 8px;}
+.keen-dots-dot:before {width: 9px; height: 9px; border-radius: inherit; content: ''; display: block; background: var(--scheme-carousel-dots-off); -webkit-transition: all var(--animation-speed-fast) linear; -moz-transition: all var(--animation-speed-fast) linear; -o-transition: all var(--animation-speed-fast) linear; -ms-transition: all var(--animation-speed-fast) linear; transition: all var(--animation-speed-fast) linear;}
+.keen-dots-dot.active:before {background: var(--scheme-carousel-dots-on);}
+.keen-dots.line {width: 100%; margin-left: 0; margin-right: 0;}
+.keen-dots.line .keen-dots-dot {border-radius: 0;}
+.keen-dots.line .keen-dots-dot:before {width: 3em; height: 4px;}
+.keen-dots.border .keen-dots-dot:not(.active):before {background: transparent; border: 1px solid var(--scheme-carousel-dots-off);}
+.keen-dots.border .keen-dots-dot.active:before {content: ''; border: 1px solid var(--scheme-carousel-dots-on);}
+.keen-dots.shadow .keen-dots-dot:before {box-shadow: 0 0 4px rgba(0,0,0,.2);}
+.keen-dots:empty {display: none;}
+
+.keen-nav-bar {position: relative; width: 100%; margin: 1em 0 0; background-color: var(--scheme-borders-color);}
+.keen-nav-bar .keen-nav-inner-bar {position: relative; background-color: var(--scheme-text-color); height: 5px;}
+.keen-nav-bar .keen-nav-inner-bar:before {content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0; background-color: var(--scheme-text-color); opacity: 0.2;}
+.keen-nav-bar.disabled {display: none !important;}
+.keen-slider.vertical + .keen-nav-bar {width: auto; margin: 0 0 0 1em;}
+.keen-slider.vertical + .keen-nav-bar .keen-nav-inner-bar {width: 5px;}
+
+.keen-slider.custom-animation .keen-slider-slide {position: absolute; width: 100%; visibility: hidden; -webkit-transition: all var(--animation-speed-slow) ease-out; -moz-transition: all var(--animation-speed-slow) ease-out; -o-transition: all var(--animation-speed-slow) ease-out; -ms-transition: all var(--animation-speed-slow) ease-out; transition: all var(--animation-speed-slow) ease-out; -webkit-animation-duration: 1s; animation-duration: 1s; -webkit-animation-fill-mode: both; animation-fill-mode: both}
+.keen-slider.custom-animation .keen-slider-slide.active {visibility: visible;}
+.keen-slider.custom-animation.fade .keen-slider-slide {opacity: 0; transition-duration: 0.5s !important;}
+.keen-slider.custom-animation.fade .keen-slider-slide.active {opacity: 1;}
+.keen-slider.custom-animation.zoom .keen-slider-slide {-webkit-animation-name: fadeOutSlide; animation-name: fadeOutSlide;}
+.keen-slider.custom-animation.zoom .keen-slider-slide.active {-webkit-animation-name: zoomInSlide; animation-name: zoomInSlide;}
+
+.keen-slider-page {margin: 0 1em; display: inline-flex; align-items: center;}
+.keen-dots .keen-slider-page {padding: 0.5em 0 0.5em 0.5em; margin: 0; border-radius: 2em; width: calc(var(--keen-slider-page-length, 2) * 3ch + 4ch); justify-content: flex-end;}
+.keen-dots.line .keen-dots-dot:first-of-type {padding-left: 0em;}
+.keen-dots.line .keen-dots-dot:last-of-type {padding-right: 0em;}
+.keen-slider-page .bar {padding: 0 0.6em; opacity: 0.3;}
+
+/*workaround to issue on slider when 3 items per view, that crops ~1px of the left side of all items except the first one when they are on the left edge of the slider */
+.keen-slider-slide-margin .keen-slider-slide > *,
+.keen-slider-container.container .keen-slider-slide > * {margin: 0 1px;}
+
+{% if settings.carousel_dots_as_navbar %}
+.keen-dots.line {display: flex;}
+.keen-dots.line .keen-dots-dot {flex-grow: 1; padding: 0; }
+.keen-dots.line .keen-dots-dot:before {height: 2px; width: 100%;}
+.keen-dots.line .keen-dots-dot.active,.not-mobile .keen-dots.line .keen-dots-dot:not(.active):hover {transform: scale(1);}
+{% endif %}
+
+@keyframes fadeOutSlide {
+  0% {opacity: 1;}
+  100% {opacity: 0;}
+}
+@keyframes zoomInSlide {
+  0% {opacity: 0;transform: scale(0.8);}
+  100% {opacity: 1;transform: none;}
+}

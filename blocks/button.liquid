@@ -1,0 +1,70 @@
+<div class="grid-item">
+  {%- render 'richtext_blocks', blockType: 'content_button', block: block -%}
+</div>
+{% schema %}
+{
+  "name": "Button",
+  "tag": null,
+  "presets": [
+    {
+      "name": "Button",
+      "category": "Content",
+      "blocks": [
+      ]
+    }
+  ],
+  "settings": [
+    {
+      "type": "header",
+      "content": "Primary Button"
+    },
+    {
+      "type": "text",
+      "id": "button",
+      "label": "Button",
+      "default": "Shop now"
+    },
+    {
+      "type": "url",
+      "id": "link",
+      "label": "Link"
+    },
+    {
+      "type": "select",
+      "id": "cta_style",
+      "label": "Style",
+      "options": [
+          {"value": "link", "label": "Link"},
+          {"value": "btn", "label": "Button"},
+          {"value": "btn v2", "label": "Button V2"}
+      ],
+      "default": "btn"
+    },
+    {
+      "type": "header",
+      "content": "Secondary Button"
+    },
+    {
+      "type": "text",
+      "id": "button_2",
+      "label": "Button"
+    },
+    {
+      "type": "url",
+      "id": "link_2",
+      "label": "Link"
+    },
+    {
+      "type": "select",
+      "id": "cta_style2",
+      "label": "Style",
+      "options": [
+          {"value": "link", "label": "Link"},
+          {"value": "btn", "label": "Button"},
+          {"value": "btn v2", "label": "Button V2"}
+      ],
+      "default": "btn"
+    }
+  ]
+}
+{% endschema %}

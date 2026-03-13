@@ -1,0 +1,9 @@
+{% if settings.free_shipping_threshold > 0 %}
+  <free-shipping-progress data-cart-total="{{cart.total_price}}" class="free-shipping-progress scheme {% if section.settings.extras_color_scheme != blank %}color-{{section.settings.extras_color_scheme}} scheme-border-bottom{% else %}color-{{settings.modals_extras_color_scheme}} {% if settings.modals_extras_border %}scheme-border-bottom{% endif %}{% endif %} flex direction-column justify-content-center align-items-center">
+    <div class="free-shipping-progress-title flex align-items-center justify-content-center">
+      <div class="away hide">{{settings.free_shipping_default | replace: '[value]', '<span data-away-value></span>'}}</div>
+      <div class="achieved hide">{{settings.free_shipping_success}}</div>
+    </div>
+    <div class="free-shipping-progress-bar scheme-border-background"><div class="progress ease-animation-slow" style="width: 0%"></div></div>
+  </free-shipping-progress>
+{% endif %}

@@ -1,0 +1,651 @@
+{%- liquid 
+  assign disableLazySizes = false
+  if section.index == 1 
+    assign disableLazySizes = true
+  endif
+-%}
+
+{{ 'section_timeline.css' | asset_url | stylesheet_tag }}
+<script src="{{ 'section_timeline.js' | asset_url }}" defer="defer"></script>
+<style> 
+  #shopify-section-{{section.id}} .timeline-section {
+    --image-width: {{section.settings.image_width}}%;
+    --image-border-radius: {{section.settings.image_border_radius | replace: '10', '1000' | append: 'em'}};
+    --items-image-border-radius: {{section.settings.items_image_border_radius | replace: '10', '1000' | append: 'em'}};
+    --items-text-width: {{section.settings.items_text_width | append: 'em'}};
+    --items-title-weight: {{section.settings.items_title_weight}};
+    --items-title-text-transform: {{section.settings.items_title_text_transform}};
+    --items-title-letter-spacing: {{section.settings.items_title_letter_spacing | divided_by: 10.00}}em;
+    --image-fit: {{section.settings.image_fit}};
+    --line-color: {{section.settings.line_color}};
+    --line-thickness: {{section.settings.line_thickness}}px;
+    --dots-color: {{section.settings.dots_color}};
+    --dots-label: {{section.settings.dots_color | replace: 'var(--scheme-text-color)', 'var(--scheme-background-color)' | replace: 'var(--scheme-headings-color)', 'var(--scheme-background-color)' | replace: 'var(--scheme-buttons-background)', 'var(--scheme-buttons-label)'}};
+    --dots-width: {{section.settings.dots_width}}em;
+  }
+  @media (min-width: {{settings.breakpoint_tablet | plus: 0.001}}em){
+    #shopify-section-{{section.id}} .timeline-section {--items-image-width: {{section.settings.items_image_width}}%;}
+  }
+  @media (max-width: {{settings.breakpoint_tablet}}){
+    #shopify-section-{{section.id}} .timeline-section {--items-image-width: {{section.settings.items_image_width_mobile}}%;}
+  }
+</style>
+
+{%- capture contentHtml -%}
+  {%- if section.settings.content_full_width -%}<div class="{{section.settings.image_position | replace: 'normal', 'large--container-right' | replace: 'row-reverse', 'large--container-left'}}">{%- endif -%}
+    <section-timeline class="timeline-section grid {% if section.settings.alternate %}alternate{% endif %} {% if section.settings.image_full_height %}image-full-height{% endif %} large--{{section.settings.image_position}}">
+      {%- if section.settings.image != blank -%}
+      <div class="grid-item image-column medium-down--one-whole">
+        <img class="{% unless disableLazySizes %}lazyload{% endunless %}" alt="{{section.settings.image.alt}}" data-sizes="auto" src="{% render 'image_placeholder', image: section.settings.image %}" {% if disableLazySizes %}fetchpriority="high" {% else %}data-{% endif %}srcset="{% render 'lazy_src', image: section.settings.image %}" width="{{ section.settings.image.width }}" height="{{ section.settings.image.height }}" {% if section.settings.image.presentation.focal_point != blank %}style="object-position: {{section.settings.image.presentation.focal_point}};"{% endif %}>
+      </div>
+      {%- endif -%}
+      <div class="grid-item large--flex-1 medium-down--one-whole steps-column">
+        {%- if section.settings.content_full_width -%}<div class="medium-down--container">{%- endif -%}
+          {%- if section.settings.timeline_text != blank and section.settings.timeline_text != '<p></p>' -%}
+            {% assign hasHeadingText = true %}
+          {%- endif -%}
+          {%- if section.settings.timeline_eyebrow != blank or section.settings.timeline_title != blank or hasHeadingText -%}
+            <div class="heading richtext-wrap {% if section.settings.alternate %}large--text-center{% endif %}">
+              {%- if section.settings.timeline_eyebrow != blank -%}
+                <div class="subheading {{section.settings.timeline_eyebrow_size | prepend: 'p'}}">{{ section.settings.timeline_eyebrow }}</div>
+              {%- endif -%}
+              {%- if section.settings.timeline_title != blank -%}
+                {{ '<' }}{%- if section.settings.timeline_is_h1 -%}h1{%- else -%}h2{%- endif %} class="title {{section.settings.timeline_title_size | replace: 0, '1-xl' | replace: -1, '1-xxl' | prepend: 'h' }}"{{ '>' }} {{ section.settings.timeline_title }} {{ '</' }}{%- if section.settings.timeline_is_h1 -%}h1{%- else -%}h2{%- endif %}{{ '>' }}
+              {%- endif -%}
+              {%- if section.settings.timeline_text != blank and section.settings.timeline_text != '<p></p>' -%}
+                <div class="text {{section.settings.timeline_text_size | prepend: 'p'}}">{{ section.settings.timeline_text }}</div>
+              {%- endif -%}
+            </div>
+          {%- endif -%}
+          <div class="steps">
+            <div class="line"></div>
+            {%- for block in section.blocks -%}
+            <div class="item flex {% if section.settings.alternate %}large--justify-content-center{% endif %} {% if forloop.first %}first{% elsif forloop.last %}last{% endif %}" {{ block.shopify_attributes }}>
+              {%- if section.settings.alternate -%}
+                <div class="info opposite text-left ease-animation-slow medium-down--hide">
+                  {%- if block.settings.image != blank and section.settings.items_image_position_opposite -%}
+                    <div class="img-wrap">
+                      <img class="{% unless disableLazySizes %}lazyload{% endunless %}" alt="{{block.settings.image.alt}}" data-sizes="auto" src="{% render 'image_placeholder', image: block.settings.image %}" {% if disableLazySizes %}fetchpriority="high" {% else %}data-{% endif %}srcset="{% render 'lazy_src', image: block.settings.image %}" width="{{ block.settings.image.width }}" height="{{ block.settings.image.height }}" {% if block.settings.image.presentation.focal_point != blank %}style="object-position: {{block.settings.image.presentation.focal_point}};"{% endif %}>
+                    </div>
+                  {%- endif -%}
+                </div>
+              {%- endif -%}
+              <div class="number-wrap">
+                <div class="number ease-animation-slow {{section.settings.color_scheme}} scheme-invert">
+                  <span class="ease-animation-slow">
+                    {% if section.settings.show_numbers %}<strong>{{forloop.index}}</strong>{% endif %}
+                  </span>
+                </div>
+              </div>
+              <div class="info text-left ease-animation-slow flex {{section.settings.items_image_position}}">
+                {%- if block.settings.text != blank and block.settings.text != '<p></p>' -%}
+                  {%- assign hasTextField = true -%}
+                {%- endif -%}
+                {%- if block.settings.eyebrow != "" or block.settings.title != "" or hasTextField -%}
+                  <div class="wrap">
+                    {%- if block.settings.eyebrow != "" -%}
+                      <div class="eyebrow small-label {{section.settings.items_eyebrow_size | prepend: 'p'}}">{{block.settings.eyebrow}}</div>
+                    {%- endif -%}
+                    {%- if block.settings.title != "" -%}
+                      {%- assign title2Tag = section.settings.timeline_is_h1 | replace: true, 'h2' | replace: false, 'h3' -%}
+                      <{{title2Tag}} class="title {{section.settings.items_title_font_family}} {{section.settings.items_title_size | replace: 0, '1-xl' | replace: -1, '1-xxl' | prepend: 'h' }}">{{block.settings.title}}</{{title2Tag}}>
+                    {%- endif -%}
+                    {%- if hasTextField -%}
+                      <div class="description {{section.settings.items_text_size | prepend: 'p'}}">{{block.settings.text}}</div>
+                    {%- endif -%}
+                  </div>
+                {%- endif -%}
+                {%- if block.settings.image != blank -%}
+                  <div class="img-wrap {% if section.settings.items_image_position_opposite %}hide medium-down--show{% endif %}">
+                    <img class="{% unless disableLazySizes %}lazyload{% endunless %}" alt="{{block.settings.image.alt}}" data-sizes="auto" src="{% render 'image_placeholder', image: block.settings.image %}" {% if disableLazySizes %}fetchpriority="high" {% else %}data-{% endif %}srcset="{% render 'lazy_src', image: block.settings.image %}" width="{{ block.settings.image.width }}" height="{{ block.settings.image.height }}" {% if block.settings.image.presentation.focal_point != blank %}style="object-position: {{block.settings.image.presentation.focal_point}};"{% endif %}>
+                  </div>
+                {%- endif -%}
+              </div>
+            </div>
+            {%- endfor -%}
+          </div>
+        {%- if section.settings.content_full_width -%}</div>{%- endif -%}
+      </div>
+    </section-timeline>
+  {%- if section.settings.content_full_width -%}</div>{%- endif -%}
+{%- endcapture -%}
+
+{%- render 'section_custom_structure', section: section, contentHtml: contentHtml -%}
+
+{% schema %}
+  {
+    "name": "Timeline",
+    "class": "type-timeline",
+    "presets": [
+      {
+        "name": "Timeline",
+        "blocks": [
+          {
+            "type": "block",
+            "settings": {
+              "eyebrow": "Fall 2010",
+              "title": "Lorem ipsum dolor",
+              "text": "<p>Vivamus bibendum at erat quis porta. Vestibulum vel nisl ut orci tincidunt luctus. Nulla et leo aliquam, faucibus risus ac, pulvinar purus. Maecenas id quam non enim interdum rhoncus sit amet quis nulla. Nulla vestibulum dolor vel tortor varius congue.</p>"
+            }
+          },
+          {
+            "type": "block",
+            "settings": {
+              "eyebrow": "Winter 2011",
+              "title": "Nulla vestibulum",
+              "text": "<p>Maecenas id quam non enim interdum rhoncus sit amet quis nulla. Nulla vestibulum dolor vel tortor varius congue. Aliquam elementum id risus et tempus. Praesent quis urna risus. Vivamus bibendum at erat quis porta. Vestibulum vel nisl ut orci tincidunt luctus.</p>"
+            }
+          },
+          {
+            "type": "block",
+            "settings": {
+              "eyebrow": "Spring 2011",
+              "title": "Praesent quis urna",
+              "text": "<p>Vivamus bibendum at erat quis porta. Vestibulum vel nisl ut orci tincidunt luctus. Nulla et leo aliquam, faucibus risus ac, pulvinar purus. Maecenas id quam non enim interdum rhoncus sit amet quis nulla. Nulla vestibulum dolor vel tortor varius congue.</p>"
+            }
+          },
+          {
+            "type": "block",
+            "settings": {
+              "eyebrow": "Summer 2011",
+              "title": "Vivamus bibendum",
+              "text": "<p>Maecenas id quam non enim interdum rhoncus sit amet quis nulla. Nulla vestibulum dolor vel tortor varius congue. Aliquam elementum id risus et tempus. Praesent quis urna risus. Vivamus bibendum at erat quis porta. Vestibulum vel nisl ut orci tincidunt luctus.</p>"
+            }
+          }
+        ]
+      }
+    ],
+    "settings": [
+      {
+        "type": "header",
+        "content": "Head"
+      },
+      {
+        "type": "text",
+        "id": "timeline_eyebrow",
+        "label": "Eyebrow"
+      },
+      {
+        "visible_if": "{{ section.settings.timeline_eyebrow != blank }}",
+        "type": "range",
+        "id": "timeline_eyebrow_size",
+        "min": 1,
+        "max": 5,
+        "step": 1,
+        "unit": "p",
+        "label": "Eyebrow size",
+        "default": 3
+      },
+      {
+        "type": "text",
+        "id": "timeline_title",
+        "label": "Title"
+      },
+      {
+        "visible_if": "{{ section.settings.timeline_title != blank }}",
+        "type": "checkbox",
+        "id": "timeline_is_h1",
+        "label": "This is the first title of the page (H1)"
+      },
+      {
+        "visible_if": "{{ section.settings.timeline_title != blank }}",
+        "type": "range",
+        "id": "timeline_title_size",
+        "min": -1,
+        "max": 6,
+        "step": 1,
+        "unit": "h",
+        "label": "Title size",
+        "default": 1,
+        "info": "Equivalent to the heading tags."
+      },
+      {
+        "type": "richtext",
+        "id": "timeline_text",
+        "label": "Text"
+      },
+      {
+        "visible_if": "{{ section.settings.timeline_text != blank }}",
+        "type": "range",
+        "id": "timeline_text_size",
+        "min": 1,
+        "max": 5,
+        "step": 1,
+        "unit": "p",
+        "label": "Text size",
+        "default": 3
+      },
+      {
+        "type": "header",
+        "content": "Image"
+      },
+      {
+        "type": "select",
+        "id": "image_position",
+        "label": "Position",
+        "options": [
+            {"value": "normal", "label": "Left"},
+            {"value": "row-reverse", "label": "Right"}
+        ],
+        "default": "normal"
+      },
+      {
+        "type": "image_picker",
+        "id": "image",
+        "label": "Image"
+      },
+      {
+        "type": "range",
+        "id": "image_width",
+        "min": 20,
+        "max": 80,
+        "step": 1,
+        "unit": "%",
+        "label": "Width",
+        "default": 50
+      },
+      {
+        "type": "range",
+        "id": "image_border_radius",
+        "min": 0,
+        "max": 10,
+        "step": 0.2,
+        "unit": "em",
+        "label": "Border radius",
+        "default": 0
+      },
+      {
+        "type": "select",
+        "id": "image_fit",
+        "label": "Fit within wrapper",
+        "options": [
+          {"value": "contain", "label": "Contain"},
+          {"value": "cover", "label": "Cover"}
+        ],
+        "default": "cover"
+      },
+      {
+        "type": "checkbox",
+        "id": "image_full_height",
+        "label": "Full height",
+        "default": false
+      },
+      {
+        "type": "header",
+        "content": "Blocks - Lines and dots"
+      },
+      {
+        "type": "checkbox",
+        "id": "alternate",
+        "label": "Alternate / Zig-zag (Desktop)",
+        "default": true
+      },
+      {
+        "type": "checkbox",
+        "id": "show_numbers",
+        "label": "Show Numbers",
+        "default": true
+      },
+      {
+        "type": "range",
+        "id": "line_thickness",
+        "min": 0,
+        "max": 5,
+        "step": 1,
+        "unit": "px",
+        "label": "Line thickness",
+        "default": 2
+      },
+      {
+        "type": "select",
+        "id": "line_color",
+        "label": "Line color",
+        "options": [
+          {
+            "value": "transparent",
+            "label": "Transparent"
+          },
+          {
+            "value": "var(--scheme-text-color)",
+            "label": "Text color"
+          },
+          {
+            "value": "var(--scheme-headings-color)",
+            "label": "Headings color"
+          },
+          {
+            "value": "var(--scheme-buttons-background)",
+            "label": "Buttons color"
+          }
+        ],
+        "default": "var(--scheme-text-color)"
+      },
+      {
+        "type": "select",
+        "id": "dots_color",
+        "label": "Dots color",
+        "options": [
+          {
+            "value": "var(--scheme-text-color)",
+            "label": "Text color"
+          },
+          {
+            "value": "var(--scheme-headings-color)",
+            "label": "Headings color"
+          },
+          {
+            "value": "var(--scheme-buttons-background)",
+            "label": "Buttons color"
+          }
+        ],
+        "default": "var(--scheme-text-color)"
+      },
+      {
+        "type": "range",
+        "id": "dots_width",
+        "min": 0,
+        "max": 3,
+        "step": 0.1,
+        "unit": "em",
+        "label": "Dots width",
+        "default": 0.8
+      },
+      {
+        "type": "header",
+        "content": "Blocks - Title and text"
+      },
+      {
+        "type": "range",
+        "id": "items_text_width",
+        "min": 0,
+        "max": 50,
+        "step": 1,
+        "unit": "em",
+        "label": "Text width",
+        "default": 30
+      },
+      {
+        "type": "range",
+        "id": "items_eyebrow_size",
+        "min": 1,
+        "max": 5,
+        "step": 1,
+        "unit": "p",
+        "label": "Eyebrow size",
+        "default": 3
+      },
+      {
+        "type": "select",
+        "id": "items_title_font_family",
+        "label": "Title font style",
+        "options": [
+          {
+            "value": "body-font",
+            "label": "Match body"
+          },
+          {
+            "value": "heading-font",
+            "label": "Match headings"
+          }
+        ],
+        "default": "heading-font"
+      },
+      {
+        "type": "select",
+        "id": "items_title_text_transform",
+        "label": "Title capitalization",
+        "options": [
+          {
+            "value": "none",
+            "label": "Natural"
+          },
+          {
+            "value": "uppercase",
+            "label": "Uppercase"
+          }
+        ],
+        "default": "none"
+      },
+      {
+        "type": "range",
+        "id": "items_title_size",
+        "min": -1,
+        "max": 6,
+        "step": 1,
+        "unit": "h",
+        "label": "Title size",
+        "default": 3,
+        "info": "Equivalent to the heading tags."
+      },
+      {
+        "type": "range",
+        "id": "items_title_weight",
+        "min": 100,
+        "max": 900,
+        "step": 100,
+        "unit": "%",
+        "label": "Title weight",
+        "default": 700
+      },
+      {
+        "type": "range",
+        "id": "items_title_letter_spacing",
+        "min": -0.5,
+        "max": 2,
+        "step": 0.1,
+        "unit": "em",
+        "label": "Title letter spacing",
+        "default": 0,
+        "info": "This value will be divided by 10, so 0.5 is 0.05em."
+      },
+      {
+        "type": "range",
+        "id": "items_text_size",
+        "min": 1,
+        "max": 5,
+        "step": 1,
+        "unit": "p",
+        "label": "Text size",
+        "default": 3
+      },
+      {
+        "type": "header",
+        "content": "Blocks - Image"
+      },
+      {
+        "type": "select",
+        "id": "items_image_position",
+        "label": "Images position",
+        "options": [
+            {"value": "column-reverse", "label": "Top"},
+            {"value": "direction-column", "label": "Bottom"}
+        ],
+        "default": "direction-column"
+      },
+      {
+        "type": "checkbox",
+        "id": "items_image_position_opposite",
+        "label": "Place images in the opposite side on 'Alternate' mode (Desktop)",
+        "default": false
+      },
+      {
+        "type": "range",
+        "id": "items_image_border_radius",
+        "min": 0,
+        "max": 10,
+        "step": 0.2,
+        "unit": "em",
+        "label": "Images border radius",
+        "default": 0
+      },
+      {
+        "type": "range",
+        "id": "items_image_width",
+        "min": 0,
+        "max": 100,
+        "step": 1,
+        "unit": "%",
+        "label": "Images width (Desktop)",
+        "default": 50
+      },
+      {
+        "type": "range",
+        "id": "items_image_width_mobile",
+        "min": 0,
+        "max": 100,
+        "step": 1,
+        "unit": "%",
+        "label": "Images width (Mobile)",
+        "default": 50
+      },
+      {
+        "type": "header",
+        "content": "Section settings"
+      },
+      {
+        "type": "checkbox",
+        "id": "content_full_width",
+        "label": "Content full width",
+        "default": false
+      },
+      {
+        "type": "checkbox",
+        "id": "full_width",
+        "label": "Section Full width",
+        "default": true
+      },
+      {
+        "type": "select",
+        "id": "text_align",
+        "label": "Heading text align",
+        "options": [
+          {"value": "left","label": "Left"},
+          {"value": "center","label": "Center"},
+          {"value": "right","label": "Right"}
+        ],
+        "default": "left"
+      },
+      {
+        "type": "color_scheme",
+        "id": "section_color_scheme",
+        "label": "Section color scheme",
+        "default": "scheme-1"
+      },
+      {
+        "type": "color_scheme",
+        "id": "content_color_scheme",
+        "label": "Content color scheme",
+        "default": "scheme-1"
+      },
+      {
+        "type": "range",
+        "id": "border_radius",
+        "min": 0,
+        "max": 10,
+        "step": 0.2,
+        "unit": "em",
+        "label": "Border radius",
+        "default": 0
+      },
+      {
+        "type": "header",
+        "content": "Padding Desktop"
+      },
+      {
+        "type": "range",
+        "id": "text_padding",
+        "min": 0,
+        "max": 100,
+        "step": 10,
+        "unit": "%",
+        "label": "Inner padding (Desktop)",
+        "default": 100
+      },
+      {
+        "type": "range",
+        "id": "section_padding_top",
+        "min": 0,
+        "max": 100,
+        "step": 10,
+        "unit": "%",
+        "label": "Outer padding top (Desktop)",
+        "default": 0
+      },
+      {
+        "type": "range",
+        "id": "section_padding_bottom",
+        "min": 0,
+        "max": 100,
+        "step": 10,
+        "unit": "%",
+        "label": "Outer padding bottom (Desktop)",
+        "default": 0
+      },
+      {
+        "type": "header",
+        "content": "Padding Mobile"
+      },
+      {
+        "type": "range",
+        "id": "text_padding_mobile",
+        "min": 0,
+        "max": 100,
+        "step": 10,
+        "unit": "%",
+        "label": "Inner padding (Mobile)",
+        "default": 100
+      },
+      {
+        "type": "range",
+        "id": "section_padding_top_mobile",
+        "min": 0,
+        "max": 100,
+        "step": 10,
+        "unit": "%",
+        "label": "Outer padding top (Mobile)",
+        "default": 0
+      },
+      {
+        "type": "range",
+        "id": "section_padding_bottom_mobile",
+        "min": 0,
+        "max": 100,
+        "step": 10,
+        "unit": "%",
+        "label": "Outer padding bottom (Mobile)",
+        "default": 0
+      }
+    ],
+    "blocks": [
+      {
+        "type": "block",
+        "name": "Block",
+        "settings": [
+          {
+            "type": "text",
+            "id": "eyebrow",
+            "label": "Eyebrow",
+            "default": "August 1990"
+          },
+          {
+            "type": "text",
+            "id": "title",
+            "label": "Title",
+            "default": "Lorem ipsum"
+          },
+          {
+            "type": "richtext",
+            "id": "text",
+            "label": "Text",
+            "default": "<p>Lorem ipsum dolor sit amet consectetur adipiscing elit.</p>"
+          },
+          {
+            "type": "image_picker",
+            "id": "image",
+            "label": "Image"
+          }
+        ]
+      }
+    ]
+  }
+{% endschema %}

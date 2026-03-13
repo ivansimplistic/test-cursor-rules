@@ -1,0 +1,34 @@
+{
+  "sections": {
+    "page_hero": {
+      "type": "page_hero",
+      "blocks": {
+        "breadcrumb": {
+          "type": "breadcrumb",
+          "settings": {
+          }
+        },
+        "title": {
+          "type": "title",
+          "settings": {
+          }
+        }
+      },
+      "block_order": [
+        "breadcrumb",
+        "title"
+      ],
+      "settings": {
+      }
+    },
+    "page_main": {
+      "type": "page_main",
+      "settings": {
+      }
+    }
+  },
+  "order": [
+    "page_hero",
+    "page_main"
+  ]
+}

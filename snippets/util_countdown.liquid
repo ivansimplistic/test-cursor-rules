@@ -1,0 +1,24 @@
+<util-countdown class="countdown-wrap block-{{block.id}}" data-date="{{block.settings.date}} {{block.settings.timezone}}" {% if block.settings.show_days %}data-show-days="true"{% endif %} data-numbers-style="{{- block.settings.numbers_text_style -}}">
+  {{ 'util_countdown.css' | asset_url | stylesheet_tag }}
+  <script type="module">
+    lngg.util_countdown_js__days_label = {{ 'util_countdown_js.days_label' | t | json }};
+    lngg.util_countdown_js__hours_label = {{ 'util_countdown_js.hours_label' | t | json }};
+    lngg.util_countdown_js__minutes_label = {{ 'util_countdown_js.minutes_label' | t | json }};
+    lngg.util_countdown_js__seconds_label = {{ 'util_countdown_js.seconds_label' | t | json }};
+  </script>
+  <script src="{{ 'util_countdown.js' | asset_url }}" defer="defer"></script>
+  <style>
+    .block-{{block.id}} {
+      --countdown-size: {{block.settings.size | replace: 'small', '0.8em' | replace: 'medium', '1em' | replace: 'large', '1.4em'}};
+      --countdown-background: {{ block.settings.background_color }}; 
+      --countdown-border: {{ block.settings.border_color }};
+      --countdown-label: {{block.settings.label_color}}; 
+      --countdown-extras: {{ block.settings.extras_color }};
+    }
+  </style>
+  {%- if block.settings.text_while_countdown != blank -%}
+    <div class="util-countdown-running">{{block.settings.text_while_countdown}}</div>
+  {%- endif -%}
+  <div class="util-countdown"></div>
+  <div class="util-countdown-default" style="display: none;">{{block.settings.default}}</div>
+</util-countdown>

@@ -1,0 +1,26 @@
+{%- if settings.cart_featured_collection -%}
+  <script src="{{ 'component_carousel.js' | asset_url }}" defer="defer"></script>
+
+  {%- assign productsInCart = cart.items | map: 'product_id' -%}
+
+  {%- assign featuredProductsCount = 0 -%}
+  {%- capture featuredProducts -%}
+    {%- assign products = settings.cart_featured_collection.products | where: 'available', true -%}
+    {%- for product in products limit: 10 -%}
+      {%- unless productsInCart contains product.id -%}
+        {%- assign featuredProductsCount = featuredProductsCount | plus: 1 -%}
+        <div class="keen-slider-slide">
+          {%- render 'product_card_atc', productCard: product, border: false -%}
+        </div>
+      {%- endunless -%}
+    {%- endfor -%}
+  {%- endcapture -%}
+  {%- if featuredProductsCount > 0 -%}
+  <div class="products-slider scheme color-{{settings.cart_featured_color_scheme}} {% if settings.cart_featured_border %}scheme-border-box{% endif %}">
+    {%- capture headContentHtml -%}
+      <h2>{{settings.cart_featured_title}}</h2>
+    {%- endcapture -%}
+    {%- render 'products_slider_content', headContentHtml: headContentHtml, itemsHtml: featuredProducts, itemsDesktop: itemsDesktop, itemsTablet: itemsTablet, itemsMobile: itemsMobile -%}
+  </div>
+  {%- endif -%}
+{%- endif -%}

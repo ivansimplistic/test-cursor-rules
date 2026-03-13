@@ -1,0 +1,382 @@
+<style>
+  .color-schemes {padding-top: 3em; padding-bottom: 3em;}
+  .color-schemes > .grid > .grid-item {margin-bottom: 2em;}
+  .color-schemes .wrap > *:not(:last-child) {margin-bottom: 1.5rem;}
+  .color-schemes .wrap > *.larger-margin:not(:last-child) {margin-bottom: 3rem;}
+  .color-schemes .buttons {grid-gap: 1em;}
+  .color-schemes .form,
+  .color-schemes .errors-success > div:not(:last-child) {margin-right: 0.5em;}
+  .color-schemes .field:not(:last-child) {margin-bottom: 1em;}
+  .color-schemes .wrap {padding: 2em 3em 3em; position: relative; height: 100%;}
+  .color-schemes .badge.round {position: absolute; top: 1em; right: 1em;}
+  .color-schemes .tabs {margin: 2em 0 0;}
+  .color-schemes .tabs util-tabs:not(:last-child) {margin-bottom: 1em;}
+  .color-schemes .icons {margin: 2em 0 0;}
+  .color-schemes .overlay {text-align: center; padding: 1.5em; margin-top: 1.5em;}
+  .color-schemes .keen-dots {text-align: left; margin: 0 0 0 1em;}
+  fontsize-calc > *:first-child {position: relative; margin-right: 1.5em;}
+  fontsize-calc > *:first-child:after {content: ''; border-right: 1px solid var(--scheme-borders-color); position: absolute; top: 0; right: 0; bottom: 0;}
+  fontsize-calc .badge {margin-bottom: 1em;}
+  .write-size {opacity: 0.5; font-size: 0.9em;}
+  @media (max-width: {{settings.breakpoint_tablet}}){
+    .color-schemes .wrap {padding: 1em 1.5em 1.5em;}
+  }
+
+  .color-schemes .icons {display: flex; flex-wrap: wrap; gap: 0.5em; font-size: 1em;}
+
+  .typography {--grid-gap: 7rem;}
+  .typography > * {margin-top: 3rem;}
+  .typography .subtitle {padding-bottom: 1.5rem; border-bottom: 1px solid var(--scheme-borders-color); margin-bottom: 1rem;}
+  .typography .error-msg {margin-bottom: 4rem;}
+  .typography strong + p {margin-left: 0.5em;}
+  .typography .items-wrap > * {margin-bottom: 2rem;}
+  .typography .grid-item:not(:last-child) {margin-bottom: 3rem;}
+  fontsize-calc > *:first-child, .typography .label {white-space: nowrap; min-width: 10em; flex-shrink: 0;}
+  .body p {width: 90%;}
+</style>
+<div class="color-schemes container">
+  <h1 class="visually-hidden">Color schemes</h1>
+  <div class="grid">
+    {% for scheme in settings.color_schemes -%}
+      {%- assign i = forloop.index -%}
+      {%- capture module -%}
+        <div class="grid-item one-half medium-down--one-whole">
+          <div class="wrap scheme color-{{scheme.id}} scheme-border-box">
+            <div class="badge round"><span>20%</span> <span>off</span></div>
+            <div class="badge"><span>Pill Badge</span></div>
+            <div class="subtitle subheading">Subheading / Eyebrow</div>
+            <h2>Scheme {{ i }}</h2>
+            <div class="border scheme-border-bottom larger-margin"></div>
+            <div class="small-label">Small Label</div>
+            <p>Lorem ipsum dolor sit amet, <a href="#">consectetur adipiscing elit</a>. Proin ultrices mattis augue id blandit. Pellentesque libero nulla, fermentum a magna in, dignissim rhoncus arcu.</p>
+            <div class="errors-success flex">
+              <div class="error-msg">Error message.</div>
+              <div class="success-msg">Success message.</div>
+            </div>
+            <div class="form larger-margin">
+              <div class="field required">
+                <input id="scheme-{{i}}-field" type="text" placeholder="Field" />
+                <label for="scheme-{{i}}-field">Field</label>
+              </div>
+              <div class="field select required">
+                {%- render 'icons', icon: 'chevron-down' -%}
+                <select id="address_country_{{i}}" name="address[country]" placeholder="{{ 'account.customer_address_form.country_label' | t | escape }}" data-default="" aria-required="true" class="country required">{{ country_option_tags | replace: '>---<', '>- Country -<' }}</select>
+                <label for="address_country_{{i}}">{{ 'account.customer_address_form.country_label' | t }}</label>
+              </div>
+            </div>
+            <div class="buttons flex larger-margin">
+              <button class="btn">Button</button>
+              <button class="btn v2">Button V2</button>
+            </div>
+            <div class="links flex larger-margin">
+              {%- assign linkIcon = blank -%}
+              {%- if settings.links_arrow != 'none' -%}
+                {%- capture linkIcon -%}{%- render 'icons', icon: settings.links_arrow -%}{%- endcapture -%}
+              {%- endif -%}
+              <a href="#" class="link">Link style call to action{{linkIcon}}</a>
+            </div>
+            <div class="carousel-nav flex align-items-center">
+              <div class="keen-arrows flex">
+                {% render 'carousel_arrow', type: 'prev', showByDefault: true %}
+                {% render 'carousel_arrow', type: 'next', showByDefault: true %}
+              </div>
+              <div class="keen-dots {{settings.carousel_dots_shape}} {{settings.carousel_dots_border | replace: true, 'border'}}">
+                <button class="keen-dots-dot active" type="button" aria-label="Go to slide 1"></button><button class="keen-dots-dot" type="button" aria-label="Go to slide 2"></button><button class="keen-dots-dot" type="button" aria-label="Go to slide 3"></button><button class="keen-dots-dot" type="button" aria-label="Go to slide 4"></button><button class="keen-dots-dot" type="button" aria-label="Go to slide 5"></button>
+              </div>
+            </div> 
+            <div class="tabs">
+              <util-tabs>
+                <div class="single-row flex" role="tablist">
+                  <button class="util-tab v1" type="button" role="tab" aria-selected="true">Tab style #1</button>
+                  <button class="util-tab v1" type="button" role="tab" aria-selected="false">Tab style #1</button>
+                  <button class="util-tab v1" type="button" role="tab" aria-selected="false">Tab style #1</button>
+                </div>
+              </util-tabs>
+              <util-tabs>
+                <div class="single-row flex" role="tablist">
+                  <button class="util-tab v2" type="button" role="tab" aria-selected="true">This is tab #1</button>
+                  <button class="util-tab v2" type="button" role="tab" aria-selected="false">This is tab #2</button>
+                  <button class="util-tab v2" type="button" role="tab" aria-selected="false">This is tab #3</button>
+                </div>
+              </util-tabs>
+            </div>
+            <div class="icons">
+              {%- render 'icons', icon: 'arrow-left' -%}
+              {%- render 'icons', icon: 'arrow-right' -%}
+              {%- render 'icons', icon: 'chevron-left' -%}
+              {%- render 'icons', icon: 'chevron-right' -%}
+              {%- render 'icons', icon: 'bag' -%}
+              {%- render 'icons', icon: 'bell' -%}
+              {%- render 'icons', icon: 'bubble' -%}
+              {%- render 'icons', icon: 'calendar' -%}
+              {%- render 'icons', icon: 'cart' -%}
+              {%- render 'icons', icon: 'carrot' -%}
+              {%- render 'icons', icon: 'checkmark' -%}
+              {%- render 'icons', icon: 'clock' -%}
+              {%- render 'icons', icon: 'close' -%}
+              {%- render 'icons', icon: 'eye' -%}
+              {%- render 'icons', icon: 'filters' -%}
+              {%- render 'icons', icon: 'fullscreen' -%}
+              {%- render 'icons', icon: 'gift' -%}
+              {%- render 'icons', icon: 'hamburger' -%}
+              {%- render 'icons', icon: 'hand' -%}
+              {%- render 'icons', icon: 'heart' -%}
+              {%- render 'icons', icon: 'help' -%}
+              {%- render 'icons', icon: 'email' -%}
+              {%- render 'icons', icon: 'map' -%}
+              {%- render 'icons', icon: 'minus' -%}
+              {%- render 'icons', icon: 'plus' -%}
+              {%- render 'icons', icon: 'tag' -%}
+              {%- render 'icons', icon: 'edit' -%}
+              {%- render 'icons', icon: 'edit-paper' -%}
+              {%- render 'icons', icon: 'piggybank' -%}
+              {%- render 'icons', icon: 'play' -%}
+              {%- render 'icons', icon: 'pause' -%}
+              {%- render 'icons', icon: 'search' -%}
+              {%- render 'icons', icon: 'share' -%}
+              {%- render 'icons', icon: 'shipping' -%}
+              {%- render 'icons', icon: 'shipping-fast' -%}
+              {%- render 'icons', icon: 'star' -%}
+              {%- render 'icons', icon: 'star-half' -%}
+              {%- render 'icons', icon: 'store' -%}
+              {%- render 'icons', icon: 'delete' -%}
+              {%- render 'icons', icon: 'user' -%}
+              {%- render 'icons', icon: 'zoom' -%}
+              {%- render 'icons', icon: 'twitter' -%}
+              {%- render 'icons', icon: 'youtube' -%}
+              {%- render 'icons', icon: 'facebook' -%}
+              {%- render 'icons', icon: 'instagram' -%}
+              {%- render 'icons', icon: 'pinterest' -%}
+              {%- render 'icons', icon: 'tiktok' -%}
+            </div>
+          </div>
+        </div>
+      {%- endcapture -%}
+      {{module}}
+    {%- endfor -%}
+  </div>
+
+  <div class="typography">
+    {%- if request.design_mode -%}
+      <p class="error-msg p0"><strong>IMPORTANT:</strong> The px sizes don't re-calculate after an update until you hit SAVE on the Customizer.</p>
+    {%- endif -%}
+
+    <h2 class="h3">Headings</h2>
+
+    <div class="headings medium-down--hide">
+      <div class="grid">
+        <div class="grid-item one-half">
+          <div class="subtitle subheading">Headings size scale <strong>(Desktop)</strong>: {{settings.heading_scale}}%</div>
+        </div>
+        <div class="grid-item one-half">
+          <div class="subtitle subheading">Headings size scale <strong>(Mobile)</strong>: {{settings.heading_scale_mobile}}%</div>
+        </div>
+
+        <div class="grid-item desktop one-half">
+          <fontsize-calc class="flex">
+            <div>
+              <strong>Heading 1XXL</strong><br/>
+              <div class="write-size"></div>
+            </div>
+            <h1 class="title get-size h1-xxl">Lorem Ipsum</h1>
+          </fontsize-calc>
+        </div>
+        <div class="grid-item mobile one-half">
+          <fontsize-calc class="flex">
+            <div>
+              <strong>Heading 1XXL</strong><br/>
+              <div class="write-size"></div>
+            </div>
+            <h1 class="title get-size h1-xxl">Lorem Ipsum</h1>
+          </fontsize-calc>
+        </div>
+        <div class="grid-item desktop one-half">
+          <fontsize-calc class="flex">
+            <div>
+              <strong>Heading 1XL</strong><br/>
+              <div class="write-size"></div>
+            </div>
+            <h1 class="title get-size h1-xl">Lorem Ipsum</h1>
+          </fontsize-calc>
+        </div>
+        <div class="grid-item mobile one-half">
+          <fontsize-calc class="flex">
+            <div>
+              <strong>Heading 1XL</strong><br/>
+              <div class="write-size"></div>
+            </div>
+            <h1 class="title get-size h1-xl">Lorem Ipsum</h1>
+          </fontsize-calc>
+        </div>
+        {%- for i in (1..6) -%}
+          {%- for j in (1..2) -%}
+            <div class="grid-item {% cycle 'desktop', 'mobile' %} one-half">
+              <fontsize-calc class="flex">
+                <div>
+                  <strong>Heading {{ i }}</strong><br/>
+                  <div class="write-size"></div>
+                </div>
+                <h{{ i }} class="title get-size">Lorem Ipsum</h{{ i }}>
+              </fontsize-calc>
+            </div>
+          {%- endfor -%}
+        {%- endfor -%}
+      </div>
+    </div>
+
+    <h2 class="h3">Body</h2>
+
+    <div class="body medium-down--hide">
+      <div class="grid">
+        <div class="grid-item one-half">
+          <div class="subtitle subheading">Body size scale <strong>(Desktop)</strong>: {{settings.body_scale}}%</div>
+        </div>
+        <div class="grid-item one-half">
+          <div class="subtitle subheading">Body size scale <strong>(Mobile)</strong>: {{settings.body_scale_mobile}}%</div>
+        </div>
+        {%- for i in (1..5) -%}
+          {%- for j in (1..2) -%}
+            <div class="grid-item {% cycle 'desktop', 'mobile' %} one-half">
+              <fontsize-calc class="flex">
+                <div>
+                  <strong>{% if i == 3 %}p<br/>{% endif %}p{{ i }}</strong><br/>
+                  <div class="write-size"></div>
+                </div>
+                <div>
+                  {% if i == 3 %}<span class="badge">MAIN / DEFAULT</span>{% endif %}
+                  <p class="p{{ i }} get-size">Dolor sit amet, consectetur adipiscing elit. Vivamus porta sem nulla, non vestibulum diam fringilla vel. Integer id erat est. Fusce quis ullamcorper purus, non ultricies est. Nunc scelerisque est eu dapibus aliquam. Nunc in nulla nulla. Vestibulum eros tellus, viverra vel ultrices sit amet, euismod id nisi. Fusce aliquet eros nec arcu efficitur, vel cursus libero suscipit.</p>
+                </div>
+              </fontsize-calc>
+            </div>
+          {%- endfor -%}
+        {%- endfor -%}
+      </div>
+    </div>
+
+    <h2 class="h3">Subheading / Eyebrows</h2>
+
+    <div class="eyebrows medium-down--hide">
+      <p>
+        <strong class="label">Font family: </strong>
+        <span class="value">{{ settings.subheading_font_family }}</span>
+        <br/>
+        <strong class="label">Style: </strong>
+        <span class="value">{{ settings.subheading_font_style }}</span>
+        <br/>
+        <strong class="label">Capitalization: </strong>
+        <span class="value">{{ settings.subheading_font_transform }}</span>
+      </p><br/>
+      <div class="grid">
+        <div class="grid-item one-half">
+          <div class="subtitle subheading">Subheading size scale <strong>(Desktop)</strong>: {{settings.subheading_scale}}%</div>
+        </div>
+        <div class="grid-item one-half">
+          <div class="subtitle subheading">Subheading size scale <strong>(Mobile)</strong>: {{settings.subheading_scale_mobile}}%</div>
+        </div>
+        {%- for i in (1..5) -%}
+          {%- for j in (1..2) -%}
+            <div class="grid-item {% cycle 'desktop', 'mobile' %} one-half">
+              <fontsize-calc class="flex">
+                <div>
+                  <strong>{% if i == 3 %}subheading<br/>{% endif %}subheading.p{{ i }}</strong><br/>
+                  <div class="write-size"></div>
+                </div>
+                <div>
+                  {% if i == 3 %}<span class="badge">MAIN/DEFAULT</span>{% endif %}
+                  <p class="subheading p{{ i }} get-size">Lorem Ipsum Dolor</p>
+                </div>
+              </fontsize-calc>
+            </div>
+          {%- endfor -%}
+        {%- endfor -%}
+      </div>
+    </div>
+
+    <h2 class="h3">Small label</h2>
+
+    <div class="eyebrows medium-down--hide">
+      <p>
+        <strong>Font family: </strong>
+        <span class="value">{{ settings.small_label_font_family }}</span>
+        <br/>
+        <strong class="label">Style: </strong>
+        <span class="value">{{ settings.small_label_font_style }}</span>
+        <br/>
+        <strong class="label">Capitalization: </strong>
+        <span class="value">{{ settings.small_label_font_transform }}</span>
+      </p><br/>
+      <div class="grid">
+        <div class="grid-item one-half">
+          <div class="subtitle subheading">Small label size scale <strong>(Desktop)</strong>: {{settings.subheading_scale}}%</div>
+        </div>
+        <div class="grid-item one-half">
+          <div class="subtitle subheading">Small label size scale <strong>(Mobile)</strong>: {{settings.subheading_scale_mobile}}%</div>
+        </div>
+        {%- for i in (1..5) -%}
+          {%- for j in (1..2) -%}
+            <div class="grid-item {% cycle 'desktop', 'mobile' %} one-half">
+              <fontsize-calc class="flex">
+                <div>
+                  <strong>{% if i == 3 %}small-label<br/>{% endif %}small-label.p{{ i }}</strong><br/>
+                  <div class="write-size"></div>
+                </div>
+                <div>
+                  {% if i == 3 %}<span class="badge">MAIN/DEFAULT</span>{% endif %}
+                  <p class="small-label p{{ i }} get-size">Lorem Ipsum Dolor</p>
+                </div>
+              </fontsize-calc>
+            </div>
+          {%- endfor -%}
+        {%- endfor -%}
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script type="module">
+  if(!customElements.get('fontsize-calc')) {
+    class fontSizeCalc extends HTMLElement {
+      constructor() {
+        super();
+        this.mainElement = this.querySelector('.get-size');
+        window.addEventListener('resize', (e)=>{
+          this.updateText();
+        });
+        this.updateText();
+      }
+      updateText() {
+        const computed = window.getComputedStyle(this.mainElement);
+        let html = `
+          <strong>size:</strong> ${computed.fontSize}<br />
+          <strong>spacing:</strong> ${computed.letterSpacing}<br />
+          <strong>height:</strong> ${computed.lineHeight}<br />
+          <strong>weight:</strong> ${computed.fontWeight}<br />
+          `;
+        this.querySelector('.write-size').innerHTML = html;
+      }
+    }
+    customElements.define('fontsize-calc', fontSizeCalc);
+  }
+  if (window.parent==null || window.parent==window) {
+    const html = document.documentElement.innerHTML;
+    const ifr = document.createElement('iframe');
+    const origDoc = document.documentElement;
+    ifr.style="width: {{ settings.breakpoint_mobile }}; height: 720px; position: absolute; top: 0; left: 0; transform: translate(-101%, -101%)";
+    document.body.appendChild(ifr);
+    const destDoc = ifr.contentDocument.documentElement;
+    destDoc.innerHTML = html;
+    const fieldsSelector = '.typography .mobile .get-size';
+    const origFields = origDoc.querySelectorAll(fieldsSelector);
+    destDoc.querySelectorAll(fieldsSelector).forEach((x,i)=>{
+      const computed = window.getComputedStyle(x);
+      const size = computed.fontSize;
+      origFields[i].style.fontSize = computed.fontSize;
+      origFields[i].style.lineHeight = computed.lineHeight;
+      origFields[i].style.letterSpacing = computed.letterSpacing;
+      origFields[i].style.fontWeight = computed.fontWeight;
+    })
+    window.dispatchEvent(new Event('resize'));
+    
+  }
+</script>

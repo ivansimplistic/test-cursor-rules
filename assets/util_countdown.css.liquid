@@ -1,0 +1,18 @@
+.countdown-wrap {display: inline-block;}
+.util-countdown {display: flex; font-size: var(--countdown-size);}
+.util-countdown .btn svg {display: block; margin-left: 0.5em;}
+.util-countdown .small-label {font-size: 0.7em; line-height: 1; margin-top: 0.7em; color: var(--countdown-extras);}
+.util-countdown span {position: relative; width: 1.5em; line-height: 2; font-size: 1.75em; background: var(--countdown-background); color: var(--countdown-label); border: 1px solid var(--countdown-border); border-radius: 0.5rem; display: block;}
+.util-countdown span:not(:last-child) {margin-right: 0.1em;}
+.util-countdown .group {position: relative; text-align: center;}
+.util-countdown .dash {font-weight: 300; font-size: 1.75em; line-height: 2; padding: 0 0.2em; color: var(--countdown-extras);}
+.util-countdown-running {margin-bottom: 1.5rem;}
+@media (min-width: {{settings.breakpoint_tablet | plus: 0.001}}em) and (max-width: {{settings.container_width}}px) {
+  .countdown-wrap {font-size: 1.15vw;}
+}
+@media (min-width: {{settings.breakpoint_mobile | plus: 0.001}}em) and (max-width: {{settings.breakpoint_tablet}}) {
+  .countdown-wrap {font-size: 1.66vw;}
+}
+@media (max-width: {{settings.breakpoint_mobile}}) {
+  .countdown-wrap {font-size: 2.5vw;}
+}

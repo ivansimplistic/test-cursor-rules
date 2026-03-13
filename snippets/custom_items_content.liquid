@@ -1,0 +1,174 @@
+{%- liquid 
+  assign imagePosition = section.settings.image_position
+  assign matchTitleHeight = false
+  if imagePosition == 'top'
+    assign matchTitleHeight = true
+  endif
+  capture star
+    render 'icons', icon: 'star'
+  endcapture
+  assign starEmpty = star | replace: 'icon-star', 'icon-star empty'
+-%}
+<style>
+  #shopify-section-{{section.id}} {
+    --image-width: {{section.settings.image_width}}%;
+    --image-height: calc(100% / {{section.settings.image_height | replace: 'auto', section.blocks[0].settings.image.aspect_ratio | default: 1  }});
+    --image-border-radius: {{section.settings.image_border_radius | replace: '10', '1000'}}em;
+    --image-offset: {{section.settings.image_offset}}rem;
+    --card-border-radius: {{section.settings.card_border_radius}}em;
+    --card-padding: max({{section.settings.card_padding_desktop}}%, 1em);
+    --cta-spacing: {{section.settings.cta_spacing}}rem;
+    --card-title-font-size: {{section.settings.card_title_font_size}}%;
+    --card-title-weight: {{section.settings.card_title_weight}};
+    --card-title-text-transform: {{section.settings.card_title_text_transform}};
+    --card-title-letter-spacing: {{section.settings.card_title_letter_spacing | divided_by: 10.00}}em;
+  }
+  {%- if section.settings.title_at_top -%}
+    #shopify-section-{{section.id}} .custom-card {flex-wrap: wrap;}
+    #shopify-section-{{section.id}} .info:not(.info-at-top) {flex-basis: 0%;}
+    #shopify-section-{{section.id}} .info-at-top {width: 100%;}
+    #shopify-section-{{section.id}} .custom-card.image-padding-true .info-at-top {margin-bottom: 1.5rem}
+  {%- endif -%}
+
+  @media (max-width: {{settings.breakpoint_mobile}}){
+    #shopify-section-{{section.id}} {
+      --card-padding: max({{section.settings.card_padding_mobile}}%, 1em);
+      --image-width: {{section.settings.image_width_mobile}}%;
+    }
+  }
+  {%- assign starColor = 'var(--scheme-text-color)' -%}
+  {%- if section.settings.card_rating_color !=  blank and section.settings.card_rating_color != 'rgba(0,0,0,0)' -%}
+    {%- assign starColor = section.settings.card_rating_color -%}
+  {%- endif -%}
+  #shopify-section-{{section.id}} .icon-star path {fill: {{starColor}}; stroke: {{starColor}};}
+  #shopify-section-{{section.id}} .icon-star.empty path {fill: transparent;}
+</style>
+{{ 'custom_items.css' | asset_url | stylesheet_tag }}
+
+{%- assign cardExpandable = section.settings.card_expandable | default: false, allow_false: true -%}
+{%- assign cardOffset = section.settings.image_offset | default: false, allow_false: true -%}
+
+{%- capture itemsHtml -%}
+  {%- for block in section.blocks -%}
+    {%- capture topHtml -%}
+      {%- if block.settings.title != blank -%}
+        <div class="title {{section.settings.card_title_font_family}}">
+          {{ block.settings.title | replace: '[br]', '<br aria-hidden="true" />' | replace: '[hi]', '<span class="highlight">' | replace: '[/hi]', '</span>' |  replace: '[hi2]', '<span class="highlight2">' | replace: '[/hi2]', '</span>' }}
+        </div>
+      {%- endif -%}
+      {%- if block.settings.subtitle != blank -%}
+        <div class="small-label">{{ block.settings.subtitle }}</div>
+      {%- endif -%}
+    {%- endcapture -%}
+
+    <div class="keen-slider-slide block-{{block.id}} image-position-{{imagePosition}} {% if cardOffset > 0 %}image-offset{% endif %}">
+      {{ '<' }}{%- if block.settings.button == blank and block.settings.link != blank -%}a href="{{block.settings.link}}" {% if block.settings.link contains 'http:// '%}target="_blank"{% endif %}{%- else -%}div{%- endif %} class="custom-card no-highlight-hover scheme color-{{section.settings.cards_color_scheme}} text-{{section.settings.card_text_align}} image-position-{{imagePosition}} border-{{section.settings.card_border}} {% if section.settings.card_border %}scheme-border-box{% endif %} image-padding-{{section.settings.image_padding}} expandable-{{cardExpandable}} same-scheme-{%- if section.settings.content_color_scheme == section.settings.cards_color_scheme -%}true{%- else -%}false{%- endif -%}" {% if cardExpandable %}tabindex="0"{% endif %}  {{block.shopify_attributes}}{{ '>' }}
+        {%- if section.settings.title_at_top -%}
+          <div class="info info-at-top">
+            {{topHtml}}
+          </div>
+        {%- endif -%}        
+        {%- capture imageHtml -%}
+        {% if block.settings.image != blank %}
+          <div class="image-container {% if cardOffset > 0 and cardExpandable %}ease-animation-slow{% endif %} {% if section.settings.image_border %}scheme-border-box{% endif %} shadow-{{section.settings.image_shadow}}">
+            <div class="img ease-animation-slow lazyload" data-bgset="{% render 'lazy_src', image: block.settings.image  %}" {% if block.settings.image.presentation.focal_point != blank %}style="background-position: {{block.settings.image.presentation.focal_point}};"{% endif %}></div>
+          </div>
+        {% endif %}
+        {%- endcapture -%}
+        {%- if imagePosition == 'top' or imagePosition == 'left' -%}
+          {{imageHtml}}
+        {%- endif -%}
+        <div class="info">
+          {%- if section.settings.title_at_top != true -%}
+          {{topHtml}}
+          {%- endif -%}
+
+          {%- if block.settings.rating > 0 -%}
+            <div class="rating highlight">
+            {%- for i in (1..5) -%}
+              {%- if i <= block.settings.rating -%}
+              {{star}}
+              {%- else -%}
+              {{starEmpty}}
+              {%- endif -%}
+            {%- endfor -%}
+            </div>
+          {%- endif -%}
+          {%- capture bottomInfo -%}
+            {%- if block.settings.text != blank and block.settings.text != '<p></p>' -%} 
+              {%- assign hasBottom = true -%}
+              <div class="text {{section.settings.card_text_size | prepend: 'p'}}">{{ block.settings.text }}</div>
+            {%- endif -%}
+            {%- if block.settings.author != blank -%}
+              {%- assign hasBottom = true -%}
+              <div class="author {{section.settings.card_text_size | prepend: 'p'}}">— {{ block.settings.author }}</div>
+            {%- endif -%}
+            {%- if block.settings.button != blank -%}
+              {%- assign hasBottom = true -%}
+              <div class="buttons">
+                {%- assign linkIcon = blank -%}
+                {%- if section.settings.cta_style contains 'link' and settings.links_arrow != 'none' -%}
+                  {%- capture linkIcon -%}{%- render 'icons', icon: settings.links_arrow -%}{%- endcapture -%}
+                {%- endif -%}
+                <a href="{{ block.settings.link }}" {% if block.settings.link contains 'http:// '%}target="_blank"{% endif %} class="cta {{section.settings.cta_style}} {{section.settings.cta_size}}">
+                  {{ block.settings.button }}{{linkIcon}}
+                </a>
+              </div>
+            {%- endif -%}
+          {%- endcapture -%}
+
+          {%- if hasBottom -%}
+            <div class="info-bottom {% if cardExpandable %}ignore-slide-tabindex sliding-panel text-overflow{% endif %}">
+              <div class="info-bottom-inner">
+                {{bottomInfo}}                
+              </div>
+            </div>
+          {%- endif -%}
+        </div>
+        {%- if imagePosition == 'bottom' or imagePosition == 'right' -%}
+          {{imageHtml}}
+        {%- endif -%}
+
+      {{ '</' }}{%- if block.settings.button == blank and block.settings.link != blank -%}a{%- else -%}div{%- endif -%}{{ '>' }}
+    </div>
+  {%- endfor -%}
+{%- endcapture -%}
+
+{%- if cardExpandable -%}
+<script type="module">
+  var section = document.getElementById('shopify-section-{{section.id}}');
+  var expandables = section.querySelectorAll('.sliding-panel');
+  var minHeight = null;
+  function handleLayout() {
+    if (minHeight != null) {
+      return
+    }
+    section.querySelectorAll('.sliding-panel .text').forEach(t=>{
+      if (minHeight == null || (t.clientHeight < t.scrollHeight && t.clientHeight < minHeight)) {
+        minHeight = t.clientHeight;
+      }
+    });
+    if (minHeight < 80) {
+      expandables.forEach(panel=> {panel.classList.remove('text-overflow')});
+    }
+  }
+  window.addEventListener('resize', $s.throttle(()=>{
+    minHeight = null;
+    expandables.forEach(panel=> {panel.classList.add('text-overflow')});
+  }, 50));
+
+  expandables.forEach(panel=> {
+    var element = panel.closest('.custom-card');
+    element.classList.add('focusable');
+    $s.initFloatingPanel({container: element, buttonOpen: element, beforeOpen: handleLayout});
+    element.addEventListener('keypress', (e)=>{
+      if (e.keyCode == 13) {
+        e.target.click();
+      }
+    });
+
+  });
+</script>
+{%- endif -%}
+
+{%- render 'section_multi_item_structure', section: section, cardType: cardType, itemsHtml: itemsHtml, matchTitleHeight: matchTitleHeight, count: section.blocks.size -%}

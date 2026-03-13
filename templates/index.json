@@ -1,0 +1,29 @@
+{
+  "sections": {
+    "1641300092f51a1298": {
+      "type": "hero_carousel",
+      "blocks": {
+        "d27fec18-0f7d-43e7-be88-34162ed8be96": {
+          "type": "slide",
+          "settings": {
+            "is_h1": true
+          }
+        },
+        "33610ed9-3650-4414-9520-0b9fc07b6083": {
+          "type": "slide",
+          "settings": {
+          }
+        }
+      },
+      "block_order": [
+        "d27fec18-0f7d-43e7-be88-34162ed8be96",
+        "33610ed9-3650-4414-9520-0b9fc07b6083"
+      ],
+      "settings": {
+      }
+    }
+  },
+  "order": [
+    "1641300092f51a1298"
+  ]
+}

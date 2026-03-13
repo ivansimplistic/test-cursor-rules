@@ -1,0 +1,338 @@
+{%- comment -%}
+  Render HTML/CSS for a product carousel section with common settings. 
+  All sections that use this snippet must contain the main settings that you can find in the Featured Products  section
+  
+  Accepts:
+    - section: {Object} Required. Liquid object
+    - cardType: {String} Required. Indicate the type of cards contained, which allow to get the correct global settings.
+    - headContentHtml: {String} Optional. HTML content to be injected in the head of the section.
+    - itemsHtml: {String} Required. HTML content with custom items. The items must be wrapped in a div.keen-slider-slide
+
+  Usage:  
+  {%- render 'section_multi_item_structure', section: section, cardType: 'product', itemsHtml: itemsHtml -%}
+
+  Note:
+  This snippet can be used to create a <template> without pulling products from a collection (collection parameter is nil).
+  Then the product items can be inserted dynamically with Javascript.
+  Sections Recommended Products and Recently viewed work this way.
+{%- endcomment -%}
+
+{%- liquid 
+  assign cardType = cardType | default: 'product'
+  assign title = title | default: section.settings.title
+  assign fullWidth = section.settings.full_width | default: false
+  assign showPageInfo = showPageInfo | default: settings.carousel_show_slider_pages, allow_false: true
+  if matchTitleHeight == nil
+    if section.settings.layout == 'grid'
+      assign cardMatchTitleHeight = cardType | append: '_match_title_height_grid'
+    else
+      assign cardMatchTitleHeight = cardType | append: '_match_title_height'
+    endif
+    assign matchTitleHeight = matchTitleHeight | default: settings[cardMatchTitleHeight]
+  endif
+  
+  assign headPosition = section.settings.head_position | default: 'top'
+  
+  if section.settings.text != blank and section.settings.text != '<p></p>'
+    assign hasTextField = true
+  endif
+  if section.settings.eyebrow != blank or title != blank or hasTextField or section.settings.button != blank or headContentHtml != blank
+    assign hasHeadContent = true
+  endif
+  assign hasArrowsTop = false
+  if section.settings.layout == 'carousel' and section.settings.show_arrows and section.settings.arrows_position == 'top'
+    assign hasArrowsTop = true
+  endif
+  assign hasArrowsSides = false
+  if section.settings.layout == 'carousel' and section.settings.show_arrows and section.settings.arrows_position == 'sides'
+    assign hasArrowsSides = true
+  endif
+-%}
+
+{{ 'section_multi_item.css' | asset_url | stylesheet_tag }}
+<style>
+  #shopify-section-{{section.id}} {  
+    --border-radius: {{section.settings.border_radius}}em;
+    {%- if headPosition == 'left' -%}
+    --head-width: {{section.settings.head_width}}%;
+    {%- endif -%}
+    --section-padding-top: calc(var(--global-sections-padding) * {{section.settings.section_padding_top | divided_by: 100.00}});
+    --section-padding-bottom: calc(var(--global-sections-padding) * {{section.settings.section_padding_bottom | divided_by: 100.00}});
+    --text-padding: calc(var(--global-sections-padding) * {{section.settings.text_padding | divided_by: 100.00}});
+    --text-width: {{section.settings.text_width | default: 55 | append: 'em' | replace: '100em', '100%' }};
+  }
+  @media (max-width: {{settings.breakpoint_tablet}}) {
+    #shopify-section-{{section.id}} {
+      --section-padding-top: calc(var(--global-sections-padding) * {{section.settings.section_padding_top_mobile | divided_by: 100.00}});
+      --section-padding-bottom: calc(var(--global-sections-padding) * {{section.settings.section_padding_bottom_mobile | divided_by: 100.00}});
+      --text-padding: calc(var(--global-sections-padding) * {{section.settings.text_padding_mobile | divided_by: 100.00}});
+    }
+  }
+
+  {%- if section.settings.layout == 'grid' and section.settings.grid_collapsible != 'none' -%}
+    #shopify-section-{{section.id}} .items-wrapper .btn-expand {display: none;}
+    {%- capture expandCss -%}
+    #shopify-section-{{section.id}} .items-wrapper .btn-expand {display: block; position: absolute; left: calc(50% + var(--grid-gap) / 2); transform: translateX(-50%); z-index: 2; bottom: 4em;}
+    #shopify-section-{{section.id}} .items-wrapper.expanded .btn-expand {bottom: -3em;}
+    #shopify-section-{{section.id}} .items-wrapper.expanded {margin-bottom: 4em;}
+    #shopify-section-{{section.id}} .items-wrapper:not(.expanded) {position: relative;}
+    #shopify-section-{{section.id}} .items-wrapper:not(.expanded):after {content: ''; position: absolute; left: var(--grid-gap); bottom: 0; width: calc(100% - var(--grid-gap)); padding-top: min(var(--gradient-height, 20em), 20em); right: 0; z-index: 1; background: linear-gradient(0deg, var(--scheme-background-color), var(--scheme-background-color), rgba(0,0,0,0));}
+    {%- endcapture -%}
+    {%- if section.settings.grid_collapsible contains 'desktop' -%}
+      @media (min-width: {{settings.breakpoint_tablet | plus: 0.001}}em){
+        {{ expandCss }}
+        #shopify-section-{{section.id}} .items-wrapper:not(.expanded) .grid-item:nth-child(n+{{section.settings.items_per_view_desktop | floor | times: 2 | plus: 1}}) {display: none;}
+      }
+    {%- endif -%}
+    {%- if section.settings.grid_collapsible contains 'mobile' -%}
+      @media (max-width: {{settings.breakpoint_tablet}}) {
+        {{expandCss}}
+        #shopify-section-{{section.id}} .items-wrapper:not(.expanded) .grid-item:nth-child(n+{{section.settings.items_per_view_tablet | floor | times: 2 | plus: 1}}) {display: none;}
+      }
+      @media (max-width: {{settings.breakpoint_mobile}}) {
+        #shopify-section-{{section.id}} .items-wrapper:not(.expanded) .grid-item:nth-child(n+{{section.settings.items_per_view_mobile | floor | times: 2 | plus: 1}}) {display: none;}
+      }
+    {%- endif -%}
+  {%- endif -%}
+
+</style>
+  
+{%- if section.settings.layout == 'carousel' -%}
+  {%- liquid
+    assign layout = 'carousel'
+    assign carouselWidthDesktop = section.settings.carousel_width
+    assign carouselWidthMobile = section.settings.carousel_width_mobile
+    assign carouselClass = cardType | append: 's-carousel'
+    assign auxNum = section.settings.items_per_view_tablet | floor
+    assign itemsPerViewTabletModulo = section.settings.items_per_view_tablet | modulo: auxNum
+    assign auxNum = section.settings.items_per_view_mobile | floor
+    assign itemsPerViewMobileModulo = section.settings.items_per_view_mobile | modulo: auxNum
+
+    assign loopDesktop = true
+    if carouselWidthDesktop contains 'left'
+      assign loopDesktop = false
+    endif
+    assign loopMobile = true
+    if carouselWidthMobile contains 'left'
+      assign loopMobile = false
+    endif
+    
+    assign centerDesktop = false
+    if carouselWidthDesktop == 'full'
+      assign centerDesktop = true
+    endif
+    if carouselWidthDesktop == 'container' and section.settings.text_align == 'center' and section.settings.items_per_view_desktop > count
+      assign centerDesktop = true
+    endif
+    assign centerMobile = false
+    if carouselWidthMobile == 'full'
+      assign centerMobile = true
+    endif
+
+    assign hideArrowsTablet = false
+    if itemsPerViewTabletModulo != 0
+      assign hideArrowsTablet = true
+    elsif centerMobile and section.settings.items_per_view_tablet > 1
+      assign hideArrowsTablet = true
+    endif 
+    assign hideArrowsMobile = false
+    if itemsPerViewMobileModulo != 0
+      assign hideArrowsMobile = true
+    elsif centerMobile and section.settings.items_per_view_mobile > 1
+      assign hideArrowsMobile = true
+    endif 
+
+
+    assign rootSize = 10
+    assign gridGapDesktop = settings.grid_gap | times: rootSize | round
+    assign gridGapTablet = settings.grid_gap | times: rootSize | round
+    assign gridGapMobile = settings.grid_gap_mobile | times: rootSize | round
+    assign spacingRateDesktop = section.settings.items_spacing_desktop | divided_by: 100.00
+    assign spacingRateMobile = section.settings.items_spacing_mobile | divided_by: 100.00
+    assign spacingScriptDesktop = gridGapDesktop | times: spacingRateDesktop
+    assign spacingScriptTablet = gridGapTablet | times: spacingRateDesktop
+    assign spacingScriptMobile = gridGapMobile | times: spacingRateMobile
+  -%}
+  <script src="{{ 'component_carousel.js' | asset_url }}" defer="defer"></script>
+{%- else -%}
+  {%- liquid 
+    assign layout = 'grid'
+    assign carouselWidthDesktop = section.settings.carousel_width | default: 'container'
+    assign carouselWidthMobile = section.settings.carousel_width_mobile | default: 'left'
+    assign carouselClass = cardType | append: 's-grid' 
+  -%}
+  <style>
+    #shopify-section-{{section.id}} {
+      --items-per-row: {{section.settings.items_per_view_desktop | floor}};
+      --grid-align: {{section.settings.grid_align}};
+      --items-spacing: calc(var(--grid-gap) * {{section.settings.items_spacing_desktop | divided_by: 100.00}});
+    }
+    @media (max-width: {{settings.breakpoint_tablet}}) {
+      #shopify-section-{{section.id}} {
+        --items-per-row: {{section.settings.items_per_view_tablet | floor}};
+        --items-spacing: calc(var(--grid-gap) * {{section.settings.items_spacing_mobile | divided_by: 100.00}});
+      }
+    }
+    @media (max-width: {{settings.breakpoint_mobile}}) {
+      #shopify-section-{{section.id}} {
+        --items-per-row: {{section.settings.items_per_view_mobile | floor}};
+      }
+    }
+  </style>
+{%- endif -%}
+
+<div class="section-multi-item head-position-{{headPosition}} section-{{layout}} {{carouselClass}} {% if fullWidth %}full-width{% endif %} {% if carouselWidthDesktop == 'left' and fullWidth == false %}overflow-hidden{% endif %} scheme color-{{section.settings.section_color_scheme}} {% if section.settings.section_padding_top > 0 %}padding-top{% endif %} {% if section.settings.section_padding_bottom > 0 %}padding-bottom{% endif %} {% if section.settings.section_color_scheme == section.settings.content_color_scheme %}same-scheme{% endif %}">
+  {% unless fullWidth %}<div class="container">{% endunless %}
+    {{ '<' }}{%- if layout == 'carousel' -%}component-carousel{%- else -%}div{%- endif %} class="content scheme color-{{section.settings.content_color_scheme}} text-{{section.settings.text_align}} medium-down--text-{{section.settings.text_align_mobile | default: section.settings.text_align}}"
+      {% if layout == 'carousel' %} 
+        data-carousel-mode="{{settings.carousel_mode}}" 
+        data-carousel-autoplay="{{section.settings.carousel_autoplay}}" 
+        data-carousel-automove="{%- if section.settings.carousel_autoplay == 0 -%}{{section.settings.carousel_automove | default: 0}}{%- else -%}0{%- endif -%}" 
+        data-carousel-loop-desktop="{{loopDesktop}}" 
+        data-carousel-loop-mobile="{{loopMobile}}" 
+        data-carousel-centered-desktop="{{centerDesktop}}" 
+        data-carousel-centered-mobile="{{centerMobile}}" 
+        data-carousel-spacing-desktop="{{spacingScriptDesktop}}" 
+        data-carousel-spacing-tablet="{{spacingScriptTablet}}" 
+        data-carousel-spacing-mobile="{{spacingScriptMobile}}" 
+        data-slides-scroll-mode="{{settings.carousel_slides_scroll_mode}}"
+        data-slides-per-view-desktop="{{section.settings.items_per_view_desktop}}" 
+        data-slides-per-view-tablet="{{section.settings.items_per_view_tablet}}" 
+        data-slides-per-view-mobile="{{section.settings.items_per_view_mobile}}"
+        data-match-height-selectors="{% if matchTitleHeight %}.title{% endif %}"
+      {%- endif -%}
+    {{ '>' }}
+      {%- capture header -%}
+        {%- if hasHeadContent -%}
+          <div class="head {% if fullWidth and headPosition == 'top' %}container{% endif %} {% if carouselWidthMobile == 'full' and headPosition == 'left' %}medium-down--container{% endif %} flex medium-down--flex-wrap {% if headPosition == 'left' %}direction-column {{section.settings.text_align | replace: 'left', 'align-items-start' | replace: 'right', 'align-items-end' | replace: 'center', 'align-items-center'}} {{section.settings.text_align_mobile | default: section.settings.text_align | replace: 'left', 'medium-down--align-items-start' | replace: 'right', 'medium-down--align-items-end' | replace: 'center', 'medium-down--align-items-center'}}{% else %} {{section.settings.text_align | replace: 'left', 'align-items-end justify-content-between' | replace: 'right', 'row-reverse align-items-end justify-content-between' | replace: 'center', 'direction-column align-items-center'}} {{section.settings.text_align_mobile | default: section.settings.text_align | replace: 'left', 'medium-down--align-items-start medium-down--justify-content-between' | replace: 'right', 'medium-down--row-reverse medium-down--align-items-end medium-down--justify-content-between' | replace: 'center', 'medium-down--direction-column medium-down--align-items-center'}}{% endif %}">
+            {%- if hasHeadContent -%}
+              <div class="richtext-wrap text-{{section.settings.text_align}} medium-down--text-{{section.settings.text_align_mobile | default: section.settings.text_align}}">
+                {%- if section.settings.eyebrow != blank -%}
+                  <div class="subheading {{section.settings.eyebrow_size | prepend: 'p'}}">{{ section.settings.eyebrow }}</div>
+                {%- endif -%}
+                {%- if title != blank -%}
+                  {{ '<' }}{%- if section.settings.is_h1 -%}h1{%- else -%}h2{%- endif %} class="title {{section.settings.title_size | replace: 0, '1-xl' | replace: -1, '1-xxl' | prepend: 'h' }}"{{ '>' }}
+                    {{title | replace: '[br]', '<br aria-hidden="true" />' | replace: '[hi]', '<span class="highlight">' | replace: '[/hi]', '</span>' |  replace: '[hi2]', '<span class="highlight2">' | replace: '[/hi2]', '</span>'}}
+                  {{ '</' }}{%- if section.settings.is_h1 -%}h1{%- else -%}h2{%- endif %}{{ '>' }}
+                {%- endif -%}
+                {%- if hasTextField -%}
+                  <div class="text {{section.settings.text_size | prepend: 'p'}}">{{ section.settings.text }}</div>
+                {%- endif -%}
+                {%- if section.settings.button != blank and section.settings.button_position == 'top' -%}
+                  {%- if section.settings.button_style contains 'link' and settings.links_arrow != 'none' -%}
+                    {%- capture linkIcon -%}{%- render 'icons', icon: settings.links_arrow -%}{%- endcapture -%}
+                  {%- endif -%}
+                  <div class="btn-wrap">
+                    <a href="{{ section.settings.link }}" class="{{section.settings.button_style}}">
+                      {{ section.settings.button }}{{linkIcon}}
+                    </a>
+                  </div>
+                {%- endif -%}
+                {{headContentHtml}}
+              </div>
+            {%- endif -%}
+            <div class="right-side flex align-items-center">
+              {%- if section.settings.button != blank and section.settings.button_position == 'right' -%}
+                <div class="btn-wrap">
+                  <a href="{{ section.settings.link }}" class="{{section.settings.button_style}}">
+                    {{ section.settings.button }}
+                  </a>
+                </div>
+              {%- endif -%}
+              {%- if hasArrowsTop -%}
+                <div class="keen-arrows allow-mobile flex justify-content-center  {% if hideArrowsTablet or section.settings.show_dots %}medium--hide{% endif %} {% if hideArrowsMobile or section.settings.show_dots %}small--hide{% endif %}">
+                  {% render 'carousel_arrow', type: 'prev' %}
+                  {% if showPageInfo and section.settings.show_dots == false or settings.carousel_dots_shape == 'circle' %}
+                    <div class="keen-slider-page brand-font"></div>
+                  {% endif %}
+                  {% render 'carousel_arrow', type: 'next' %}
+                </div>
+              {%- endif -%}
+            </div>
+          </div>
+        {%- endif -%}
+      {%- endcapture -%}
+
+      {%- if headPosition == 'top' -%}
+        {{header}}
+      {%- endif -%}
+      <div class="keen keen-slider-container {% if headPosition == 'left' %}large--flex large--align-items-start{% endif %} large--{{carouselWidthDesktop | replace: 'left', 'container-left large--container-right'}} medium-down--{{carouselWidthMobile | replace: 'left', 'container-left medium-down--container-right'}}">
+        {%- if headPosition == 'left' -%}
+          {{header}}
+        {%- endif -%}
+        {%- if hasArrowsSides -%}
+          <div class="keen-arrows allow-mobile sides inside {{ settings.carousel_arrows_effect }} large--flex justify-content-center {% if hideArrowsTablet or section.settings.show_dots %}medium--hide{% endif %} {% if hideArrowsMobile or section.settings.show_dots %}small--hide{% endif %}">
+            {% render 'carousel_arrow', type: 'prev' %}
+            {% render 'carousel_arrow', type: 'next' %}
+          </div>
+        {%- endif -%}
+        <div class="{% if headPosition == 'left' %}right-content flex-1{% endif %}">
+          {%- if layout == 'carousel' -%}
+            <div class="keen-slider items-wrapper">
+              {{itemsHtml}}
+            </div>
+          {%- else -%}
+            <div class="grid items-wrapper justify-content-{{section.settings.text_align | replace: 'left', 'start' | replace: 'right', 'end'}} medium-down--justify-content-{{section.settings.text_align_mobile | default: section.settings.text_align | replace: 'left', 'start' | replace: 'right', 'end'}}">
+              {{itemsHtml | replace: 'keen-slider-slide', 'grid-item'}}
+              {%- if section.settings.grid_collapsible != 'none' -%}
+                <button type="button" class="btn {% if section.settings.cta_style == 'btn' %}v2{% endif %} btn-expand" data-textalt="{{ 'custom_items_content.view_less_caption' | t | escape }}">{{ 'custom_items_content.view_all_caption' | t }}</button>
+              {%- endif -%}
+            </div>
+          {%- endif -%}
+        </div>
+      </div>
+      {% if layout == 'carousel' and section.settings.show_dots %}
+        <div class="{% if fullWidth %}container{% endif %}">
+          <div class="keen-dots {{settings.carousel_dots_shape}} {{settings.carousel_dots_border | replace: true, 'border'}}">
+            {% if showPageInfo and settings.carousel_dots_shape == 'line' %}
+              <div class="keen-slider-page brand-font"></div>
+            {% endif %}
+          </div>
+        </div>
+      {% endif %}
+      {%- if section.settings.button != blank and section.settings.button_position == 'bottom' -%}
+        {%- if section.settings.button_style contains 'link' and settings.links_arrow != 'none' -%}
+          {%- capture linkIcon -%}{%- render 'icons', icon: settings.links_arrow -%}{%- endcapture -%}
+        {%- endif -%}
+        <div class="btn-wrap bottom {% if fullWidth %}container{% endif %}">
+          <a href="{{ section.settings.link }}" class="{{section.settings.button_style}}">
+            {{ section.settings.button }}{{linkIcon}}
+          </a>
+        </div>
+      {%- endif -%}
+
+    {{ '</' }}{%- if layout == 'carousel' -%}component-carousel{%- else -%}div{%- endif -%}{{ '>' }}
+  {% unless fullWidth %}</div>{% endunless %}
+</div>
+
+{%- if section.settings.layout == 'grid' -%}
+  <script type="module">
+    {%- if section.settings.grid_collapsible != 'none' -%}
+    var section = document.getElementById('shopify-section-{{section.id}}');
+    var btn = section.querySelector('.btn-expand');
+    var itemsWrapper = section.querySelector('.items-wrapper');
+    itemsWrapper.style.setProperty('--gradient-height', itemsWrapper.querySelector('.grid-item')?.offsetHeight+'px');
+    btn.addEventListener('click', function() {
+      if (itemsWrapper.classList.contains('expanded')) {
+        itemsWrapper.classList.remove('expanded');
+        setTimeout(function() {
+          $s.scrollToElement(btn, window.innerHeight/2);
+        })
+      } else {
+        itemsWrapper.classList.add('expanded');
+      }
+      const x = btn.dataset.textalt;
+      btn.dataset.textalt = btn.innerHTML;
+      btn.innerHTML = x;
+    });
+    {% endif %}
+
+    {% if matchTitleHeight %}
+      function layout() {
+        $s.matchHeight(document.querySelectorAll('#shopify-section-{{section.id}} .common-card .title'));
+      }
+      $s.resizeWidthHandle(layout);
+    {% endif %}
+
+  </script>
+{%- endif -%}

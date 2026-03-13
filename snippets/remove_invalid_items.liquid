@@ -1,0 +1,13 @@
+{%- assign removeItems = '' -%}
+
+
+
+
+{%- if removeItems != blank -%}
+  <script>
+    var itemKeys = {{removeItems | remove_first: ',' | split: ',' | slice: 0, 10 | json}};
+    var updates = itemKeys.map(x=>{return 'updates['+x+']=0'})
+    var url = '{{ routes.cart_url }}/update?'+updates.join('&');
+    location = url;
+  </script>
+{%- endif -%}

@@ -1,0 +1,385 @@
+{%- capture contentHtml -%}
+  {{page.content}}
+{%- endcapture -%}
+{%- render 'section_image_text_structure', section: section, textColumnHtml: contentHtml -%}
+{% schema %}
+  {
+    "name": "Page Main",
+    "class": "type-page-main",
+	  "settings": [
+      {
+        "type": "header",
+        "content": "Desktop Media"
+      },
+      {
+        "type": "select",
+        "id": "media_type",
+        "label": "Media type",
+        "options": [
+          {"value": "image", "label": "Image"},
+          {"value": "video", "label": "Video"}
+        ],
+        "default": "image"
+      },
+      {
+        "visible_if": "{{ section.settings.media_type == 'image' }}",
+        "type": "image_picker",
+        "id": "image",
+        "label": "Image"
+      },
+      {
+        "visible_if": "{{ section.settings.media_type == 'video' }}",
+        "type": "video",
+        "id": "video_mp4",
+        "label": "Video (MP4)"
+      },
+      {
+        "visible_if": "{{ section.settings.media_type == 'video' }}",
+        "type": "video_url",
+        "id": "video_iframe",
+        "label": "Video (Youtube/Vimeo)",
+        "accept": ["youtube", "vimeo"]
+      },
+      {
+        "type": "header",
+        "content": "Mobile Media"
+      },
+      {
+        "type": "paragraph",
+        "content": "If left blank, Mobile inherits what was set up for Desktop."
+      },
+      {
+        "type": "select",
+        "id": "media_type_mobile",
+        "label": "Media type",
+        "options": [
+          {"value": "image", "label": "Image"},
+          {"value": "video", "label": "Video"}
+        ],
+        "default": "image"
+      },
+      {
+        "visible_if": "{{ section.settings.media_type_mobile == 'image' }}",
+        "type": "image_picker",
+        "id": "image_mobile",
+        "label": "Image",
+      },
+      {
+        "visible_if": "{{ section.settings.media_type_mobile == 'video' }}",
+        "type": "video",
+        "id": "video_mp4_mobile",
+        "label": "Video (MP4)"
+      },
+      {
+        "visible_if": "{{ section.settings.media_type_mobile == 'video' }}",
+        "type": "video_url",
+        "id": "video_iframe_mobile",
+        "label": "Video (Youtube/Vimeo)",
+        "accept": ["youtube", "vimeo"]
+      },
+      {
+        "type": "header",
+        "content": "Colors"
+      },
+      {
+        "type": "color_scheme",
+        "id": "section_color_scheme",
+        "label": "Section color scheme",
+        "default": "scheme-1",
+        "info": "Only visible when the section is not full width, or the section top/bottom paddings are enabled."
+      },
+      {
+        "type": "color_scheme",
+        "id": "content_color_scheme",
+        "label": "Content color scheme",
+        "default": "scheme-1"
+      },
+      {
+        "type": "header",
+        "content": "Media Settings"
+      },
+      {
+        "type": "select",
+        "id": "image_position",
+        "label": "Media position (Desktop)",
+        "options": [
+          {"value": "normal", "label": "Left"},
+          {"value": "row-reverse", "label": "Right"}
+        ],
+        "default": "row-reverse"
+      },
+      {
+        "type": "select",
+        "id": "image_position_mobile",
+        "label": "Media position (Mobile)",
+        "options": [
+          {"value": "normal", "label": "Top"},
+          {"value": "column-reverse", "label": "Bottom"}
+        ],
+        "default": "normal"
+      },
+      {
+        "type": "range",
+        "id": "image_width",
+        "min": 0,
+        "max": 100,
+        "step": 1,
+        "unit": "%",
+        "label": "Media width",
+        "default": 50
+      },
+      {
+        "type": "radio",
+        "id": "image_height",
+        "label": "Media height (Desktop)",
+        "options": [
+          {"value": "auto", "label": "Auto (media natural height)"},
+          {"value": "cover", "label": "Cover the height of the text column"}
+        ],
+        "default": "auto"
+      },
+      {
+        "type": "range",
+        "id": "image_min_height_desktop",
+        "min": 0,
+        "max": 100,
+        "step": 1,
+        "unit": "rem",
+        "label": "Min-height (Desktop)",
+        "default": 50,
+        "info": "Useful when image height is set to 'Cover...'. Use 0 to ignore."
+      },
+      {
+        "type": "range",
+        "id": "image_max_height_mobile",
+        "min": 0,
+        "max": 100,
+        "step": 1,
+        "unit": "rem",
+        "label": "Max-height (Mobile)",
+        "default": 33,
+        "info": "Helps keep images consistent in size, no matter their original specs. Use 100 to ignore."
+      },
+      {
+        "type": "range",
+        "id": "image_border_radius",
+        "min": 0,
+        "max": 10,
+        "step": 0.2,
+        "unit": "em",
+        "label": "Border radius",
+        "default": 0
+      },
+      {
+        "type": "checkbox",
+        "id": "image_padding",
+        "label": "Padding"
+      },
+      {
+        "type": "header",
+        "content": "Video specific"
+      },
+      {
+        "type": "range",
+        "id": "video_height",
+        "min": 50,
+        "max": 150,
+        "step": 1,
+        "unit": "%",
+        "label": "Video natural height",
+        "default": 56
+      },
+      {
+        "type": "checkbox",
+        "id": "video_autoplay",
+        "label": "Video autoplay"
+      },
+      {
+        "type": "header",
+        "content": "Text Settings"
+      },
+      {
+        "type": "range",
+        "id": "text_width",
+        "min": 0,
+        "max": 100,
+        "step": 1,
+        "unit": "em",
+        "label": "Width",
+        "default": 100
+      },
+      {
+        "type": "select",
+        "id": "text_position",
+        "label": "Position (Desktop)",
+        "options": [
+          {"value": "start", "label": "Left"},
+          {"value": "center", "label": "Center"},
+          {"value": "end", "label": "Right"}
+        ],
+        "default": "start",
+        "info": "Within the Text column"
+      },
+      {
+        "type": "select",
+        "id": "text_align",
+        "label": "Alignment (Desktop)",
+        "options": [
+          {"value": "left", "label": "Left"},
+          {"value": "center", "label": "Center"},
+          {"value": "right", "label": "Right"}
+        ],
+        "default": "left"
+      },
+      {
+        "type": "select",
+        "id": "text_position_mobile",
+        "label": "Position (Mobile)",
+        "options": [
+          {"value": "start", "label": "Left"},
+          {"value": "center", "label": "Center"},
+          {"value": "end", "label": "Right"}
+        ],
+        "default": "start",
+        "info": "Within the Text column"
+      },
+      {
+        "type": "select",
+        "id": "text_align_mobile",
+        "label": "Alignment (Mobile)",
+        "options": [
+          {"value": "left", "label": "Left"},
+          {"value": "center", "label": "Center"},
+          {"value": "right", "label": "Right"}
+        ],
+        "default": "left"
+      },
+      {
+        "type": "range",
+        "id": "text_border_radius",
+        "min": 0,
+        "max": 10,
+        "step": 0.2,
+        "unit": "em",
+        "label": "Border radius (Desktop)",
+        "default": 0
+      },
+      {
+        "type": "range",
+        "id": "text_border_radius_mobile",
+        "min": 0,
+        "max": 10,
+        "step": 0.2,
+        "unit": "em",
+        "label": "Border radius (Mobile)",
+        "default": 0
+      },
+      {
+        "type": "header",
+        "content": "Section Settings"
+      },
+      {
+        "type": "checkbox",
+        "id": "full_width",
+        "label": "Full width (Desktop)",
+        "default": true
+      },
+      {
+        "type": "checkbox",
+        "id": "full_width_mobile",
+        "label": "Full width (Mobile)",
+        "default": true
+      },
+      {
+        "type": "select",
+        "id": "content_vertical_alignment",
+        "label": "Content vertical alignment (Desktop)",
+        "options": [
+          {"value": "start", "label": "Top"},
+          {"value": "center", "label": "Center"},
+          {"value": "end", "label": "Bottom"}
+        ],
+        "default": "start"
+      },
+      {
+        "type": "checkbox",
+        "id": "column_gap",
+        "label": "Column gap"
+      },
+      {
+        "type": "checkbox",
+        "id": "text_overlaps_media",
+        "label": "Text overlaps media",
+        "default": false
+      },
+      {
+        "type": "header",
+        "content": "Padding Desktop"
+      },
+      {
+        "type": "range",
+        "id": "text_padding",
+        "min": 0,
+        "max": 100,
+        "step": 10,
+        "unit": "%",
+        "label": "Inner padding (Desktop)",
+        "default": 100
+      },
+      {
+        "type": "range",
+        "id": "section_padding_top",
+        "min": 0,
+        "max": 100,
+        "step": 10,
+        "unit": "%",
+        "label": "Outer padding top (Desktop)",
+        "default": 0
+      },
+      {
+        "type": "range",
+        "id": "section_padding_bottom",
+        "min": 0,
+        "max": 100,
+        "step": 10,
+        "unit": "%",
+        "label": "Outer padding bottom (Desktop)",
+        "default": 0
+      },
+      {
+        "type": "header",
+        "content": "Padding Mobile"
+      },
+      {
+        "type": "range",
+        "id": "text_padding_mobile",
+        "min": 0,
+        "max": 100,
+        "step": 10,
+        "unit": "%",
+        "label": "Inner padding (Mobile)",
+        "default": 100
+      },
+      {
+        "type": "range",
+        "id": "section_padding_top_mobile",
+        "min": 0,
+        "max": 100,
+        "step": 10,
+        "unit": "%",
+        "label": "Outer padding top (Mobile)",
+        "default": 0
+      },
+      {
+        "type": "range",
+        "id": "section_padding_bottom_mobile",
+        "min": 0,
+        "max": 100,
+        "step": 10,
+        "unit": "%",
+        "label": "Outer padding bottom (Mobile)",
+        "default": 0
+      }
+    ]
+  }
+{% endschema %}

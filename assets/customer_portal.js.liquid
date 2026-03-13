@@ -1,0 +1,42 @@
+if(!customElements.get('customer-address-form')) {
+  class CustomerAddressForm extends HTMLElement {
+    constructor() {
+      super();
+      this.form = this.querySelector('form');
+
+      this.initAddressSelector();
+      this.form.addEventListener('submit', this.onSubmit.bind(this));
+    }
+
+    initAddressSelector() {
+      let countryElement = this.form.querySelector('.country');
+      let provinceElement = this.form.querySelector('.province');
+      new Shopify.CountryProvinceSelector(countryElement.id, provinceElement.id, {hideElement: provinceElement.parentNode.parentNode.id});
+    }
+
+    onSubmit(e) {
+      var error = false;
+      this.form.querySelectorAll('.error').forEach((element)=>{
+        element.classList.remove('error');
+      });
+      this.form.querySelectorAll('.required').forEach((element) => {
+        if(element.value == "" || element.value == "---") {
+          error = true;
+          element.classList.add('error');
+        }
+      });
+      this.form.querySelectorAll('input[maxlength]').forEach((element) => {
+        if(element.value.length > element.getAttribute('maxlength')/1) {
+          error = true;
+          element.classList.add('error');
+        }
+      });
+      if(error) {
+        e.preventDefault();
+        e.stopImmediatePropagation();
+        return false;
+      }
+    }
+  }
+  customElements.define('customer-address-form', CustomerAddressForm);
+}

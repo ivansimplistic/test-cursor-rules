@@ -1,0 +1,45 @@
+
+{%- case media.media_type -%}
+  {%- when 'image' -%}
+    <div class="image-wrap media-wrap" data-media-id="{{media.id}}" data-media-alt="{{ media.alt| escape}}" data-product-id="{{ productObject.id }}" {% if section.settings.desktop_gallery contains 'scrolling' and media.alt contains 'pdp-grid-width' %}style="flex-basis: {{media.alt | split: 'pdp-grid-width' | last | split: ';' | first | remove: ':' | strip}}"{% endif %}>
+      <img src="{% render 'image_placeholder', image: media %}" {% if disableLazySizes %}fetchpriority="high"{% else %} data-{% endif %}srcset="{% render 'lazy_src', image: media %}" data-sizes="auto" data-file="{{media | image_url}}" class="{% unless disableLazySizes %}lazyload{% endunless %}" itemprop="image" alt="{%- unless media.alt contains ':' or media.alt == productObject.title -%}{{media.alt}}{%- endunless -%}" width="{{ media.width }}" height="{{ media.height }}" />
+    </div>
+  {%- when 'video' -%}
+    {%- assign mutedValue = false -%}
+    {%- if section.settings.video_autoplay_muted -%}
+      {%- assign mutedValue = true -%}
+    {%- endif -%}
+    <div class="video-wrap media-wrap" data-media-id="{{media.id}}" data-media-alt="{{ media.alt| escape}}" data-product-id="{{ productObject.id }}" >
+    {{ media | video_tag: controls: true, muted: mutedValue, class: "media", image_size: "1024x" }}
+    </div>
+  {%- when 'external_video' -%}
+    {%- assign mutedValue = '' -%}
+    {%- if section.settings.video_autoplay_muted -%}
+      {%- assign mutedValue = '&muted=1&mute=1' -%}
+    {%- endif -%}                      
+    <div class="iframe-wrap media-wrap" data-media-id="{{media.id}}" data-media-alt="{{ media.alt| escape}}" data-product-id="{{ productObject.id }}" >
+    {%- if media.host == 'youtube' -%}
+      <iframe src="https://www.youtube.com/embed/{{ media.external_id }}?enablejsapi=1{{ mutedValue }}" class="js-youtube media" allow="autoplay; encrypted-media" allowfullscreen title="{{ section.settings.description | escape }}"></iframe>
+    {%- else -%}
+      <iframe src="https://player.vimeo.com/video/{{ media.external_id }}?{{ mutedValue }}" class="js-vimeo media" allow="autoplay; encrypted-media" allowfullscreen title="{{ section.settings.description | escape }}"></iframe>
+    {%- endif -%}
+    </div>
+  {%- when 'model' -%}
+    <div class="model-wrap media-wrap" data-media-id="{{media.id}}" data-media-alt="{{ media.alt| escape}}" data-product-id="{{ productObject.id }}" >
+      <button type="button">
+        <span class="visually-hidden">{{ 'product_main.view_3d_model_label' | t }}</span>
+        <div class="overlay">
+          <div>{% render 'icons', icon: '3d' %}</div>
+        </div>
+        <img src="{% render 'image_placeholder', image: media.preview_image %}" data-srcset="{% render 'lazy_src', image: media.preview_image %}" width="{{  media.preview_image.width }}" height="{{  media.preview_image.height }}" data-sizes="auto" class="lazyload" itemprop="image" alt="{%- unless media.alt contains ':' or media.alt == productObject.title -%}{{media.alt}}{%- endunless -%}" />
+      </button>
+      <template>
+        <product-model class="model-viewer-wrapper flex direction-column" data-product-id="{{ productObject.id }}">
+          {{ media | model_viewer_tag }}
+          <button type="button" class="btn" data-shopify-model3d-id="{{ media.id }}" data-shopify-title="{{ productObject.title | escape }}" data-shopify-xr data-shopify-xr-hidden>
+            <div class="flex justify-content-center">{% render 'icons', icon: '3d' %} {{ 'product_main.model_view_message' | t }}</div>
+          </button>
+        </product-model>
+      </template>
+    </div>
+{%- endcase -%}

@@ -1,0 +1,116 @@
+{%- capture customContent -%}
+  <div class="grid">{% content_for 'blocks' %}</div>
+{%- endcapture -%}
+
+<div class="grid-item accordion-item">
+  {%- render 'richtext_blocks', blockType: 'accordion_item', block: block, customContent: customContent -%}
+</div>
+
+{% schema %}
+{
+  "name": "Accordion",
+  "tag": null,
+  "blocks": [{"type": "@app"}, {"type": "@theme"}],
+  "presets": [
+    {
+      "name": "Accordion",
+      "category": "Content",
+      "blocks": [
+      ]
+    }
+  ],
+  "settings": [
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Title",
+      "default": "Lorem ipsum dolor sit amet?"
+    },
+    {
+      "type": "range",
+      "id": "title_size",
+      "min": 1,
+      "max": 3,
+      "step": 1,
+      "unit": "p",
+      "label": "Title size",
+      "default": 2,
+      "info": "1 = larger. 2 = normal. 3 = smaller."
+    },
+    {
+      "type": "select",
+      "id": "title_style",
+      "label": "Title style",
+      "options": [
+        {"value": "normal","label": "Body"},
+        {"value": "heading-font","label": "Heading"},
+        {"value": "subheading","label": "Subheading"},
+        {"value": "small-label","label": "Small label"}
+      ],
+      "default": "normal"
+    },
+    {
+      "type": "richtext",
+      "id": "content",
+      "label": "Text",
+      "default": "<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus ut tellus nec mi tincidunt imperdiet eget vitae sapien. Integer massa velit, commodo at magna eget, semper vehicula quam. Morbi laoreet tellus at neque blandit, eu congue sem congue. Mauris dapibus est ut ipsum malesuada tincidunt. Curabitur tempus commodo suscipit. Sed eu blandit urna, at porttitor ligula. In maximus lobortis tellus.</p>"
+    },
+    {
+      "type": "range",
+      "id": "text_size",
+      "min": 1,
+      "max": 5,
+      "step": 1,
+      "unit": "p",
+      "label": "Text size",
+      "default": 3
+    },
+    {
+      "type": "checkbox",
+      "id": "accordion_border_top",
+      "label": "Border Top",
+      "default": false
+    },
+    {
+      "type": "checkbox",
+      "id": "accordion_border_bottom",
+      "label": "Border Bottom",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "Image"
+    },
+    {
+      "type": "image_picker",
+      "id": "image",
+      "label": "Image"
+    },
+    {
+      "type": "range",
+      "id": "image_width",
+      "min": 0,
+      "max": 5,
+      "step": 0.5,
+      "unit": "rem",
+      "label": "Width",
+      "default": 2
+    },
+    {
+      "type": "range",
+      "id": "image_border_radius",
+      "min": 0,
+      "max": 10,
+      "step": 0.2,
+      "unit": "em",
+      "label": "Border radius",
+      "default": 0
+    },
+    {
+      "type": "checkbox",
+      "id": "image_border",
+      "label": "Border"
+    }
+  ]
+}
+{% endschema %}

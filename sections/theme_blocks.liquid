@@ -1,0 +1,54 @@
+{{ 'theme_blocks.css' | asset_url | stylesheet_tag }}
+
+{%- capture content -%}
+<div class="scheme color-{{section.settings.section_color_scheme}} ">
+  <div class="grid">
+    {% content_for 'blocks' %}
+  </div>
+</div>
+{%- endcapture -%}
+
+{%- if content contains 'accordion-trigger' -%}
+  {{ 'util_accordion.css' | asset_url | stylesheet_tag }}
+  <script src="{{ 'util_accordion.js' | asset_url }}" defer="defer"></script>
+  {%- capture content -%}
+    <util-accordion class="richtext-wrap" data-expand-multiple="false">
+      {{ content }}
+    </util-accordion>
+  {%- endcapture -%}
+{%- endif -%}
+
+{{ content }}
+
+
+{% schema %}
+{
+  "name": "Theme blocks",
+  "class": "theme-blocks type-theme-blocks",
+  "presets": [
+    {
+      "name": "Theme blocks"
+    },
+    {
+      "name": "Deferred App or Content",
+      "blocks": [
+        {
+          "type": "deferred_content"
+        }
+      ]
+    }
+  ],
+  "settings": [
+    {
+      "type": "color_scheme",
+      "id": "section_color_scheme",
+      "label": "Container color scheme",
+      "default": "scheme-1",
+      "info": "Only visible when the section is not full width, or the section top/bottom paddings are enabled."
+    }
+  ],
+  "blocks": [
+    {"type": "@theme"}
+  ]
+}
+{% endschema %}

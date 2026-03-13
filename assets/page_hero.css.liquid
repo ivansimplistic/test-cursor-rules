@@ -1,0 +1,60 @@
+.page-hero {padding-top: var(--section-padding-top); padding-bottom: var(--section-padding-bottom); overflow: hidden;}
+.page-hero .content-wrapper:not(.container) {position: relative;}
+.page-hero .content-wrapper.container .content {position: relative;}
+.page-hero .content {border-radius: var(--text-border-radius);}
+.page-hero:not(.same-scheme) .content {overflow: hidden;}
+.page-hero .wrap {position: relative; width: 100%; max-width: min(var(--container-width), var(--text-width)); box-sizing: content-box; padding: var(--text-padding) max(2em, calc(var(--text-padding) * 0.8));}
+.page-hero .richtext-wrap {max-width: 100%;}
+.page-hero .badge-wrap.round {position: absolute; right: 1em; top: 1em;}
+.page-hero .back-link svg {margin-right: 0.5em; -webkit-transition: all var(--animation-speed-fast) ease-out; -moz-transition: all var(--animation-speed-fast) ease-out; -o-transition: all var(--animation-speed-fast) ease-out; -ms-transition: all var(--animation-speed-fast) ease-out; transition: all var(--animation-speed-fast) ease-out;}
+.not-mobile .page-hero .back-link:hover svg {-webkit-transform: translateX(-5px); transform: translateX(-5px);}
+
+.page-hero .media-wrap {position: relative; width: 100%; height: calc(var(--image-height) * 0.75); min-height: calc(var(--image-min-height) * 0.75); padding-top: var(--image-padding); border-radius: var(--image-border-radius); overflow: hidden;}
+.page-hero .media {display: block; width: 100%; height: 100%; position: absolute; top: 0; left: 0; object-fit: cover;}
+.page-hero .controls {position: absolute; top: 0; right: 0; z-index: 3; padding: 1em;}
+.page-hero.media-padding .media-column {padding: var(--text-padding) 0;}
+.page-hero.same-scheme .content {background: transparent;}
+
+@media (min-width: {{settings.breakpoint_tablet | plus: 0.001}}em){
+  .page-hero .media-column {width: var(--image-width); align-self: stretch;}
+  .page-hero:not(.background-image-desktop) .content-wrapper:not(.container) .media-column {width: calc(var(--image-width) + max(calc(var(--container-padding) / 2),calc(calc(100% / 2 - var(--container-width) / 2))));}
+  .page-hero.desktop-media-cover .media-wrap {height: 100%;}
+
+  .page-hero.text-padding-correction .row-reverse .wrap {padding-left: 0 !important;}
+  .page-hero.text-padding-correction .normal .wrap {padding-right: 0 !important;}
+  .page-hero.text-padding-correction .row-reverse .media-column {padding-right: 0 !important;}
+  .page-hero.text-padding-correction .normal .media-column {padding-left: 0 !important;}
+  .page-hero.text-padding-correction .no-media .wrap {padding-left: 0 !important; padding-right: 0 !important;}
+
+  .page-hero.media-padding .normal .media-column {padding-left: max(2em, calc(var(--text-padding) * 0.8));}
+  .page-hero.media-padding .row-reverse .media-column {padding-right: max(2em, calc(var(--text-padding) * 0.8));}
+
+  {% capture backgroundImage %}
+    .page-hero.background-image-desktop .media-column {position: absolute; top: 0; left: 0; width: 100%; height: 100%; padding: 0 !important;}
+    .page-hero.background-image-desktop .media-wrap {min-height: unset; height: 100%; padding-top: 0;}
+    .page-hero.background-image-desktop .content {min-height: var(--image-min-height);}
+    .page-hero.background-image-desktop .large--container-left,
+    .page-hero.background-image-desktop .large--container-right {box-sizing: content-box; max-width: var(--container-width); margin: auto; width: auto; padding: 0 var(--container-padding);}
+    .page-hero.background-image-desktop .content-wrapper:not(.container) .wrap {padding-left: 0; padding-right: 0;}
+    .page-hero.background-image-desktop .captions-wrap {padding: var(--text-padding) 0; position: relative; color: var(--text-color); --scheme-icons-color: var(--text-color);}
+    .page-hero.background-image-desktop .captions-wrap .title {color: var(--text-color);}
+    .page-hero.background-image-desktop .captions-wrap > * {position: relative; z-index: 2;}
+    .page-hero.background-image-desktop.tint-full .content-wrapper .content:before,
+    .page-hero.background-image-desktop:not(.tint-full) .captions-wrap:before {content: ''; position: absolute; top: 0; left: 0; bottom: 0; right: 0; background: var(--tint); backdrop-filter: blur(var(--tint-blur, 0px)); z-index: 1; border-radius: var(--tint-border-radius);}
+    .page-hero.background-image-desktop.tint-shadow .captions-wrap:before {background: radial-gradient(var(--tint) 0%, transparent 60%); margin: -15% -20%; border-radius: 0;}
+    .page-hero.background-image-desktop.tint-box .captions-wrap {padding-left: 3em; padding-right: 3em;}
+  {%- endcapture -%}
+  {{backgroundImage}}
+}
+
+@media (max-width: {{settings.breakpoint_tablet}}){
+  .page-hero .wrap {padding-left: var(--container-padding); padding-right: var(--container-padding);}
+  .page-hero .media-column {padding-bottom: 0;}
+
+  .page-hero.media-padding .media-column {padding: var(--container-padding); padding-bottom: 0;}
+
+  .page-hero.same-scheme .container .wrap {padding-left: 0 !important; padding-right: 0 !important;}
+  .page-hero.same-scheme .container .media-column {padding-left: 0 !important; padding-right: 0 !important;}
+
+  {{backgroundImage | replace: 'background-image-desktop', 'background-image-mobile' | replace: 'padding: var(--text-padding);', 'padding: var(--text-padding) var(--container-padding);'}}
+}

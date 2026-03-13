@@ -1,0 +1,12 @@
+{%- if product -%}{% comment %}IMPORTANT: DO NOT REMOVE THIS 'IF' CONDITION, otherwise invalid product handles will display empty product cards{% endcomment %}
+<div class="keen-slider-slide">
+  {%- render 'product_card_atc', productCard: product -%}
+</div>
+{%- endif -%}
+{% schema %}
+    {
+      "name": "Product Card (AJAX)",
+      "class": "product-card-ajax type-product-card-ajax",
+      "settings": []
+    }
+{% endschema %}

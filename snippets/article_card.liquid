@@ -1,0 +1,80 @@
+{%- comment -%}
+    Renders an article card
+
+    Accepts:
+    - article:* {Object} Product Liquid object
+    - ctaLabel: {String} Text to show on the CTA. If blank, the CTA will be hidden.
+    - showAuthor: {Boolean} Shows the article title. Default: true
+    - dateStyle: {String} 'badge round' Shows the badge over the image, with a round style. 'small-label' shows the date under the image with a small-label style. Other option would hide the date. Default: 'badge round'
+    - openNewTab: {Boolean} Opens the article in a new tab. Default: false
+    - excerptWords: {Number} Truncates the description. If 0, the description is hidden. If 100, the description will not be truncated. Default: 30
+    - showTags: {Boolean} Shows all the tags of the article at the bottom. Default: true
+
+    Usage:
+    {%- render 'article_card', article: article -%}
+
+{%- endcomment -%}
+
+{%- liquid
+  assign ctaLabel = ctaLabel | default: settings.article_card_cta_label
+  assign showAuthor = showAuthor | default: settings.article_card_show_author
+  assign dateStyle = dateStyle | default: settings.article_card_date_style
+  assign openNewTab = openNewTab | default: settings.article_card_open_new_tab, allow_false: true
+  assign excerptWords = excerptWords | default: settings.article_card_truncate_words | replace: 100, 5000 | times: 1
+  assign showTags = showTags | default: settings.article_card_show_tags, allow_false: true
+  assign border = border | default: settings.product_card_border, allow_false: true
+  assign contentColorScheme = section.settings.content_color_scheme | append: '' | default: 'scheme-1'
+  assign cardsColorScheme = section.settings.cards_color_scheme | append: '' | default: 'scheme-1'
+-%}
+
+<div class="article-card common-card text-{{settings.article_card_text_align}} {% if settings.article_card_border %}scheme-border-box{% endif %} {% if settings.article_card_image_full_width %}image-full-width{% endif %} {% if cardsColorScheme != blank %}scheme color-{{cardsColorScheme}}{% endif %} same-scheme-{%- if cardsColorScheme == contentColorScheme -%}true{%- else -%}false{%- endif -%}">
+  <div class="image-container">
+    <div class="img ease-animation-slow {% if article.image %}lazyload{% endif %}" {% if article.image %}data-bgset="{% render 'lazy_src', image: article.image  %}"{% endif %}></div>
+    {%- if dateStyle contains 'badge' -%}
+      <div class="date {{ dateStyle }}">
+        <span>{{ article.published_at | date: "%d" }}</span>
+        <span>{{ article.published_at | date: "%b" }}</span>
+      </div>
+    {%- endif -%}
+  </div>
+  <div class="info">
+    {%- if dateStyle == 'small-label' -%}
+      <div class="date {{ dateStyle }}">
+        {{ article.published_at | date: "%d" }}
+        {{ article.published_at | date: "%B" }}
+        {{ article.published_at | date: "%Y" }}
+      </div>
+    {%- endif -%}
+    <a href="{{ article.url }}" class="title {{settings.article_card_title_font_family}} no-highlight-hover" {% if openNewTab %}target="_blank"{% endif %}>{{ article.title }}</a>
+    {%- if showAuthor -%}
+      <div class="author small-label">
+        {{ 'article_card.author_title' | t: author_name: article.author }}
+      </div>
+    {%- endif -%}
+    {%- if excerptWords > 0 -%}
+    <div class="text-wrapper">
+      <div class="excerpt">
+        {%- if article.excerpt != blank -%}
+        <p>{{ article.excerpt | replace: '<br>', '|*|' | replace: '</h1>', '|*|' | replace: '</h2>', '|*|' | replace: '</h3>', '|*|' | replace: '</li>', '|*|' | replace: '</p>', '|*|' | strip_html | replace: '|*|', '. ' | replace: '...', '.' | replace: '..', '.' | replace: '. . .', '.' | replace: '. .', '.' | truncatewords: excerptWords }}</p>
+        {%- else -%}
+        <p>{{ article.content | replace: '<br>', '|*|' | replace: '</h1>', '|*|' | replace: '</h2>', '|*|' | replace: '</h3>', '|*|' | replace: '</li>', '|*|' | replace: '</p>', '|*|' | strip_html | replace: '|*|', '. ' | replace: '...', '.' | replace: '..', '.' | replace: '. . .', '.' | replace: '. .', '.' | truncatewords: excerptWords }}</p>
+        {%- endif -%}
+      </div>
+      {%- if ctaLabel != blank -%}
+        {%- assign linkIcon = blank -%}
+        {%- if settings.article_card_cta_label_style contains 'link' and settings.links_arrow != 'none' -%}
+          {%- capture linkIcon -%}{%- render 'icons', icon: settings.links_arrow -%}{%- endcapture -%}
+        {%- endif -%}
+        <span class="{{settings.article_card_cta_label_style}}">{{ctaLabel}}{{linkIcon}}</span>
+      {%- endif -%}
+    </div>
+    {%- endif -%}
+    {%- if showTags and article.tags.size > 0 -%}
+      <div class="tags flex flex-wrap justify-content-{{settings.article_card_text_align | replace: 'left', 'start' | replace: 'right', 'end'}}">
+        {%- for tag in article.tags -%}
+        <div class="badge">{{tag}}</div>
+        {%- endfor -%}
+      </div>
+    {%- endif -%}
+  </div>
+</div>

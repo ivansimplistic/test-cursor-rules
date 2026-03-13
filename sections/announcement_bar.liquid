@@ -1,0 +1,279 @@
+{%- if settings.show_currency_selector_header or settings.show_language_selector_header -%}
+  {%- assign showToolbar = true -%}
+{%- endif -%}
+{%- if showToolbar or section.blocks.size > 0 -%}
+  <style>
+    #shopify-section-{{section.id}} {position: relative; z-index: 101;}
+    .announcement-bar {display: block; line-height: 1.2;}
+    .announcement-bar .content-wrapper {padding: {{section.settings.padding_desktop}}rem 0;}
+    .announcement-bar .content {line-height: 1.2; font-weight: {{section.settings.font_weight}}; text-transform: {{section.settings.transform}}; letter-spacing: {{section.settings.letter_spacing | divided_by: 10.00}}em;}
+    {%- if section.blocks.size > 1 -%}
+      .announcement-bar .content {opacity: 0;}
+      .announcement-bar .keen-slider-slide {flex-shrink: 0;}
+      .announcement-bar .active .content {opacity: 1;}
+      .announcement-bar.text-left .keen-arrow.prev {display: none !important;}
+      .announcement-bar .keen-arrow {font-size: 0.9em; padding: 1em; margin-top: -1em !important;}
+      .not-mobile .announcement-bar .keen:hover .keen-arrows.sides.inside.animate .keen-arrow.prev {left: -0.6em;}
+      .not-mobile .announcement-bar .keen:hover .keen-arrows.sides.inside.animate .keen-arrow.next {right: -0.6em;}
+    {%- endif -%}
+    .announcement-bar .toolbar > :not(:last-child) {margin-right: 0.5em;}
+    .announcement-bar .toolbar {margin-right: 2em;}
+    @media (max-width: {{settings.breakpoint_mobile}}) {
+      .announcement-bar .content-wrapper {padding: {{section.settings.padding_mobile}}rem 0;}
+    }
+  </style>
+  <announcement-bar class="announcement-bar {% if showToolbar %}text-left medium-down--{{section.settings.text_alignment}}{% else %}{{section.settings.text_alignment}}{% endif %} scheme color-{{section.settings.color_scheme}} {% if section.settings.border %}scheme-border-bottom{% endif %}" role="region" aria-label="{{ 'announcement_bar.caption' | t | escape }}">
+    <div class="container flex align-items-center">
+      <div class="column flex-1">
+        <div class="keen">
+          <div class="content-wrapper {% if section.blocks.size > 1 %}keen-slider{% endif %} align-items-center">
+            {%- for block in section.blocks -%}
+              {%- if block.settings.text != blank and block.settings.text != '<p></p>' -%}
+                <div class="keen-slider-slide" {{ block.shopify_attributes }}>
+                  {%- unless block.settings.text contains '<a' or block.settings.link == blank  -%}
+                    <a href="{{ block.settings.link }}">
+                  {%- endunless -%}
+                  <div class="content ease-animation-slow {{section.settings.text_size | prepend: 'p'}} {{section.settings.font_style}}">
+                    {{block.settings.text}}
+                  </div>
+                  {%- unless block.settings.text contains '<a' or block.settings.link == blank  -%}
+                    </a>
+                  {%- endunless -%}
+                </div>
+              {%- endif -%}
+            {%- endfor -%}
+          </div>
+          {%- if section.blocks.size > 1 and section.settings.show_arrows -%}
+            <div class="keen-arrows medium-down--hide sides inside {{ settings.carousel_arrows_effect }}">
+              {% render 'carousel_arrow', type: 'prev', frame: 'normal' %}
+              {% render 'carousel_arrow', type: 'next', frame: 'normal' %}
+            </div>
+          {%- endif -%}
+        </div>
+      </div>
+      {%- if showToolbar -%}
+        <div class="column medium-down--hide flex toolbar">
+          {%- if settings.show_currency_selector_header -%}
+            {%- render 'currency_selector' -%}
+          {%- endif -%}
+          {%- if settings.show_language_selector_header -%}
+            {%- render 'language_selector' -%} 
+          {%- endif -%}
+        </div>
+      {%- endif -%}
+    </div>
+  </announcement-bar>
+  {%- if section.blocks.size > 1 -%}
+    <script type="module">
+      if(!customElements.get('announcement-bar')) {
+        class ComponentAnnouncementBar extends HTMLElement {
+          constructor() {
+            super();
+
+            this.slidesWrapper = this.querySelector('.keen-slider');
+            this.slides = this.slidesWrapper.children;
+            this.carousel = false;
+
+            setTimeout(()=>{ //The timeout is for the customizer
+              this.initCarousel();
+            }, 1);
+
+            this.bindCustomizerEvents();
+          }
+
+          initCarousel() {
+            if(this.slides.length > 1) {
+              this.carousel = new KeenSlider(this.slidesWrapper, {
+                mode: "free-snap",
+                autoplay: {{section.settings.autoplay}},
+                duration: 700,
+                slidesPerView: 1,
+                {% if section.settings.show_arrows -%}
+                prevButton: this.querySelector('.keen-arrow.prev'),
+                nextButton: this.querySelector('.keen-arrow.next'),
+                {%- endif %}
+                loop: true
+              });
+            } else {
+              this.slidesWrapper.classList.add('initialized');
+            }
+          }
+
+          bindCustomizerEvents() {
+            if(Shopify.designMode) {
+              this.addEventListener('shopify:block:select', (e)=>{
+                let index = Array.from(this.slides).findIndex(x=>x==e.target);
+                if(index>=0) {
+                  setTimeout(()=>{
+                    this.carousel.moveToSlideRelative(index, true, 0)
+                  }, 10);
+                }
+              });
+            }
+          }
+        }
+        customElements.define('announcement-bar', ComponentAnnouncementBar);
+      }
+    </script>
+  {%- endif -%}
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "Announcement Bar",
+  "class": "type-announcement-bar",
+  "settings": [
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "Color scheme",
+      "default": "scheme-3"
+    },
+    {
+      "type": "checkbox",
+      "id": "border",
+      "label": "Border bottom"
+    },
+    {
+      "type": "select",
+      "id": "text_alignment",
+      "label": "Text alignment",
+      "options": [
+        {
+          "value": "text-left",
+          "label": "Left"
+        },
+        {
+          "value": "text-center",
+          "label": "Center"
+        }
+      ],
+      "default": "text-center",
+      "info": "Center alignment only works if the Currency or Language selectors are not in the Header."
+    },
+    {
+      "type": "range",
+      "id": "text_size",
+      "min": 1,
+      "max": 5,
+      "step": 1,
+      "unit": "p",
+      "label": "Text size",
+      "default": 3
+    },
+    {
+      "type": "select",
+      "id": "font_style",
+      "label": "Font family",
+      "options": [
+        {"value": "body-font", "label": "Body"},
+        {"value": "heading-font", "label": "Headings"}
+      ],
+      "default": "body-font"
+    },
+    {
+      "type": "range",
+      "id": "font_weight",
+      "min": 100,
+      "max": 900,
+      "step": 100,
+      "unit": "%",
+      "label": "Font weight",
+      "default": 400
+    },
+    {
+      "type": "select",
+      "id": "transform",
+      "label": "Capitalization",
+      "options": [
+        {
+          "value": "none",
+          "label": "Natural"
+        },
+        {
+          "value": "uppercase",
+          "label": "Uppercase"
+        }
+      ],
+      "default": "none"
+    },
+    {
+      "type": "range",
+      "id": "letter_spacing",
+      "min": -0.5,
+      "max": 2,
+      "step": 0.1,
+      "unit": "em",
+      "label": "Letter spacing",
+      "default": 0,
+      "info": "This value will be divided by 10, so 0.5 is 0.05em."
+    },
+    {
+      "type": "range",
+      "id": "padding_desktop",
+      "min": 0,
+      "max": 3,
+      "step": 0.1,
+      "default": 0.6,
+      "unit": "rem",
+      "label": "Padding (Desktop)"
+    },
+    {
+      "type": "range",
+      "id": "padding_mobile",
+      "min": 0,
+      "max": 3,
+      "step": 0.1,
+      "default": 0.6,
+      "unit": "rem",
+      "label": "Padding (Mobile)"
+    },
+    {
+      "type": "header",
+      "content": "Carousel settings"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_arrows",
+      "label": "Show Arrows",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "autoplay",
+      "min": 0,
+      "max": 15,
+      "step": 1,
+      "unit": "s",
+      "label": "Autoplay interval",
+      "default": 8
+    }
+  ],
+  "blocks": [
+    {
+      "type": "announcement",
+      "name": "Line",
+      "settings": [
+        {
+          "type": "richtext",
+          "id": "text",
+          "label": "Text",
+          "default": "<p>Welcome to our store<\/p>"
+        },
+        {
+          "type": "url",
+          "id": "link",
+          "label": "Link"
+        }
+      ]
+    }
+  ],
+  "default": {
+    "blocks": [
+      {
+        "type": "announcement"
+      }
+    ]
+  }
+}
+{% endschema %}

@@ -1,0 +1,31 @@
+{
+  "sections": {
+    "search_main": {
+      "type": "search_main",
+      "blocks": {
+        "breadcrumb": {
+          "type": "breadcrumb",
+          "settings": {
+          }
+        }
+      },
+      "block_order": [
+        "breadcrumb"
+      ],
+      "settings": {
+      }
+    },
+    "featured_products": {
+      "type": "featured_products",
+      "settings": {
+        "collection": "all",
+        "title": "Need some inspiration?",
+        "title_size": 2
+      }
+    }
+  },
+  "order": [
+    "search_main",
+    "featured_products"
+  ]
+}

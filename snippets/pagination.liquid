@@ -1,0 +1,40 @@
+{%- if paginate.pages > 1 -%}
+<div class="pagination">
+  <div class="flex flex-wrap align-items-center justify-content-center">
+    {%- if paginate.previous -%}
+      <a class="prev" href="{{ paginate.previous.url | url_decode }}">&laquo; {{ 'pagination.previous_button' | t }}</a>
+    {%- else -%}
+      <a class="prev disabled" aria-hidden="true">&laquo; {{ 'pagination.previous_button' | t }}</a>
+    {%- endif -%}
+    
+    <nav class="pages flex flex-wrap align-items-center justify-content-center">
+    {%- for part in paginate.parts -%}
+      {%- if part.is_link -%}
+    	<a class="a" href="{{ part.url | url_decode }}">
+        <span class="visually-hidden">{{ 'pagination.page_caption' | t | escape }} {{ part.title }}</span>
+        <span aria-hidden="true">{{ part.title }}</span>        
+      </a>
+      {%- else -%}
+        {%- if part.title == '&hellip;' -%}
+        <a class="a ellipsis disabled" aria-hidden="true">{{ part.title }}</a>
+        {%- else -%}
+        <span class="visually-hidden">{{ 'pagination.current_page_caption' | t | escape }}: {{ part.title }}</span>
+        <span class="a active" aria-hidden="true">{{ part.title }}</span>        
+        {%- endif -%}
+      {%- endif -%}
+    {%- endfor -%}
+    </nav>
+
+    {%- if paginate.next -%}
+      <a class="next" href="{{ paginate.next.url | url_decode  }}">{{ 'pagination.next_button' | t }} &raquo;</a>
+    {%- else -%}
+      <a class="next disabled" aria-hidden="true">{{ 'pagination.next_button' | t }} &raquo;</a>
+    {%- endif -%}    
+  </div>
+  {%- capture currentItems =  -%}
+    {{ paginate.current_offset | plus: 1 }}-{% if paginate.next %}{{ paginate.current_offset | plus: paginate.page_size }}{% else %}{{ paginate.items }}{% endif %}
+  {%- endcapture -%}
+  {%- assign totalItems = paginate.items -%}
+  <div class="pagination-num-showing text-center">{{ 'pagination.showing_items_label' | t: current_items: currentItems, total_items: totalItems  }}</div>
+</div>
+{%- endif -%}

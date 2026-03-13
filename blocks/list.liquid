@@ -1,0 +1,56 @@
+<div class="grid-item">
+  {%- render 'richtext_blocks', blockType: 'content_list', block: block -%}
+</div>
+{% schema %}
+{
+  "name": "List",
+  "tag": null,
+  "presets": [
+    {
+      "name": "List",
+      "category": "Content",
+      "blocks": [
+      ]
+    }
+  ],
+  "settings": [
+    {
+      "type": "richtext",
+      "id": "list",
+      "label": "List",
+      "default": "<p>Lorem ipsum dolor sit amet</p><p>Consectur adipiscing elit</p><p>Cras tempus finibus mi at aliquet orci</p>"
+    },
+    {
+      "type": "select",
+      "id": "list_style",
+      "label": "List style",
+      "options": [
+        {"value": "disc","label": "Bullets"},
+        {"value": "decimal","label": "Numeric"}
+      ],
+      "default": "disc"
+    },
+    {
+      "type": "select",
+      "id": "text_style",
+      "label": "Text style",
+      "options": [
+        {"value": "normal","label": "Body"},
+        {"value": "subheading","label": "Subheading"},
+        {"value": "small-label","label": "Small label"}
+      ],
+      "default": "normal"
+    },
+    {
+      "type": "range",
+      "id": "text_size",
+      "min": 1,
+      "max": 5,
+      "step": 1,
+      "unit": "p",
+      "label": "Text size",
+      "default": 3
+    }
+  ]
+}
+{% endschema %}

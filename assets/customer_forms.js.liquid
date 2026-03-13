@@ -1,0 +1,50 @@
+function showRecoverPasswordForm() {
+  document.getElementById('customer-recover-password').style.display = 'block';
+  document.getElementById('customer-login').style.display='none';
+}
+function hideRecoverPasswordForm() {
+  document.getElementById('customer-recover-password').style.display = 'none';
+  document.getElementById('customer-login').style.display = 'block';
+}
+if (window.location.hash.indexOf('recover') > 0) {
+  showRecoverPasswordForm();
+  if ($s.getQueryParam('email')) {
+    document.querySelector('#customer-recover-password input.email').value = $s.getQueryParam('email');
+  }
+}
+
+document.querySelectorAll('.customer-form-page form').forEach((form)=>{
+  form.addEventListener('submit', (e)=>{
+    var error = false;
+    form.querySelectorAll('.error').forEach((element)=>{
+      element.classList.remove('error');
+    });
+    form.querySelectorAll('.required').forEach((element)=>{
+      if(element.value=="") {
+        error = true;
+        element.classList.add('error');
+        form.querySelector('.error-msg').innerHTML = lngg.general__forms__complete_all_the_fields_message;
+      }
+    });
+    if(!error && form.querySelector('.email')) {
+      if(!$s.validateEmail(form.querySelector('.email').value)) {
+        error = true;
+        form.querySelector('.email').classList.add('error');
+        form.querySelector('.error-msg').innerHTML = lngg.general__forms__enter_a_valid_email_message;
+      }
+    }
+    if(!error && form.querySelector('[name="customer[password_confirmation]"]')) {
+      if(form.querySelector('[name="customer[password]"]').value != form.querySelector('[name="customer[password_confirmation]"]').value) {
+        error = true;
+        form.querySelector('[name="customer[password_confirmation]"]').classList.add('error');
+        form.querySelector('.error-msg').innerHTML = lngg.general__forms__confirmation_password_must_match_message;
+      }
+    }
+    if(error) {
+      e.preventDefault();
+      e.stopImmediatePropagation();
+      form.querySelector('.error-msg').style.display = 'block';
+      return false;
+    }
+  });
+});

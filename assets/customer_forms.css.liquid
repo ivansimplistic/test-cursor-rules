@@ -1,0 +1,24 @@
+#main-content {display: flex; flex-direction: column;}
+.customer-form-page {flex: 1;}
+
+.customer-form-page {padding: 4em 0;}
+.customer-form-page .container {max-width: 50rem;}
+.customer-form-page .container > *:not(:last-child) {margin-bottom: 3em;}
+.customer-form-page .btn {width: 100%; margin-bottom: 1em;}
+.customer-form-page .field {margin-bottom: 1em;}
+.customer-form-page .errors ul {margin-bottom: 1em; list-style-type: none; padding: 0; color: {{settings.color_error}};}
+.customer-form-page .note {margin-bottom: 1.5em;}
+#customer-recover-password {display: none;}
+
+.customer-form-page .error-msg:empty {display: none;}
+.customer-form-page .errors,
+.customer-form-page .error-msg,
+.customer-form-page .success-msg {margin-bottom: 1em;}
+
+.customer-portal-menu .help-link {margin: 2rem 0 0.5em;}
+.customer-portal-menu .help-link svg {margin-right: 0.5em; margin-top: 0.3em;}
+.customer-portal-menu .help-link a {display: inline; padding: 0;}
+
+@media (max-width: {{settings.breakpoint_tablet}}){
+  .customer-form-page {padding: 2em 0;}
+}

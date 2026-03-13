@@ -1,0 +1,72 @@
+{%- if submenuClass contains 'slide' -%}
+<div class="item back-item">
+  <div class="item-inner flex align-items-center justify-content-start">
+    <button class="back-button" aria-label="{{ 'mobile_menu.navigation_back_caption' | t | escape }}">
+      {%- render 'icons', icon: 'chevron-left' -%}
+    </button>
+    <div class="item-padding">
+      <span class="back-text subheading" onclick="this.closest('.item-inner').querySelector('button').click();">{{ 'mobile_menu.navigation_back_label' | t }}</span>
+    </div>
+  </div>
+</div>
+{%- endif -%}
+{%- for child_link in parent_link.links -%}
+  {%- assign hasBlock = false -%}
+  {%- if section.blocks.size > 0 -%}
+    {%- capture blocksContent -%}
+      {%- for block in section.blocks -%}
+        {%- assign customIcon = false -%}
+        {%- if block.settings.parent_link == child_link.title -%}
+          {%- if block.type == 'icon' -%}
+            {%- assign customIcon = true -%}
+            {%- render 'icons', icon: block.settings.icon -%}
+            {%- break -%}
+          {%- else -%}
+            {%- assign hasBlock = true -%}
+          {%- endif -%}
+          {%- if block.type == 'featured_banner' -%}
+            <div class="grid-item {{block.settings.width}} block-{{block.id}}">
+              <style>#mobile-menu .block-{{block.id}} {--img-simple-border-radius: {{block.settings.image_border_radius}}em;}</style>
+              {% render 'img_simple_overlay', imageLink: block.settings.image_link, image: block.settings.image, text: block.settings.image_text, textShadow: block.settings.image_text_shadow, colorScheme: block.settings.image_text_color, textPosition: block.settings.image_text_position, textAlign: block.settings.image_text_align, cta: block.settings.image_cta, ctaStyle: block.settings.image_cta_style %}
+            </div>
+          {%- endif -%}
+          {%- if block.type == 'button' -%}
+            <div class="grid-item {{block.settings.width}} block-{{block.id}} flex align-items-center">
+              <a href="{{block.settings.button_link}}" class="{{block.settings.cta_style}} {% if block.settings.cta_style contains 'btn' %}{{section.settings.cta_size}}{% endif %}">{{block.settings.button}}</a>
+            </div>
+          {%- endif -%}
+        {%- endif -%}
+      {%- endfor -%}
+    {%- endcapture -%}
+  {%- endif -%}
+  <div class="item{% if child_link.links != blank or hasBlock %} has-dropdown{% endif %}">
+    <div class="item-inner flex align-items-center justify-content-between">
+      {%- assign linkUrlLastChar = child_link.url | slice: -1 -%}
+      <a class="flex item-padding" href="{{ child_link.url }}" {% if linkUrlLastChar == '#' %}role="button" tabindex="-1" data-notab="1" onclick="this.parentNode.querySelector('button').click(); return false;"{% endif %}>
+        {%- assign titlePart = child_link.title | split: '**' -%}
+        <div class="flex flex-wrap align-items-center">
+          <span>{{ titlePart[0] | strip }}</span> {%- if titlePart.size > 1 -%}<div class="badge smaller {{titlePart[1] | handle}}">{{titlePart[1] | strip}}</div>{%- endif -%}
+        </div>
+      </a>
+      {%- if child_link.links != blank or hasBlock -%}
+        <button aria-expanded="false" aria-label="{{ 'mobile_menu.toggle_submenu_caption' | t: submenu_title: titlePart[0] | escape }}">{%- render 'icons', icon: arrowIcon -%}</button>
+      {%- elsif customIcon -%}
+        {{blocksContent}}
+      {%- endif -%}
+    </div>
+    {%- if child_link.links != blank or hasBlock -%}
+    <div class="submenu {{submenuClass}} scheme color-{{settings.modals_main_color_scheme}}">
+      <div class="submenu-inner">
+        {%- render 'mobile_menu_level', parent_link: child_link, submenuClass: submenuClass, arrowIcon: arrowIcon -%}
+        {%- if hasBlock -%}
+          <div class="featured-banners">
+            <div class="grid">
+              {{blocksContent}}
+            </div>
+          </div>
+        {%- endif -%}
+      </div>
+    </div>
+    {%- endif -%}
+  </div>
+{%- endfor -%}

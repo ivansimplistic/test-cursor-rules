@@ -1,0 +1,55 @@
+{%- assign orders = customer.orders -%}
+{%- if orderLimit > 0 -%}
+  {%- assign orders = orders | slice: 0, orderLimit -%}
+{%- endif -%}
+
+<div class="order-history">
+  <div id="order-history"></div>
+  {%- if customer.orders.size != 0 -%}
+    <div class="table orders">
+      <div class="small--hide">
+        <div class="order-number">{{ 'account.order_history.order_column_title' | t }}</div>
+        <div class="date">{{ 'account.order_history.date_column_title' | t }}</div>
+        <div class="payment-status">{{ 'account.order_history.payment_status_column_title' | t }}</div>
+        <div class="fulfillment-status">{{ 'account.order_history.fulfillment_status_column_title' | t }}</div>
+        <div class="total">{{ 'account.order_history.total_column_title' | t }}</div>
+        <div class="tracking-link">{{ 'account.order_history.tracking_column_title' | t }}</div>
+      </div>
+      {%- for order in customer.orders limit: orderLimit -%}
+        <div class="{% cycle 'odd', 'even' %}">
+          <div><strong class="hide small--inline-block">{{ 'account.order_history.order_column_title' | t }}:</strong> <a href="{{order.customer_url}}" class="link">{{ order.name }}</a> {% if order.cancelled %}<span>{{ 'account.order_history.status_cancelled_label' | t }}</span>{% endif %}</div>
+          <div><strong class="hide small--inline-block">{{ 'account.order_history.date_column_title' | t }}:</strong> {{ order.created_at | date: "%b %d, %Y" }}</div>
+          <div><strong class="hide small--inline-block">{{ 'account.order_history.payment_status_column_title' | t }}:</strong> {{ order.financial_status | capitalize }}</div>
+          <div><strong class="hide small--inline-block">{{ 'account.order_history.fulfillment_status_column_title' | t }}:</strong> {{ order.fulfillment_status | capitalize }}</div>
+          <div><strong class="hide small--inline-block">{{ 'account.order_history.total_column_title' | t }}:</strong> {{ order.total_price | money }}</div>
+          <div><strong class="hide small--inline-block">{{ 'account.order_history.tracking_column_title' | t }}:&nbsp;</strong>
+            {%- liquid
+              assign trackingUrl = ''
+              assign trackingNumber = ''
+              assign moreTracking = ''
+              for line_item in order.line_items
+                if line_item.fulfillment and line_item.fulfillment.tracking_number != blank
+                  if trackingNumber == blank
+                    assign trackingUrl = line_item.fulfillment.tracking_url
+                    assign trackingNumber = line_item.fulfillment.tracking_number
+                  else
+                    assign moreTracking = 'account.order.other_tracking_numbers_label' | t
+                    break
+                  endif
+                endif
+              endfor
+            -%}
+            {%- if trackingNumber != blank -%}
+              <a href="{{ trackingUrl }}" target="_blank" class="link" tabindex="-1" aria-hidden="true">{{ trackingNumber }}</a>
+              {% if moreTracking != blank %}<br /><a href="{{order.customer_url}}" class="link" tabindex="-1" aria-hidden="true"> {{ moreTracking }}</a>{% endif %}
+            {%- else -%}
+              {{ 'account.order_history.tracking_unavailable' | t }}
+            {%- endif -%}
+          </div>
+        </div>
+      {%- endfor -%}
+    </div>
+  {%- else -%}
+    <p>{{ 'account.order_history.no_orders_message' | t }}</p>
+  {%- endif -%}
+</div>
